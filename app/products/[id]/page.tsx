@@ -95,47 +95,49 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
       {/* Mobile Layout */}
       <div className="lg:hidden">
-        {/* Hero Image - Full width */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="relative w-full aspect-square bg-gradient-to-br from-pink-50 to-rose-50"
-        >
-          <Image
-            src={allImages[selectedImage]}
-            alt={product.imageAlt || product.name}
-            fill
-            className="object-cover"
-            priority
-          />
-          {product.discount > 0 && (
-            <motion.div
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg"
-            >
-              {product.discount}% OFF
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Image Thumbnails - Full width scroll */}
-        {allImages.length > 1 && (
-          <div className="flex gap-2 overflow-x-auto px-4 py-3 bg-gray-50 border-b scrollbar-hide">
-            {allImages.map((img, idx) => (
-              <motion.button
-                key={idx}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => setSelectedImage(idx)}
-                className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all ${
-                  selectedImage === idx ? 'border-pink-500 shadow-md' : 'border-gray-200'
-                }`}
+        {/* Hero Image - Full width with overlapping thumbnails */}
+        <div className="relative">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="relative w-full aspect-square bg-gradient-to-br from-pink-50 to-rose-50"
+          >
+            <Image
+              src={allImages[selectedImage]}
+              alt={product.imageAlt || product.name}
+              fill
+              className="object-cover"
+              priority
+            />
+            {product.discount > 0 && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold shadow-lg"
               >
-                <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
-              </motion.button>
-            ))}
-          </div>
-        )}
+                {product.discount}% OFF
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Image Thumbnails - Overlapping bottom */}
+          {allImages.length > 1 && (
+            <div className="absolute bottom-4 left-0 right-0 flex gap-2 overflow-x-auto px-4 scrollbar-hide">
+              {allImages.map((img, idx) => (
+                <motion.button
+                  key={idx}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => setSelectedImage(idx)}
+                  className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all backdrop-blur-sm ${
+                    selectedImage === idx ? 'border-pink-500 shadow-lg ring-2 ring-white' : 'border-white/80 opacity-70 hover:opacity-100'
+                  }`}
+                >
+                  <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
+                </motion.button>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Product Content */}
         <div className="px-4 py-4 space-y-4">
@@ -235,41 +237,43 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="grid md:grid-cols-2 gap-12">
           {/* Images Section */}
           <div className="space-y-4">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="relative aspect-square bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl overflow-hidden"
-            >
-              <Image
-                src={allImages[selectedImage]}
-                alt={product.imageAlt || product.name}
-                fill
-                className="object-cover"
-                priority
-              />
-              {product.discount > 0 && (
-                <div className="absolute top-6 right-6 bg-red-500 text-white px-4 py-2 rounded-full text-base font-bold shadow-lg">
-                  {product.discount}% OFF
+            <div className="relative">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative aspect-square bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl overflow-hidden"
+              >
+                <Image
+                  src={allImages[selectedImage]}
+                  alt={product.imageAlt || product.name}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+                {product.discount > 0 && (
+                  <div className="absolute top-6 right-6 bg-red-500 text-white px-4 py-2 rounded-full text-base font-bold shadow-lg">
+                    {product.discount}% OFF
+                  </div>
+                )}
+              </motion.div>
+
+              {/* Image Thumbnails - Overlapping bottom */}
+              {allImages.length > 1 && (
+                <div className="absolute bottom-6 left-6 right-6 flex gap-3">
+                  {allImages.map((img, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => setSelectedImage(idx)}
+                      className={`relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all backdrop-blur-sm ${
+                        selectedImage === idx ? 'border-pink-500 shadow-lg ring-2 ring-white scale-105' : 'border-white/80 opacity-70 hover:opacity-100 hover:scale-105'
+                      }`}
+                    >
+                      <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
+                    </button>
+                  ))}
                 </div>
               )}
-            </motion.div>
-
-            {/* Image Thumbnails */}
-            {allImages.length > 1 && (
-              <div className="flex gap-3">
-                {allImages.map((img, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => setSelectedImage(idx)}
-                    className={`relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
-                      selectedImage === idx ? 'border-pink-500 shadow-md' : 'border-gray-200 hover:border-pink-300'
-                    }`}
-                  >
-                    <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
-                  </button>
-                ))}
-              </div>
-            )}
+            </div>
           </div>
 
           {/* Product Details */}
