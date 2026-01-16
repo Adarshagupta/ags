@@ -2,8 +2,11 @@
 
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import Header from '@/components/Header'
+import SkeletonLoader from '@/components/SkeletonLoader'
+import { useUserStore } from '@/lib/store/user'
 import { formatPrice } from '@/lib/utils'
 
 const orderStatuses = [
@@ -17,20 +20,35 @@ const orderStatuses = [
 
 export default function OrderTrackingPage() {
   const params = useParams()
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const { user, _hasHydrated } = useUserStore()
   const [order, setOrder] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
+    // Wait for session to load
+    if (status === 'loading' || !_hasHydrated) return
+
+    // Redirect to login if not authenticated
+    if (status === 'unauthenticated' || !user) {
+      router.push('/login')
+      return
+    }
+
     fetchOrder()
     
     // Poll for updates every 5 seconds
     const interval = setInterval(fetchOrder, 5000)
     return () => clearInterval(interval)
-  }, [params.id])
+  }, [params.id, status, user, _hasHydrated])
 
   const fetchOrder = async () => {
     try {
-      const response = await fetch(`/api/orders/${params.id}`)
+      const token = localStorage.getItem('token') || (session?.user as any)?.token
+      const response = await fetch(`/api/orders/${params.id}`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      })
       const data = await response.json()
       if (response.ok) {
         setOrder(data.order)
@@ -44,8 +62,12 @@ export default function OrderTrackingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="spinner w-12 h-12" />
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
+          <SkeletonLoader variant="order" />
+          <SkeletonLoader variant="text" count={3} />
+        </div>
       </div>
     )
   }

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
 import Header from '@/components/Header'
+import SkeletonLoader from '@/components/SkeletonLoader'
 import { useCartStore } from '@/lib/store/cart'
 
 interface Product {
@@ -92,8 +93,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div>
+      <div className="min-h-screen bg-white pb-20 lg:pb-0">
+        <Header />
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <SkeletonLoader variant="product" />
+        </div>
       </div>
     )
   }

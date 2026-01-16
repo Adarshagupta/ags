@@ -1,15 +1,16 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart'
 import { useLocationStore } from '@/lib/store/location'
 import { useUserStore } from '@/lib/store/user'
 import { formatPrice } from '@/lib/utils'
-import Header from '@/components/Header'
 import LocationPicker from '@/components/LocationPicker'
 import BottomNav from '@/components/BottomNav'
+import SkeletonLoader from '@/components/SkeletonLoader'
+import SessionSync from '@/components/SessionSync'
 
 interface GiftWrap {
   id: string
@@ -38,6 +39,10 @@ export default function CheckoutPage() {
   const { deliveryAddress } = useLocationStore()
   const { user, _hasHydrated } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [orderPlaced, setOrderPlaced] = useState(false)
+  const [addressesLoading, setAddressesLoading] = useState(true)
+  const [giftDataLoading, setGiftDataLoading] = useState(true)
+  const [showMobileSummary, setShowMobileSummary] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'ONLINE'>('CASH')
   const [giftWraps, setGiftWraps] = useState<GiftWrap[]>([])
   const [occasions, setOccasions] = useState<Occasion[]>([])
@@ -71,16 +76,18 @@ export default function CheckoutPage() {
       router.push('/auth')
       return
     }
-    if (items.length === 0) {
+    // Don't redirect to home if order was just placed
+    if (items.length === 0 && !orderPlaced) {
       router.push('/')
       return
     }
     fetchGiftData()
     fetchAddresses()
-  }, [user, items, router, _hasHydrated])
+  }, [user, items, router, _hasHydrated, orderPlaced])
 
   const fetchAddresses = async () => {
     try {
+      setAddressesLoading(true)
       const token = localStorage.getItem('token')
       if (!token) return
       
@@ -100,11 +107,14 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error('Error fetching addresses:', error)
+    } finally {
+      setAddressesLoading(false)
     }
   }
 
   const fetchGiftData = async () => {
     try {
+      setGiftDataLoading(true)
       const token = localStorage.getItem('token')
       const [wrapsRes, occasionsRes, recipientsRes] = await Promise.all([
         fetch('/api/gift-wraps'),
@@ -120,6 +130,8 @@ export default function CheckoutPage() {
       }
     } catch (error) {
       console.error('Error fetching gift data:', error)
+    } finally {
+      setGiftDataLoading(false)
     }
   }
 
@@ -216,8 +228,10 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Failed to place order')
       }
 
+      // Set flag before clearing cart to prevent redirect
+      setOrderPlaced(true)
       clearCart()
-      router.push(`/orders/${data.order.id}`)
+      router.push('/orders')
     } catch (error: any) {
       alert(error.message)
     } finally {
@@ -241,53 +255,74 @@ export default function CheckoutPage() {
   const selectedRecipient = recipients.find(r => r.id === giftOptions.recipientId)
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-      <Header />
+    <div className="min-h-screen bg-gray-50 pb-32 lg:pb-0">
+      {/* Page-Specific Header */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="flex items-center justify-between px-3 lg:px-4 py-3">
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
+              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900 lg:text-xl">Checkout</h1>
+              <p className="text-xs text-gray-500">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-xs text-gray-500">Total</p>
+            <p className="text-base font-bold text-pink-600">{formatPrice(total)}</p>
+          </div>
+        </div>
+      </div>
       
-      <div className="max-w-6xl mx-auto px-4 py-6">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Checkout</h1>
-
-        <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-          <div className="lg:col-span-3 space-y-6">
-            {/* Delivery Address */}
+      <div className="lg:max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-5 gap-4 lg:gap-6 px-3 lg:px-4 py-3 lg:py-6">
+          <div className="lg:col-span-3 space-y-4 lg:space-y-6">
+            {/* Delivery Address - Open Design */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-lg shadow-md p-6"
+              className=""
             >
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Delivery Address</h2>
+              <h2 className="text-base font-bold text-gray-900 mb-3 lg:text-xl lg:mb-4">📍 Delivery Address</h2>
               
-              {addresses.length > 0 ? (
-                <div className="space-y-3">
+              {addressesLoading ? (
+                <div className="space-y-2 lg:space-y-3">
+                  <SkeletonLoader variant="list" count={2} />
+                </div>
+              ) : addresses.length > 0 ? (
+                <div className="space-y-2 lg:space-y-3">
                   {addresses.map((addr) => (
-                    <label key={addr.id} className="flex items-start space-x-3 p-3 border-2 rounded-lg cursor-pointer hover:border-pink-500 transition-colors"
+                    <label key={addr.id} className="flex items-start space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 rounded-xl cursor-pointer hover:border-pink-500 hover:shadow-sm transition-all active:scale-[0.98]"
                       style={{ borderColor: selectedAddressId === addr.id ? '#ec4899' : '#e5e7eb' }}>
                       <input
                         type="radio"
                         name="address"
                         checked={selectedAddressId === addr.id}
                         onChange={() => setSelectedAddressId(addr.id)}
-                        className="mt-1"
+                        className="mt-0.5 lg:mt-1"
                       />
-                      <div className="flex-1">
-                        <p className="font-semibold text-gray-900">{addr.label || 'Address'}</p>
-                        <p className="text-gray-600 text-sm">{addr.street}, {addr.city}, {addr.state} - {addr.pincode}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-semibold text-gray-900 text-sm lg:text-base">{addr.label || 'Address'}</p>
+                        <p className="text-gray-600 text-xs lg:text-sm line-clamp-2">{addr.street}, {addr.city}, {addr.state} - {addr.pincode}</p>
                       </div>
                     </label>
                   ))}
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-pink-500 hover:text-pink-600 transition-colors"
+                    className="w-full py-3 lg:py-2.5 bg-white border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-pink-500 hover:text-pink-600 hover:shadow-sm transition-all text-sm lg:text-base active:scale-[0.98]"
                   >
                     + Add New Address
                   </button>
                 </div>
               ) : (
-                <div className="text-center py-6">
-                  <p className="text-gray-600 mb-4">No delivery address added</p>
+                <div className="text-center py-6 lg:py-8 bg-white rounded-xl border-2 border-dashed border-gray-300">
+                  <p className="text-gray-600 mb-3 lg:mb-4 text-sm lg:text-base">No delivery address added</p>
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700"
+                    className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-5 py-2.5 lg:px-6 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700 text-sm lg:text-base active:scale-95"
                   >
                     Add Delivery Address
                   </button>
@@ -296,13 +331,13 @@ export default function CheckoutPage() {
 
               {/* Add Address Form */}
               {showAddressForm && (
-                <div className="mt-4 p-4 border-2 border-pink-200 rounded-lg bg-pink-50">
-                  <h3 className="font-semibold mb-3">New Address</h3>
-                  <div className="space-y-3">
+                <div className="mt-3 lg:mt-4 p-3 lg:p-4 bg-white border-2 border-pink-200 rounded-xl">
+                  <h3 className="font-semibold mb-2 lg:mb-3 text-sm lg:text-base">New Address</h3>
+                  <div className="space-y-2 lg:space-y-3">
                     <select
                       value={newAddress.label}
                       onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
-                      className="w-full px-4 py-2 border rounded-lg bg-white"
+                      className="w-full px-3 py-2 lg:px-4 border rounded-lg bg-white text-sm lg:text-base"
                     >
                       <option value="Home">Home</option>
                       <option value="Work">Work</option>
@@ -312,39 +347,39 @@ export default function CheckoutPage() {
                       placeholder="Full Address (Street, Building, etc.) *"
                       value={newAddress.street}
                       onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}
-                      className="w-full px-4 py-2 border rounded-lg"
+                      className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
                       rows={2}
                     />
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 lg:gap-3">
                       <input
                         type="text"
-                        placeholder="Apartment/Flat No."
+                        placeholder="Apt/Flat No."
                         value={newAddress.apartment}
                         onChange={(e) => setNewAddress({...newAddress, apartment: e.target.value})}
-                        className="w-full px-4 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
                       />
                       <input
                         type="text"
                         placeholder="Landmark"
                         value={newAddress.landmark}
                         onChange={(e) => setNewAddress({...newAddress, landmark: e.target.value})}
-                        className="w-full px-4 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
                       />
                     </div>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-2 gap-2 lg:gap-3">
                       <input
                         type="text"
                         placeholder="City *"
                         value={newAddress.city}
                         onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
-                        className="w-full px-4 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
                       />
                       <input
                         type="text"
                         placeholder="State *"
                         value={newAddress.state}
                         onChange={(e) => setNewAddress({...newAddress, state: e.target.value})}
-                        className="w-full px-4 py-2 border rounded-lg"
+                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
                       />
                     </div>
                     <input
@@ -352,18 +387,18 @@ export default function CheckoutPage() {
                       placeholder="Pincode *"
                       value={newAddress.pincode}
                       onChange={(e) => setNewAddress({...newAddress, pincode: e.target.value})}
-                      className="w-full px-4 py-2 border rounded-lg"
+                      className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={handleCreateAddress}
-                        className="flex-1 bg-gradient-to-r from-pink-500 to-rose-600 text-white py-2 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700"
+                        className="flex-1 bg-gradient-to-r from-pink-500 to-rose-600 text-white py-2.5 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700 text-sm lg:text-base active:scale-95"
                       >
                         Save Address
                       </button>
                       <button
                         onClick={() => setShowAddressForm(false)}
-                        className="px-6 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300"
+                        className="px-4 lg:px-6 bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 text-sm lg:text-base active:scale-95"
                       >
                         Cancel
                       </button>
@@ -373,23 +408,23 @@ export default function CheckoutPage() {
               )}
             </motion.div>
 
-            {/* Gift Options */}
+            {/* Gift Options - Open Design */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.05 }}
-              className="bg-white rounded-lg shadow-md p-6"
+              className=""
             >
-              <div className="flex items-center justify-between mb-4">
-                <h2 className="text-xl font-bold text-gray-900">🎁 Send as Gift</h2>
+              <div className="flex items-center justify-between mb-3 lg:mb-4">
+                <h2 className="text-base font-bold text-gray-900 lg:text-xl">🎁 Send as Gift</h2>
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={giftOptions.isGift}
                     onChange={(e) => setGiftOptions({ ...giftOptions, isGift: e.target.checked })}
-                    className="w-5 h-5 text-pink-500 rounded"
+                    className="w-4 h-4 lg:w-5 lg:h-5 text-pink-500 rounded"
                   />
-                  <span className="text-sm font-semibold text-gray-700">Yes, this is a gift</span>
+                  <span className="text-xs lg:text-sm font-semibold text-gray-700">Yes, this is a gift</span>
                 </label>
               </div>
 
@@ -404,6 +439,15 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Select Occasion
                     </label>
+                    {giftDataLoading ? (
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {[1, 2, 3, 4].map((i) => (
+                          <div key={i} className="flex-shrink-0 min-w-[100px]">
+                            <div className="animate-pulse bg-gray-200 h-20 rounded-lg"></div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
                     <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
                       {occasions.map((occ) => (
                         <button
@@ -420,7 +464,7 @@ export default function CheckoutPage() {
                         </button>
                       ))}
                     </div>
-                  </div>
+                    )}\n                  </div>
 
                   {/* Recipient */}
                   <div>
@@ -452,6 +496,15 @@ export default function CheckoutPage() {
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
                       Choose Gift Wrapping
                     </label>
+                    {giftDataLoading ? (
+                      <div className="flex gap-3 overflow-x-auto pb-2">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="flex-shrink-0 min-w-[140px]">
+                            <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
                       {giftWraps.map((wrap) => (
                         <button
@@ -472,7 +525,7 @@ export default function CheckoutPage() {
                         </button>
                       ))}
                     </div>
-                  </div>
+                    )}\n                  </div>
 
                   {/* Greeting Message */}
                   <div>
@@ -518,54 +571,55 @@ export default function CheckoutPage() {
               )}
             </motion.div>
 
-            {/* Payment Method */}
+            {/* Payment Method - Open Design */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
-              className="bg-white rounded-lg shadow-md p-6"
+              className=""
             >
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Payment Method</h2>
-              <div className="space-y-3">
-                <label className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary smooth-transition">
+              <h2 className="text-base font-bold text-gray-900 mb-3 lg:text-xl lg:mb-4">💳 Payment Method</h2>
+              <div className="space-y-2 lg:space-y-3">
+                <label className="flex items-center space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all active:scale-[0.98]">
                   <input
                     type="radio"
                     name="payment"
                     value="CASH"
                     checked={paymentMethod === 'CASH'}
                     onChange={(e) => setPaymentMethod(e.target.value as any)}
-                    className="w-5 h-5 text-primary"
+                    className="w-4 h-4 lg:w-5 lg:h-5 text-primary"
                   />
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">Cash on Delivery</p>
-                    <p className="text-sm text-gray-600">Pay when you receive</p>
+                    <p className="font-semibold text-gray-900 text-sm lg:text-base">Cash on Delivery</p>
+                    <p className="text-xs lg:text-sm text-gray-600">Pay when you receive</p>
                   </div>
                 </label>
-                <label className="flex items-center space-x-3 p-4 border-2 border-gray-200 rounded-lg cursor-pointer hover:border-primary smooth-transition">
+                <label className="flex items-center space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all active:scale-[0.98]">
                   <input
                     type="radio"
                     name="payment"
                     value="ONLINE"
                     checked={paymentMethod === 'ONLINE'}
                     onChange={(e) => setPaymentMethod(e.target.value as any)}
-                    className="w-5 h-5 text-primary"
+                    className="w-4 h-4 lg:w-5 lg:h-5 text-primary"
                   />
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900">Online Payment</p>
-                    <p className="text-sm text-gray-600">UPI, Card, Net Banking</p>
+                    <p className="font-semibold text-gray-900 text-sm lg:text-base">Online Payment</p>
+                    <p className="text-xs lg:text-sm text-gray-600">UPI, Card, Net Banking</p>
                   </div>
                 </label>
               </div>
             </motion.div>
           </div>
 
-          {/* Order Summary */}
+          {/* Order Summary - Mobile: Expandable, Desktop: Sticky Sidebar */}
           <div className="lg:col-span-2">
+            {/* Desktop Sticky Summary */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="bg-white rounded-lg shadow-md p-6 sticky top-24"
+              className="hidden lg:block bg-white rounded-xl shadow-sm p-6 sticky top-24"
             >
               <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
 
@@ -628,9 +682,73 @@ export default function CheckoutPage() {
                 )}
               </motion.button>
             </motion.div>
+
+            {/* Mobile Fixed Bottom Summary with Expandable Breakdown */}
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-xl">
+              {/* Expandable Cost Breakdown */}
+              <motion.div
+                initial={false}
+                animate={{ height: showMobileSummary ? 'auto' : 0 }}
+                className="overflow-hidden"
+              >
+                <div className="px-3 py-3 border-b border-gray-100 space-y-2 text-sm">
+                  <div className="flex justify-between text-gray-600">
+                    <span>Items ({items.length})</span>
+                    <span>{formatPrice(subtotal)}</span>
+                  </div>
+                  {giftWrapPrice > 0 && (
+                    <div className="flex justify-between text-gray-600">
+                      <span>🎁 {selectedWrap?.name}</span>
+                      <span>+{formatPrice(giftWrapPrice)}</span>
+                    </div>
+                  )}
+                  <div className="flex justify-between text-gray-600">
+                    <span>Delivery</span>
+                    <span className={deliveryFee === 0 ? 'text-green-600 font-semibold' : ''}>
+                      {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-gray-600">
+                    <span>Tax</span>
+                    <span>{formatPrice(tax)}</span>
+                  </div>
+                </div>
+              </motion.div>
+
+              {/* Main Action Bar */}
+              <div className="px-3 py-3">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex-1">
+                    <button
+                      onClick={() => setShowMobileSummary(!showMobileSummary)}
+                      className="flex items-center text-xs text-gray-600 mb-1"
+                    >
+                      <span>{showMobileSummary ? '▼' : '▶'}</span>
+                      <span className="ml-1">View details</span>
+                    </button>
+                    <p className="text-xs text-gray-600">Total Amount</p>
+                    <p className="text-xl font-bold text-gray-900">{formatPrice(total)}</p>
+                  </div>
+                  <motion.button
+                    whileTap={{ scale: 0.95 }}
+                    onClick={handlePlaceOrder}
+                    disabled={isLoading || (giftOptions.isGift && !giftOptions.recipientId)}
+                    className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md smooth-transition disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                  >
+                    {isLoading ? (
+                      <div className="flex items-center space-x-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
+                        <span className="text-sm">Processing...</span>
+                      </div>
+                    ) : (
+                      <span className="text-sm">{giftOptions.isGift ? '🎁 Send Gift' : 'Place Order'}</span>
+                    )}
+                  </motion.button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      <BottomNav />
       </div>
     </div>
   )

@@ -1,8 +1,12 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import Header from '@/components/Header'
+import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import BottomNav from '@/components/BottomNav'
+import SkeletonLoader from '@/components/SkeletonLoader'
+import { useUserStore } from '@/lib/store/user'
 import { formatPrice } from '@/lib/utils'
 
 interface OrderItem {
@@ -34,30 +38,42 @@ interface Order {
 }
 
 export default function OrdersPage() {
+  const router = useRouter()
+  const { data: session, status } = useSession()
+  const { user, _hasHydrated } = useUserStore()
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    // Fetch orders from API
-    const token = localStorage.getItem('token')
-    if (!token) {
-      setLoading(false)
+    // Wait for session to load
+    if (status === 'loading' || !_hasHydrated) {
       return
     }
-    
-    fetch('/api/orders', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    })
-      .then(res => res.json())
-      .then(data => {
-        setOrders(data.orders || [])
-        setLoading(false)
+
+    // Only redirect if definitely unauthenticated (not just waiting for session)
+    if (status === 'unauthenticated' && !user) {
+      router.push('/login')
+      return
+    }
+
+    // Fetch orders if user exists (either from session or store)
+    if (user || session?.user) {
+      const token = localStorage.getItem('token') || (session?.user as any)?.token
+      
+      fetch('/api/orders', {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
       })
-      .catch(err => {
-        console.error('Error fetching orders:', err)
-        setLoading(false)
-      })
-  }, [])
+        .then(res => res.json())
+        .then(data => {
+          setOrders(data.orders || [])
+          setLoading(false)
+        })
+        .catch(err => {
+          console.error('Error fetching orders:', err)
+          setLoading(false)
+        })
+    }
+  }, [status, session, user, _hasHydrated, router])
 
   const getStatusColor = (status: string) => {
     switch (status.toLowerCase()) {
@@ -83,23 +99,35 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-      <Header />
+    <div className="min-h-screen bg-white pb-20 lg:pb-0">
+      {/* Page-Specific Header */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="flex items-center justify-between px-3 sm:px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Your Orders</h1>
+              <p className="text-xs text-gray-500">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
       
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
-        <h1 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Orders</h1>
+        <h1 className="text-base sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4">📦 Your Orders</h1>
 
         {loading ? (
-          <div className="space-y-4">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="bg-white rounded-xl p-4 animate-pulse">
-                <div className="h-6 bg-gray-200 rounded w-1/4 mb-4"></div>
-                <div className="h-20 bg-gray-200 rounded"></div>
-              </div>
-            ))}
+          <div className="space-y-3">
+            <SkeletonLoader variant="order" count={3} />
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-white rounded-2xl p-12 text-center">
+          <div className="p-12 text-center border-2 border-dashed border-gray-200 rounded-2xl">
             <div className="text-7xl mb-4">🎁</div>
             <h2 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h2>
             <a
@@ -112,7 +140,7 @@ export default function OrdersPage() {
         ) : (
             <div className="space-y-3">
             {orders.map((order) => (
-              <div key={order.id} className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100">
+              <div key={order.id} className="p-4 pb-6 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors">
                 <div className="flex items-center justify-between mb-3 gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-semibold text-gray-900">#{order.id.slice(0, 8).toUpperCase()}</p>
@@ -166,10 +194,10 @@ export default function OrdersPage() {
                 </div>
 
                 <div className="mt-4 flex gap-2">
-                  <button className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors text-sm font-medium">
+                  <button className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium active:scale-[0.98]">
                     Track Order
                   </button>
-                  <button className="flex-1 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors text-sm font-medium">
+                  <button className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl hover:shadow-md transition-all text-sm font-medium active:scale-[0.98]">
                     Reorder
                   </button>
                 </div>

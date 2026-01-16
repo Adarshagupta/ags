@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
-import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 
 interface GiftWrap {
@@ -49,12 +48,9 @@ export default function CartPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="max-w-7xl mx-auto px-4 py-20">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent mx-auto" />
-          </div>
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent mx-auto" />
         </div>
       </div>
     )
@@ -62,8 +58,24 @@ export default function CartPage() {
 
   if (totalItems === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-        <Header />
+      <div className="min-h-screen bg-white pb-20 lg:pb-0">
+        <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+          <div className="flex items-center justify-between px-4 py-3">
+            <div className="flex items-center gap-3">
+              <Link href="/">
+                <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
+                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              </Link>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900">Your Cart</h1>
+                <p className="text-xs text-gray-500">0 items</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="max-w-7xl mx-auto px-4 py-20">
           <div className="text-center">
             <motion.div
@@ -90,22 +102,42 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-      <Header />
-      
-      <div className="max-w-7xl mx-auto px-4 sm:px-4 py-3">
-        <h1 className="text-lg sm:text-2xl font-bold text-gray-900 mb-3">Your Cart ({totalItems})</h1>
+    <div className="min-h-screen bg-white pb-20 lg:pb-0">
+      {/* Page-Specific Header */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Your Cart</h1>
+              <p className="text-xs text-gray-500">{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
+            </div>
+          </div>
+          <button
+            onClick={() => clearCart()}
+            className="text-sm text-red-600 hover:text-red-700 font-medium"
+          >
+            Clear
+          </button>
+        </div>
+      </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-4 py-3 sm:py-4">
+        <div className="space-y-3">
           {/* Cart Items */}
-          <div className="lg:col-span-2 space-y-3">
-            {items.map((item, index) => (
+          {items.map((item, index) => (
               <motion.div
                 key={item.id}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="bg-white rounded-xl border border-gray-200 p-3 flex items-start space-x-3"
+                className="p-3 lg:p-4 flex items-start space-x-3 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
               >
                 <div className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
                   <Image
@@ -157,126 +189,26 @@ export default function CartPage() {
                 </div>
               </motion.div>
             ))}
-          </div>
 
-          {/* Order Summary */}
-          <div className="lg:col-span-1">
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white rounded-xl border border-gray-200 p-4 sticky top-20"
-            >
-              <h2 className="text-base font-bold text-gray-900 mb-3">Summary</h2>
-
-              <div className="space-y-2 mb-3">
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Subtotal</span>
-                  <span className="font-medium text-gray-900">{formatPrice(subtotal)}</span>
-                </div>
-                {giftWrapPrice > 0 && (
-                  <div className="flex justify-between text-sm text-gray-600">
-                    <span>🎁 {selectedWrap?.name}</span>
-                    <span className="font-medium text-gray-900">+{formatPrice(giftWrapPrice)}</span>
-                  </div>
-                )}
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Delivery</span>
-                  <span className={deliveryFee === 0 ? 'text-green-600 font-semibold' : 'font-medium text-gray-900'}>
-                    {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm text-gray-600">
-                  <span>Tax (5%)</span>
-                  <span className="font-medium text-gray-900">{formatPrice(tax)}</span>
-                </div>
-                <div className="border-t pt-2 flex justify-between text-base font-bold text-gray-900">
-                  <span>Total</span>
-                  <span className="text-pink-600">{formatPrice(total)}</span>
-                </div>
+          {/* Fixed Bottom Checkout Bar */}
+          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 shadow-lg z-40">
+            <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+              <div className="flex-1">
+                <p className="text-xs text-gray-500">Total Amount</p>
+                <p className="text-xl font-bold text-pink-600">{formatPrice(total)}</p>
               </div>
-
-              {subtotal < 199 && (
-                <div className="bg-pink-50 border border-pink-200 rounded-lg p-2.5 mb-3 text-xs text-pink-800 flex items-center space-x-2">
-                  <span>🎉</span>
-                  <span>Add {formatPrice(199 - subtotal)} more for free delivery!</span>
-                </div>
-              )}
-
-              {/* Gift Option Toggle */}
-              <div className="bg-pink-50 border border-pink-200 rounded-lg p-3 mb-3">
-                <label className="flex items-center justify-between cursor-pointer">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-xl">🎁</span>
-                    <div>
-                      <p className="font-semibold text-sm text-gray-900">Send as Gift</p>
-                      <p className="text-xs text-gray-500">Add wrapping & card</p>
-                    </div>
-                  </div>
-                  <input
-                    type="checkbox"
-                    checked={giftOptions.isGift}
-                    onChange={(e) => setGiftOptions({ ...giftOptions, isGift: e.target.checked, giftWrapId: e.target.checked ? giftOptions.giftWrapId : undefined })}
-                    className="w-5 h-5 text-pink-500 rounded focus:ring-2 focus:ring-pink-500"
-                  />
-                </label>
-                {giftOptions.isGift && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    className="mt-2 pt-2 border-t border-pink-200 space-y-2"
-                  >
-                    <p className="text-xs font-semibold text-gray-700">Choose Wrap:</p>
-                    {/* Horizontal scrollable gift wraps */}
-                    <div className="flex gap-2 overflow-x-auto pb-1 -mx-3 px-3 scrollbar-hide">
-                      {Array.isArray(giftWraps) && giftWraps.length > 0 ? (
-                        giftWraps.map((wrap) => (
-                          <label
-                            key={wrap.id}
-                            className={`flex-shrink-0 w-20 p-2 rounded-lg border cursor-pointer transition-all text-center ${
-                              giftOptions.giftWrapId === wrap.id
-                                ? 'border-pink-500 bg-white shadow-sm'
-                                : 'border-gray-200 bg-white hover:border-pink-300'
-                            }`}
-                          >
-                            <input
-                              type="radio"
-                              name="giftwrap"
-                              checked={giftOptions.giftWrapId === wrap.id}
-                              onChange={() => setGiftOptions({ ...giftOptions, giftWrapId: wrap.id })}
-                              className="sr-only"
-                            />
-                            <span className="text-2xl block mb-0.5">{wrap.image}</span>
-                            <p className="text-[10px] font-medium text-gray-900 truncate">{wrap.name}</p>
-                            <p className="text-pink-600 font-bold text-xs">+₹{wrap.price}</p>
-                          </label>
-                        ))
-                      ) : (
-                        <p className="text-xs text-gray-500">Loading...</p>
-                      )}
-                    </div>
-                  </motion.div>
-                )}
-              </div>
-
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => router.push('/checkout')}
-                className="w-full bg-pink-500 text-white py-3 rounded-lg font-semibold shadow-sm hover:bg-pink-600 transition-colors mb-2"
+                className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
               >
-                Checkout • {formatPrice(total)}
+                Checkout
               </motion.button>
-
-              <button
-                onClick={() => router.push('/')}
-                className="w-full text-pink-600 py-2.5 rounded-lg font-medium text-sm hover:bg-pink-50 transition-colors"
-              >
-                Continue Shopping
-              </button>
-            </motion.div>
+            </div>
           </div>
         </div>
-      <BottomNav />
       </div>
+      <BottomNav />
     </div>
   )
 }

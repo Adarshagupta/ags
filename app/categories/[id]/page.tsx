@@ -3,6 +3,7 @@
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import SkeletonLoader from '@/components/SkeletonLoader'
 import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 import ProductCard from '@/components/ProductCard'
@@ -64,8 +65,11 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
-        <div className="flex items-center justify-center h-96">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent"></div>
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <div className="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <SkeletonLoader variant="grid" count={8} />
+          </div>
         </div>
         <BottomNav />
       </div>

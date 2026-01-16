@@ -7,8 +7,8 @@ import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useUserStore } from '@/lib/store/user'
 import { useLocationStore } from '@/lib/store/location'
-import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
+import SkeletonLoader from '@/components/SkeletonLoader'
 
 interface Order {
   id: string
@@ -121,18 +121,43 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-      <Header />
+    <div className="min-h-screen bg-white pb-20 lg:pb-0">
+      {/* Page-Specific Header */}
+      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+        <div className="flex items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3">
+            <Link href="/">
+              <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+            </Link>
+            <div>
+              <h1 className="text-lg font-bold text-gray-900">Profile</h1>
+              <p className="text-xs text-gray-500">{user.name}</p>
+            </div>
+          </div>
+          <Link href="/account">
+            <button className="p-2 hover:bg-gray-50 rounded-lg transition-colors">
+              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          </Link>
+        </div>
+      </div>
 
-      <div className="max-w-4xl mx-auto px-0 pt-0">
+      <div className="px-0 pt-0">
         {/* Profile Header - Clean Professional */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white border-b border-gray-200 pt-6 pb-6 px-4"
+          className="pt-6 pb-6 px-4 mb-2 border-b border-gray-100"
         >
           <div className="flex items-center gap-4 mb-6">
-            <div className="w-20 h-20 bg-gray-100 rounded-2xl flex items-center justify-center border border-gray-200 flex-shrink-0">
+            <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center flex-shrink-0">
               <span className="text-3xl font-bold text-gray-700">
                 {user.name.charAt(0).toUpperCase()}
               </span>
@@ -145,18 +170,18 @@ export default function ProfilePage() {
           </div>
 
           {/* Quick Stats - Minimal */}
-          <div className="grid grid-cols-3 gap-3">
-            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+          <div className="grid grid-cols-3 gap-1 -mx-4 px-4 py-4 bg-gray-50">
+            <div className="text-center p-3">
               <p className="text-2xl font-bold text-gray-900">{orders.length}</p>
               <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide">Orders</p>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+            <div className="text-center p-3 border-l border-r border-gray-200">
               <p className="text-2xl font-bold text-gray-900">
                 {orders.filter(o => o.status === 'DELIVERED').length}
               </p>
               <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide">Delivered</p>
             </div>
-            <div className="bg-gray-50 rounded-xl p-3 border border-gray-200">
+            <div className="text-center p-3">
               <p className="text-2xl font-bold text-gray-900">{addresses.length}</p>
               <p className="text-[10px] text-gray-500 mt-0.5 uppercase tracking-wide">Addresses</p>
             </div>
@@ -164,7 +189,7 @@ export default function ProfilePage() {
         </motion.div>
 
         {/* Tab Navigation - Clean Minimal */}
-        <div className="sticky top-16 z-10 bg-white border-b border-gray-200 px-4 py-2">
+        <div className="sticky top-16 z-10 bg-white border-b border-gray-100 px-4 py-3">
           <div className="flex gap-1">
             {[
               { id: 'overview', label: 'Overview', icon: (
@@ -223,8 +248,8 @@ export default function ProfilePage() {
                 >
                   {/* Profile Info - Minimal */}
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Personal Information</h3>
-                    <div className="bg-white rounded-xl overflow-hidden border border-gray-200">
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">👤 Personal Information</h3>
+                    <div className="overflow-hidden">
                       <div className="flex items-center gap-3 px-4 py-3.5 border-b border-gray-100">
                         <div className="w-9 h-9 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                           <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -266,8 +291,8 @@ export default function ProfilePage() {
                   {/* Current Location */}
                   {deliveryAddress && (
                     <div>
-                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Current Location</h3>
-                      <div className="bg-white border border-gray-200 rounded-xl p-4">
+                      <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">📍 Current Location</h3>
+                      <div className="p-4 border border-gray-100 rounded-lg">
                         <div className="flex items-start gap-3">
                           <div className="w-10 h-10 bg-gray-100 rounded-lg flex items-center justify-center flex-shrink-0">
                             <svg className="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
@@ -285,10 +310,10 @@ export default function ProfilePage() {
 
                   {/* Quick Actions */}
                   <div>
-                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 px-1">Quick Actions</h3>
+                    <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">⚡ Quick Actions</h3>
                     <div className="grid grid-cols-2 gap-3">
                       <Link href="/orders">
-                        <button className="w-full bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors">
+                        <button className="w-full border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors active:scale-[0.98]">
                           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                             <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
@@ -300,7 +325,7 @@ export default function ProfilePage() {
 
                       <button 
                         onClick={() => setActiveTab('addresses')}
-                        className="w-full bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors"
+                        className="w-full border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors active:scale-[0.98]"
                       >
                         <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                           <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -311,7 +336,7 @@ export default function ProfilePage() {
                       </button>
 
                       <Link href="/recipients">
-                        <button className="w-full bg-white border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors">
+                        <button className="w-full border border-gray-200 rounded-xl p-4 hover:bg-gray-50 transition-colors active:scale-[0.98]">
                           <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-2">
                             <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -323,7 +348,7 @@ export default function ProfilePage() {
 
                       <button 
                         onClick={handleLogout}
-                        className="w-full bg-white border border-red-200 rounded-xl p-4 hover:bg-red-50 transition-colors"
+                        className="w-full border-2 border-red-200 rounded-xl p-4 hover:bg-red-50 transition-colors active:scale-[0.98]"
                       >
                         <div className="w-12 h-12 bg-red-50 rounded-lg flex items-center justify-center mx-auto mb-2">
                           <svg className="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -368,7 +393,7 @@ export default function ProfilePage() {
                           initial={{ opacity: 0, y: 20 }}
                           animate={{ opacity: 1, y: 0 }}
                           transition={{ delay: index * 0.05 }}
-                          className="bg-white border border-gray-200 rounded-xl p-4 hover:border-gray-300 transition-colors"
+                          className="p-4 pb-6 border-b border-gray-100 last:border-0 hover:bg-gray-50 transition-colors"
                         >
                           <div className="flex items-start justify-between mb-3">
                             <div className="flex-1 min-w-0">

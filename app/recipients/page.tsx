@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useUserStore } from '@/lib/store/user'
 import Header from '@/components/Header'
+import SkeletonLoader from '@/components/SkeletonLoader'
 
 interface Recipient {
   id: string
@@ -355,8 +356,8 @@ export default function RecipientsPage() {
 
         {/* Recipients List */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="space-y-3">
+            <SkeletonLoader variant="list" count={4} />
           </div>
         ) : recipients.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-12 text-center">
