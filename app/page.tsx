@@ -5,6 +5,10 @@ import CategorySection from '@/components/CategorySection'
 import SearchBar from '@/components/SearchBar'
 import { prisma } from '@/lib/prisma'
 
+// Disable caching for this page
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 async function getProducts() {
   try {
     const products = await prisma.product.findMany({
