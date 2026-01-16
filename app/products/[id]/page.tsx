@@ -59,17 +59,18 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const fetchRelatedProducts = async () => {
     try {
       // Fetch addons (greeting cards, gift wraps, etc.)
-      const addonsRes = await fetch('/api/products?category=Addons&limit=4')
+      const addonsRes = await fetch('/api/products?category=Addons')
       if (addonsRes.ok) {
         const addonsData = await addonsRes.json()
-        setAddons(addonsData)
+        setAddons(Array.isArray(addonsData.products) ? addonsData.products.slice(0, 4) : [])
       }
 
       // Fetch related products from same/similar category
-      const relatedRes = await fetch(`/api/products?limit=8`)
+      const relatedRes = await fetch(`/api/products`)
       if (relatedRes.ok) {
         const relatedData = await relatedRes.json()
-        setRelatedProducts(relatedData.filter((p: Product) => p.id !== id).slice(0, 6))
+        const products = Array.isArray(relatedData.products) ? relatedData.products : []
+        setRelatedProducts(products.filter((p: Product) => p.id !== id).slice(0, 6))
       }
     } catch (error) {
       console.error('Error fetching related products:', error)
