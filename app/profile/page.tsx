@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import { useUserStore } from '@/lib/store/user'
 import { useLocationStore } from '@/lib/store/location'
