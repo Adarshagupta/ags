@@ -1,28 +1,32 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import { Providers } from './providers'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import OfflineIndicator from '@/components/OfflineIndicator'
+import { SessionSync } from '@/components/SessionSync'
 
 const inter = Inter({ subsets: ['latin'] })
 
-export const metadata: Metadata = {
-  title: 'Flowers N Petals - Gift & Flower Delivery | Same Day Delivery',
-  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with FNP - Your trusted gift delivery partner.',
-  manifest: '/manifest.json',
-  themeColor: '#ec4899',
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: 'black-translucent',
-    title: 'FNP - Flowers & Gifts',
-  },
-  viewport: {
+export function generateViewport(): Viewport {
+  return {
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5,
     userScalable: true,
     viewportFit: 'cover',
+    themeColor: '#ec4899',
+  }
+}
+
+export const metadata: Metadata = {
+  title: 'Flowers N Petals - Gift & Flower Delivery | Same Day Delivery',
+  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with FNP - Your trusted gift delivery partner.',
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'black-translucent',
+    title: 'FNP - Flowers & Gifts',
   },
   applicationName: 'Flowers N Petals',
   keywords: ['flowers', 'gifts', 'cakes', 'delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
@@ -56,14 +60,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
       { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
-      { url: '/icons/icon-152x152.png', sizes: '152x152', type: 'image/png' },
-      { url: '/icons/icon-192x192.png', sizes: '192x192', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
-    shortcut: '/icons/icon-192x192.png',
+    shortcut: '/icons/icon-512x512.png',
   },
 }
 
@@ -76,20 +78,15 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" href="/icons/icon-192x192.png" />
+        <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="FNP" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="theme-color" content="#ec4899" />
-        <link rel="apple-touch-startup-image" href="/splash/splash-640x1136.png" media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2)" />
-        <link rel="apple-touch-startup-image" href="/splash/splash-750x1334.png" media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2)" />
-        <link rel="apple-touch-startup-image" href="/splash/splash-1242x2208.png" media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3)" />
-        <link rel="apple-touch-startup-image" href="/splash/splash-1125x2436.png" media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3)" />
-        <link rel="apple-touch-startup-image" href="/splash/splash-1242x2688.png" media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3)" />
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
+          <SessionSync />
           <OfflineIndicator />
           <PWAInstallPrompt />
           {children}
