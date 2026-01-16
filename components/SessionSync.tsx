@@ -31,7 +31,7 @@ export function SessionSync() {
               name: session.user.name || 'User',
               role: (session.user as any).role || 'CUSTOMER',
               image: session.user.image || null,
-              phone: null,
+              phone: null as any,
               createdAt: new Date()
             }
             setUser(fallbackUser)
