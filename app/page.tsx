@@ -50,49 +50,7 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* Quick Actions - Minimal */}
-      <div className="px-4 py-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-4 gap-3">
-            <button className="flex flex-col items-center group">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200 rounded-2xl flex items-center justify-center group-active:scale-95 transition-transform">
-                <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <span className="text-xs text-gray-700 mt-2 font-medium">Express</span>
-            </button>
-            
-            <button className="flex flex-col items-center group">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200 rounded-2xl flex items-center justify-center group-active:scale-95 transition-transform">
-                <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 22c-1.1 0-2-.9-2-2h4c0 1.1-.9 2-2 2zm0-18C8.13 4 5 7.13 5 11c0 2.38 1.19 4.47 3 5.74V19c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.87-3.13-7-7-7z"/>
-                </svg>
-              </div>
-              <span className="text-xs text-gray-700 mt-2 font-medium">Flowers</span>
-            </button>
-            
-            <button className="flex flex-col items-center group">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200 rounded-2xl flex items-center justify-center group-active:scale-95 transition-transform">
-                <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6c1.11 0 2-.9 2-2 0-.38-.1-.73-.29-1.03L12 0l-1.71 2.97c-.19.3-.29.65-.29 1.03 0 1.1.9 2 2 2zm6 9h-5V7h-2v8H6c-1.66 0-3 1.34-3 3v1c0 .55.45 1 1 1h16c.55 0 1-.45 1-1v-1c0-1.66-1.34-3-3-3z"/>
-                </svg>
-              </div>
-              <span className="text-xs text-gray-700 mt-2 font-medium">Cakes</span>
-            </button>
-            
-            <button className="flex flex-col items-center group">
-              <div className="w-14 h-14 bg-gradient-to-br from-pink-50 to-rose-50 border border-pink-200 rounded-2xl flex items-center justify-center group-active:scale-95 transition-transform">
-                <svg className="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 22c4.97 0 9-4.03 9-9-4.97 0-9 4.03-9 9zM5.6 10.25c0 1.38 1.12 2.5 2.5 2.5.53 0 1.01-.16 1.42-.44l-.02.19c0 1.38 1.12 2.5 2.5 2.5s2.5-1.12 2.5-2.5l-.02-.19c.4.28.89.44 1.42.44 1.38 0 2.5-1.12 2.5-2.5 0-1-.59-1.85-1.43-2.25.84-.4 1.43-1.25 1.43-2.25 0-1.38-1.12-2.5-2.5-2.5-.53 0-1.01.16-1.42.44l.02-.19C14.5 4.12 13.38 3 12 3S9.5 4.12 9.5 5.5l.02.19c-.4-.28-.89-.44-1.42-.44-1.38 0-2.5 1.12-2.5 2.5 0 1 .59 1.85 1.43 2.25-.84.4-1.43 1.25-1.43 2.25zM3 13c0 4.97 4.03 9 9 9 0-4.97-4.03-9-9-9z"/>
-                </svg>
-              </div>
-              <span className="text-xs text-gray-700 mt-2 font-medium">Plants</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
+     
       {/* Categories */}
       <div className="px-4 py-3">
         <div className="max-w-7xl mx-auto">
