@@ -14,6 +14,8 @@ interface UserStore {
   isAuthenticated: boolean
   setUser: (user: User | null) => void
   logout: () => void
+  _hasHydrated: boolean
+  setHasHydrated: (state: boolean) => void
 }
 
 export const useUserStore = create<UserStore>()(
@@ -21,6 +23,7 @@ export const useUserStore = create<UserStore>()(
     (set) => ({
       user: null,
       isAuthenticated: false,
+      _hasHydrated: false,
       
       setUser: (user) => {
         set({ user, isAuthenticated: !!user })
@@ -31,6 +34,10 @@ export const useUserStore = create<UserStore>()(
         if (typeof window !== 'undefined') {
           localStorage.removeItem('token')
         }
+      },
+
+      setHasHydrated: (state) => {
+        set({ _hasHydrated: state })
       },
     }),
     {
@@ -45,7 +52,9 @@ export const useUserStore = create<UserStore>()(
           removeItem: () => {},
         }
       }),
-      skipHydration: false,
+      onRehydrateStorage: () => (state) => {
+        state?.setHasHydrated(true)
+      },
     }
   )
 )

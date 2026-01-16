@@ -36,7 +36,7 @@ export default function CheckoutPage() {
   const router = useRouter()
   const { items, getTotalPrice, clearCart, giftOptions, setGiftOptions } = useCartStore()
   const { deliveryAddress } = useLocationStore()
-  const { user } = useUserStore()
+  const { user, _hasHydrated } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
   const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'ONLINE'>('CASH')
   const [giftWraps, setGiftWraps] = useState<GiftWrap[]>([])
@@ -65,15 +65,19 @@ export default function CheckoutPage() {
   const total = subtotal + giftWrapPrice + deliveryFee + tax
 
   useEffect(() => {
+    if (!_hasHydrated) return
+    
     if (!user) {
       router.push('/auth')
+      return
     }
     if (items.length === 0) {
       router.push('/')
+      return
     }
     fetchGiftData()
     fetchAddresses()
-  }, [user, items, router])
+  }, [user, items, router, _hasHydrated])
 
   const fetchAddresses = async () => {
     try {

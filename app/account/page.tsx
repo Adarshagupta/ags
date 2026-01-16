@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation'
 
 export default function AccountPage() {
   const router = useRouter()
-  const { user, logout } = useUserStore()
+  const { user, logout, _hasHydrated } = useUserStore()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -20,7 +20,7 @@ export default function AccountPage() {
     router.push('/')
   }
 
-  if (!mounted) {
+  if (!mounted || !_hasHydrated) {
     return null
   }
 

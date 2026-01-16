@@ -11,7 +11,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
-  const { user } = useUserStore()
+  const { user, _hasHydrated } = useUserStore()
   const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
@@ -19,12 +19,14 @@ export default function AdminLayout({
   }, [])
 
   useEffect(() => {
+    if (!_hasHydrated) return
+    
     if (mounted && (!user || user.role !== 'ADMIN')) {
       router.push('/login')
     }
-  }, [mounted, user, router])
+  }, [mounted, user, router, _hasHydrated])
 
-  if (!mounted || !user || user.role !== 'ADMIN') {
+  if (!mounted || !_hasHydrated || !user || user.role !== 'ADMIN') {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">

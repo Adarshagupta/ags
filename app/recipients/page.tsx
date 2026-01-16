@@ -20,7 +20,7 @@ interface Recipient {
 
 export default function RecipientsPage() {
   const router = useRouter()
-  const { user } = useUserStore()
+  const { user, _hasHydrated } = useUserStore()
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
@@ -38,12 +38,14 @@ export default function RecipientsPage() {
   })
 
   useEffect(() => {
+    if (!_hasHydrated) return
+    
     if (!user) {
       router.push('/auth')
       return
     }
     fetchRecipients()
-  }, [user, router])
+  }, [user, router, _hasHydrated])
 
   const fetchRecipients = async () => {
     try {
