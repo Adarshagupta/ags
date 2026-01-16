@@ -125,7 +125,7 @@ export default function AdminDashboard() {
                       {order.orderNumber}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      ₹{order.totalAmount.toFixed(2)}
+                      ₹{(order.total || 0).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">

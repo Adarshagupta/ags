@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const body = await request.json()
     const giftWrap = await prisma.giftWrap.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         name: body.name,
         description: body.description || null,
@@ -22,10 +23,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     await prisma.giftWrap.delete({
-      where: { id: params.id }
+      where: { id }
     })
     return NextResponse.json({ message: 'Gift wrap deleted' })
   } catch (error) {

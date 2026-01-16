@@ -8,9 +8,9 @@ export async function GET() {
 
     // Get total revenue
     const ordersWithAmount = await prisma.order.findMany({
-      select: { totalAmount: true }
+      select: { total: true }
     })
-    const totalRevenue = ordersWithAmount.reduce((sum, order) => sum + order.totalAmount, 0)
+    const totalRevenue = ordersWithAmount.reduce((sum, order) => sum + order.total, 0)
 
     // Get total products
     const totalProducts = await prisma.product.count()
@@ -25,7 +25,7 @@ export async function GET() {
       select: {
         id: true,
         orderNumber: true,
-        totalAmount: true,
+        total: true,
         status: true,
         createdAt: true
       }

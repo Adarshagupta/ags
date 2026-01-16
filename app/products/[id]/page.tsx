@@ -61,6 +61,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       name: product.name,
       price: product.price - (product.price * (product.discount || 0) / 100),
       image: product.image,
+      isVeg: true,
       quantity
     })
     router.push('/cart')

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     const body = await request.json()
     const user = await prisma.user.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         role: body.role
       },
@@ -25,11 +26,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
   }
 }
 
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params
     // Delete user's orders and addresses first (cascade delete)
     await prisma.user.delete({
-      where: { id: params.id }
+      where: { id }
     })
     return NextResponse.json({ message: 'User deleted' })
   } catch (error) {
