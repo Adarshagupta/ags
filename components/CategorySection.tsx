@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
 
 interface Category {
   id: string
@@ -27,6 +28,7 @@ const categoryIcons: { [key: string]: React.ReactElement } = {
 }
 
 export default function CategorySection({ type, title }: CategorySectionProps) {
+  const router = useRouter()
   const [categories, setCategories] = useState<Category[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>('')
 
@@ -46,6 +48,11 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
     }
   }
 
+  const handleCategoryClick = (categoryId: string) => {
+    setSelectedCategory(categoryId)
+    router.push(`/categories/${categoryId}`)
+  }
+
   if (categories.length === 0) return null
 
   return (
@@ -57,7 +64,7 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
         {categories.map((category) => (
           <motion.button
             key={category.id}
-            onClick={() => setSelectedCategory(category.id)}
+            onClick={() => handleCategoryClick(category.id)}
             whileTap={{ scale: 0.95 }}
             className="flex-shrink-0 flex flex-col items-center"
           >
