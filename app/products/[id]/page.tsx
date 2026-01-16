@@ -289,30 +289,52 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         {/* Related Products Section */}
         {relatedProducts.length > 0 && (
           <div className="px-4 py-6 pb-24">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">You May Also Like</h2>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-bold text-gray-900">You May Also Like</h2>
+              <div className="w-12 h-1 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full"></div>
+            </div>
             <div className="grid grid-cols-2 gap-3">
-              {relatedProducts.map((relatedProduct) => (
+              {relatedProducts.map((relatedProduct, index) => (
                 <motion.div
                   key={relatedProduct.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
                   whileTap={{ scale: 0.97 }}
                   onClick={() => router.push(`/products/${relatedProduct.id}`)}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
+                  className="group bg-white rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
                 >
-                  <div className="relative h-40 bg-gray-100">
-                    <Image src={relatedProduct.image} alt={relatedProduct.name} fill className="object-cover" />
+                  <div className="relative h-44 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                    <Image 
+                      src={relatedProduct.image} 
+                      alt={relatedProduct.name} 
+                      fill 
+                      className="object-cover group-hover:scale-110 transition-transform duration-500" 
+                    />
                     {relatedProduct.discount > 0 && (
-                      <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg">
                         {relatedProduct.discount}% OFF
                       </div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <div className="p-3">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{relatedProduct.name}</p>
-                    <div className="flex items-baseline gap-1 mt-1">
-                      <span className="text-base font-bold text-pink-600">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
-                      {relatedProduct.discount > 0 && (
-                        <span className="text-xs text-gray-400 line-through">₹{relatedProduct.price}</span>
-                      )}
+                    <p className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] leading-tight">{relatedProduct.name}</p>
+                    <div className="flex items-center justify-between mt-2">
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                        {relatedProduct.discount > 0 && (
+                          <span className="text-xs text-gray-400 line-through">₹{relatedProduct.price}</span>
+                        )}
+                      </div>
+                      <motion.div
+                        whileHover={{ x: 3 }}
+                        className="w-6 h-6 bg-pink-50 rounded-full flex items-center justify-center group-hover:bg-pink-100 transition-colors"
+                      >
+                        <svg className="w-3 h-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </motion.div>
                     </div>
                   </div>
                 </motion.div>
@@ -472,31 +494,71 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         {/* Related Products Section - Desktop */}
         {relatedProducts.length > 0 && (
           <div className="mt-12 mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+            <div className="flex items-center gap-4 mb-8">
+              <h2 className="text-3xl font-bold text-gray-900">You May Also Like</h2>
+              <div className="flex-1 h-1 bg-gradient-to-r from-pink-500 via-rose-500 to-transparent rounded-full"></div>
+            </div>
             <div className="grid grid-cols-3 gap-6">
-              {relatedProducts.map((relatedProduct) => (
+              {relatedProducts.map((relatedProduct, index) => (
                 <motion.div
                   key={relatedProduct.id}
-                  whileHover={{ scale: 1.02 }}
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1, duration: 0.5 }}
+                  whileHover={{ y: -8 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => router.push(`/products/${relatedProduct.id}`)}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                  className="group bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100"
                 >
-                  <div className="relative h-64 bg-gray-100">
-                    <Image src={relatedProduct.image} alt={relatedProduct.name} fill className="object-cover" />
+                  <div className="relative h-72 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+                    <Image 
+                      src={relatedProduct.image} 
+                      alt={relatedProduct.name} 
+                      fill 
+                      className="object-cover group-hover:scale-110 transition-transform duration-700" 
+                    />
                     {relatedProduct.discount > 0 && (
-                      <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
+                      <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: index * 0.1 + 0.3 }}
+                        className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm"
+                      >
                         {relatedProduct.discount}% OFF
-                      </div>
+                      </motion.div>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileHover={{ opacity: 1, y: 0 }}
+                      className="absolute bottom-4 left-4 right-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
+                    >
+                      <div className="bg-white/95 backdrop-blur-sm text-pink-600 px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+                        <span>Quick View</span>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
+                    </motion.div>
                   </div>
-                  <div className="p-4">
-                    <p className="text-base font-semibold text-gray-900 line-clamp-2">{relatedProduct.name}</p>
-                    <div className="flex items-baseline gap-2 mt-2">
-                      <span className="text-xl font-bold text-pink-600">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
-                      {relatedProduct.discount > 0 && (
-                        <span className="text-sm text-gray-400 line-through">₹{relatedProduct.price}</span>
-                      )}
+                  <div className="p-5">
+                    <p className="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[3.5rem] leading-snug group-hover:text-pink-600 transition-colors">{relatedProduct.name}</p>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                        {relatedProduct.discount > 0 && (
+                          <span className="text-sm text-gray-400 line-through">₹{relatedProduct.price}</span>
+                        )}
+                      </div>
+                      <motion.button
+                        whileHover={{ scale: 1.1, rotate: 5 }}
+                        whileTap={{ scale: 0.9 }}
+                        className="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white shadow-md group-hover:shadow-lg transition-shadow"
+                      >
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                        </svg>
+                      </motion.button>
                     </div>
                   </div>
                 </motion.div>
