@@ -4,6 +4,7 @@ import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
+import Header from '@/components/Header'
 import { useCartStore } from '@/lib/store/cart'
 
 interface Product {
@@ -29,10 +30,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
   const [quantity, setQuantity] = useState(1)
+  const [addons, setAddons] = useState<Product[]>([])
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
     fetchProduct()
+    fetchRelatedProducts()
   }, [id])
 
   const fetchProduct = async () => {
@@ -49,6 +53,26 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       router.push('/')
     } finally {
       setLoading(false)
+    }
+  }
+
+  const fetchRelatedProducts = async () => {
+    try {
+      // Fetch addons (greeting cards, gift wraps, etc.)
+      const addonsRes = await fetch('/api/products?category=Addons&limit=4')
+      if (addonsRes.ok) {
+        const addonsData = await addonsRes.json()
+        setAddons(addonsData)
+      }
+
+      // Fetch related products from same/similar category
+      const relatedRes = await fetch(`/api/products?limit=8`)
+      if (relatedRes.ok) {
+        const relatedData = await relatedRes.json()
+        setRelatedProducts(relatedData.filter((p: Product) => p.id !== id).slice(0, 6))
+      }
+    } catch (error) {
+      console.error('Error fetching related products:', error)
     }
   }
 
@@ -82,10 +106,15 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
   return (
     <div className="min-h-screen bg-white pb-20 lg:pb-0">
+      {/* Header - Desktop only */}
+      <div className="hidden lg:block">
+        <Header />
+      </div>
+      
       {/* Back button - Fixed overlay on mobile */}
       <button
         onClick={() => router.back()}
-        className="fixed top-4 left-4 z-50 lg:absolute lg:top-6 lg:left-6 w-10 h-10 lg:w-auto lg:h-auto bg-white/90 backdrop-blur-sm lg:bg-transparent rounded-full shadow-lg lg:shadow-none flex items-center justify-center lg:justify-start gap-2 text-gray-900 hover:bg-white lg:hover:bg-transparent transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-900 hover:bg-white transition-colors"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -230,6 +259,66 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </motion.button>
           </div>
         </div>
+
+        {/* Add-ons Section */}
+        {addons.length > 0 && (
+          <div className="px-4 py-6 bg-gray-50">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">Add Extra Love 💝</h2>
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
+              {addons.map((addon) => (
+                <motion.div
+                  key={addon.id}
+                  whileTap={{ scale: 0.95 }}
+                  onClick={() => router.push(`/products/${addon.id}`)}
+                  className="flex-shrink-0 w-32 bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
+                >
+                  <div className="relative h-32 bg-gray-100">
+                    <Image src={addon.image} alt={addon.name} fill className="object-cover" />
+                  </div>
+                  <div className="p-2">
+                    <p className="text-xs font-semibold text-gray-900 truncate">{addon.name}</p>
+                    <p className="text-sm font-bold text-pink-600">₹{addon.price}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Related Products Section */}
+        {relatedProducts.length > 0 && (
+          <div className="px-4 py-6 pb-24">
+            <h2 className="text-lg font-bold text-gray-900 mb-3">You May Also Like</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {relatedProducts.map((relatedProduct) => (
+                <motion.div
+                  key={relatedProduct.id}
+                  whileTap={{ scale: 0.97 }}
+                  onClick={() => router.push(`/products/${relatedProduct.id}`)}
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
+                >
+                  <div className="relative h-40 bg-gray-100">
+                    <Image src={relatedProduct.image} alt={relatedProduct.name} fill className="object-cover" />
+                    {relatedProduct.discount > 0 && (
+                      <div className="absolute top-2 right-2 bg-red-500 text-white px-2 py-0.5 rounded-full text-xs font-bold">
+                        {relatedProduct.discount}% OFF
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-3">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{relatedProduct.name}</p>
+                    <div className="flex items-baseline gap-1 mt-1">
+                      <span className="text-base font-bold text-pink-600">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                      {relatedProduct.discount > 0 && (
+                        <span className="text-xs text-gray-400 line-through">₹{relatedProduct.price}</span>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Desktop Layout */}
@@ -352,6 +441,68 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </motion.button>
           </div>
         </div>
+
+        {/* Add-ons Section - Desktop */}
+        {addons.length > 0 && (
+          <div className="mt-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">Add Extra Love 💝</h2>
+            <div className="grid grid-cols-4 gap-6">
+              {addons.map((addon) => (
+                <motion.div
+                  key={addon.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => router.push(`/products/${addon.id}`)}
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                >
+                  <div className="relative h-48 bg-gray-100">
+                    <Image src={addon.image} alt={addon.name} fill className="object-cover" />
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm font-semibold text-gray-900 truncate">{addon.name}</p>
+                    <p className="text-lg font-bold text-pink-600 mt-1">₹{addon.price}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Related Products Section - Desktop */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-12 mb-8">
+            <h2 className="text-2xl font-bold text-gray-900 mb-6">You May Also Like</h2>
+            <div className="grid grid-cols-3 gap-6">
+              {relatedProducts.map((relatedProduct) => (
+                <motion.div
+                  key={relatedProduct.id}
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => router.push(`/products/${relatedProduct.id}`)}
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                >
+                  <div className="relative h-64 bg-gray-100">
+                    <Image src={relatedProduct.image} alt={relatedProduct.name} fill className="object-cover" />
+                    {relatedProduct.discount > 0 && (
+                      <div className="absolute top-4 right-4 bg-red-500 text-white px-3 py-1.5 rounded-full text-sm font-bold">
+                        {relatedProduct.discount}% OFF
+                      </div>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <p className="text-base font-semibold text-gray-900 line-clamp-2">{relatedProduct.name}</p>
+                    <div className="flex items-baseline gap-2 mt-2">
+                      <span className="text-xl font-bold text-pink-600">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                      {relatedProduct.discount > 0 && (
+                        <span className="text-sm text-gray-400 line-through">₹{relatedProduct.price}</span>
+                      )}
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
