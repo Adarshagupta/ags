@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { signToken } from '@/lib/auth'
+import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Check if user exists
+    // Check if user exists by email
     const existingUser = await prisma.user.findUnique({
       where: { email },
     })
@@ -27,11 +28,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    // If phone provided, check if it's already taken
+    if (phone) {
+      const existingPhone = await prisma.user.findUnique({
+        where: { phone },
+      })
+      if (existingPhone) {
+        return NextResponse.json(
+          { error: 'Phone number already registered' },
+          { status: 400 }
+        )
+      }
+    }
+
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Generate a unique phone placeholder if not provided
-    const userPhone = phone || `temp_${Date.now()}_${Math.random().toString(36).substring(7)}`
+    // Generate a truly unique phone placeholder if not provided
+    const userPhone = phone || `temp_${crypto.randomUUID()}`
 
     // Create user
     const user = await prisma.user.create({
