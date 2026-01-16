@@ -11,6 +11,8 @@ import LocationModal from './LocationModal'
 export default function Header() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [showInstallButton, setShowInstallButton] = useState(false)
   
   const totalItems = useCartStore((state) => state.getTotalItems())
   const user = useUserStore((state) => state.user)
@@ -18,7 +20,35 @@ export default function Header() {
 
   useEffect(() => {
     setMounted(true)
+
+    // Check if already installed
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true
+    
+    if (!isStandalone) {
+      const handler = (e: Event) => {
+        e.preventDefault()
+        setDeferredPrompt(e)
+        setShowInstallButton(true)
+      }
+
+      window.addEventListener('beforeinstallprompt', handler)
+
+      return () => window.removeEventListener('beforeinstallprompt', handler)
+    }
   }, [])
+
+  const handleInstallClick = async () => {
+    if (!deferredPrompt) return
+
+    deferredPrompt.prompt()
+    const { outcome } = await deferredPrompt.userChoice
+
+    if (outcome === 'accepted') {
+      setShowInstallButton(false)
+    }
+
+    setDeferredPrompt(null)
+  }
 
   return (
     <motion.header
@@ -83,9 +113,27 @@ export default function Header() {
                 </span>
               )}
             </motion.div>
-            </Link>
+          </Link>
 
-            {/* User - Only on desktop */}
+          {/* Install PWA Button */}
+          {mounted && showInstallButton && (
+            <motion.button
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={handleInstallClick}
+              className="hidden lg:flex items-center gap-2 bg-gradient-to-r from-pink-500 to-rose-600 text-white px-3 py-2 rounded-lg shadow-md hover:shadow-lg transition-all"
+              title="Install App"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              <span className="text-sm font-medium">Install</span>
+            </motion.button>
+          )}
+
+          {/* User - Only on desktop */}
             <Link href={user ? '/account' : '/auth'} className="hidden lg:block">
               <motion.div
                 whileHover={{ scale: 1.05 }}

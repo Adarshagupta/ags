@@ -1,12 +1,13 @@
 {
-  "name": "Quick Delivery - Fast Food Delivery",
-  "short_name": "QuickDel",
-  "description": "Get your favorite food delivered in 15-30 minutes",
+  "name": "Flowers N Petals - Gift & Flower Delivery",
+  "short_name": "FNP",
+  "description": "Send flowers, cakes, and gifts with same-day delivery. Express your love with personalized gifts.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#fc8019",
+  "theme_color": "#ec4899",
   "orientation": "portrait",
+  "scope": "/",
   "icons": [
     {
       "src": "/icons/icon-72x72.png",
@@ -56,5 +57,46 @@
       "type": "image/png",
       "purpose": "any maskable"
     }
-  ]
+  ],
+  "shortcuts": [
+    {
+      "name": "Browse Flowers",
+      "short_name": "Flowers",
+      "description": "Browse flower collections",
+      "url": "/categories/Flowers",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Browse Cakes",
+      "short_name": "Cakes",
+      "description": "Order delicious cakes",
+      "url": "/categories/Cakes",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Orders",
+      "short_name": "Orders",
+      "description": "View your orders",
+      "url": "/orders",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Cart",
+      "short_name": "Cart",
+      "description": "View shopping cart",
+      "url": "/cart",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    }
+  ],
+  "categories": ["shopping", "lifestyle", "gifts"],
+  "share_target": {
+    "action": "/share",
+    "method": "POST",
+    "enctype": "multipart/form-data",
+    "params": {
+      "title": "title",
+      "text": "text",
+      "url": "url"
+    }
+  }
 }
