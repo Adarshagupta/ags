@@ -10,7 +10,7 @@ import { formatPrice } from '@/lib/utils'
 import LocationPicker from '@/components/LocationPicker'
 import BottomNav from '@/components/BottomNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
-import SessionSync from '@/components/SessionSync'
+import { SessionSync } from '@/components/SessionSync'
 
 interface GiftWrap {
   id: string
@@ -242,7 +242,21 @@ export default function CheckoutPage() {
   if (!deliveryAddress) {
     return (
       <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-        <Header />
+        <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+          <div className="flex items-center justify-between px-3 lg:px-4 py-3">
+            <div className="flex items-center gap-3">
+              <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div>
+                <h1 className="text-lg font-bold text-gray-900 lg:text-xl">Checkout</h1>
+                <p className="text-xs text-gray-500">Select delivery address</p>
+              </div>
+            </div>
+          </div>
+        </div>
         <div className="max-w-2xl mx-auto px-4 py-20">
           <LocationPicker />
         </div>
