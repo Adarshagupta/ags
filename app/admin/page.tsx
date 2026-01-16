@@ -11,7 +11,7 @@ interface Stats {
   recentOrders: Array<{
     id: string
     orderNumber: string
-    totalAmount: number
+    total: number
     status: string
     createdAt: string
   }>
