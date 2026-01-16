@@ -77,8 +77,9 @@ export default function ProfilePage() {
     }
   }
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     logout()
+    await signOut({ redirect: false })
     router.push('/')
   }
 

@@ -55,30 +55,20 @@ export default function LoginPage() {
         if (result?.error) {
           setError(result.error)
         } else if (result?.ok) {
-          // Fetch user data and update store
-          const res = await fetch('/api/auth/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: formData.email,
-              password: formData.password
-            })
-          })
+          // Session will be automatically synced by SessionSync component
+          // Check user role from session
+          const sessionRes = await fetch('/api/auth/session')
+          const session = await sessionRes.json()
           
-          const data = await res.json()
-          if (res.ok) {
-            setUser(data.user)
-            if (data.user.role === 'ADMIN') {
-              router.push('/admin')
-            } else {
-              router.push('/')
-            }
+          if (session?.user?.role === 'ADMIN') {
+            router.push('/admin')
+          } else {
+            router.push('/')
           }
         }
       } else {
-        // Regular registration
-        const endpoint = '/api/auth/register'
-        const res = await fetch(endpoint, {
+        // Regular registration - sign up then automatically sign in
+        const res = await fetch('/api/auth/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(formData)
@@ -87,11 +77,21 @@ export default function LoginPage() {
         const data = await res.json()
 
         if (res.ok) {
-          setUser(data.user)
-          if (data.user.role === 'ADMIN') {
-            router.push('/admin')
+          // After successful signup, sign in with NextAuth to create session
+          const result = await signIn('credentials', {
+            email: formData.email,
+            password: formData.password,
+            redirect: false
+          })
+          
+          if (result?.ok) {
+            if (data.user.role === 'ADMIN') {
+              router.push('/admin')
+            } else {
+              router.push('/')
+            }
           } else {
-            router.push('/')
+            setError('Account created but login failed. Please try logging in.')
           }
         } else {
           setError(data.error || 'Something went wrong')

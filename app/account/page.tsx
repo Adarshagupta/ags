@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import { signOut } from 'next-auth/react'
 import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 import { useUserStore } from '@/lib/store/user'
@@ -15,8 +16,9 @@ export default function AccountPage() {
     setMounted(true)
   }, [])
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     logout()
+    await signOut({ redirect: false })
     router.push('/')
   }
 

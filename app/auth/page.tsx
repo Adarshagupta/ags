@@ -45,25 +45,47 @@ export default function AuthPage() {
     setError('')
 
     try {
-      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup'
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
+      if (isLogin) {
+        // Use NextAuth credentials provider for login
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false
+        })
 
-      const data = await response.json()
+        if (result?.error) {
+          setError(result.error)
+        } else if (result?.ok) {
+          // Session will be automatically synced by SessionSync component
+          router.push('/')
+        }
+      } else {
+        // Sign up then automatically sign in with NextAuth
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(formData),
+        })
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Authentication failed')
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Authentication failed')
+        }
+
+        // After successful signup, sign in with NextAuth to create session
+        const result = await signIn('credentials', {
+          email: formData.email,
+          password: formData.password,
+          redirect: false
+        })
+        
+        if (result?.ok) {
+          router.push('/')
+        } else {
+          setError('Account created but login failed. Please try logging in.')
+        }
       }
-
-      // Save token and user
-      localStorage.setItem('token', data.token)
-      setUser(data.user)
-
-      // Redirect to home
-      router.push('/')
     } catch (err: any) {
       setError(err.message)
     } finally {
