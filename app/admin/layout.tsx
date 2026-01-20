@@ -44,7 +44,8 @@ export default function AdminLayout({
     { icon: '📂', label: 'Categories', href: '/admin/categories' },
     { icon: '📦', label: 'Orders', href: '/admin/orders' },
     { icon: '👥', label: 'Users', href: '/admin/users' },
-    { icon: '🎀', label: 'Gift Wraps', href: '/admin/gift-wraps' },
+    { icon: '�', label: 'Sellers', href: '/admin/sellers' },
+    { icon: '�🎀', label: 'Gift Wraps', href: '/admin/gift-wraps' },
     { icon: '🎉', label: 'Occasions', href: '/admin/occasions' },
     { icon: '⚙️', label: 'Settings', href: '/admin/settings' },
   ]

@@ -19,6 +19,7 @@ model User {
   addresses     Address[]
   orders        Order[]
   giftRecipients GiftRecipient[]
+  seller        Seller?
   accounts      Account[]
   sessions      Session[]
   createdAt     DateTime  @default(now())
@@ -113,12 +114,15 @@ model Product {
   prepTime        Int          @default(15) // in minutes
   tags            String[]
   discount        Float?       @default(0)
+  sellerId        String?
+  seller          Seller?      @relation(fields: [sellerId], references: [id])
   orderItems      OrderItem[]
   createdAt       DateTime     @default(now())
   updatedAt       DateTime     @updatedAt
 
   @@index([category])
   @@index([isAvailable])
+  @@index([sellerId])
 }
 
 model Order {
@@ -211,10 +215,35 @@ model DeliveryPartner {
   @@index([isAvailable])
 }
 
+model Seller {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  businessName    String
+  businessAddress String
+  gstin           String?   @unique
+  phone           String
+  email           String
+  commission      Float     @default(15) // Commission percentage
+  bankAccountName String?
+  bankAccountNo   String?
+  ifscCode        String?
+  panNumber       String?
+  isActive        Boolean   @default(true)
+  isVerified      Boolean   @default(false)
+  products        Product[]
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  @@index([userId])
+  @@index([isActive])
+}
+
 enum UserRole {
   CUSTOMER
   ADMIN
   DELIVERY_PARTNER
+  SELLER
 }
 
 model Category {

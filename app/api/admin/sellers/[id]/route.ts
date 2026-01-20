@@ -1,0 +1,130 @@
+import { NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
+import { authOptions } from '@/lib/auth-options'
+import { prisma } from '@/lib/prisma'
+
+export async function GET(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session || session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const seller = await prisma.seller.findUnique({
+      where: { id: params.id },
+      include: {
+        user: true,
+        _count: {
+          select: {
+            products: true,
+          },
+        },
+      },
+    })
+
+    if (!seller) {
+      return NextResponse.json({ error: 'Seller not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(seller)
+  } catch (error) {
+    console.error('Error fetching seller:', error)
+    return NextResponse.json({ error: 'Failed to fetch seller' }, { status: 500 })
+  }
+}
+
+export async function PATCH(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session || session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const body = await request.json()
+
+    const seller = await prisma.seller.update({
+      where: { id: params.id },
+      data: {
+        ...(body.businessName && { businessName: body.businessName }),
+        ...(body.businessAddress && { businessAddress: body.businessAddress }),
+        ...(body.gstin !== undefined && { gstin: body.gstin }),
+        ...(body.phone && { phone: body.phone }),
+        ...(body.email && { email: body.email }),
+        ...(body.commission !== undefined && { commission: body.commission }),
+        ...(body.bankAccountName !== undefined && { bankAccountName: body.bankAccountName }),
+        ...(body.bankAccountNo !== undefined && { bankAccountNo: body.bankAccountNo }),
+        ...(body.ifscCode !== undefined && { ifscCode: body.ifscCode }),
+        ...(body.panNumber !== undefined && { panNumber: body.panNumber }),
+        ...(body.isActive !== undefined && { isActive: body.isActive }),
+        ...(body.isVerified !== undefined && { isVerified: body.isVerified }),
+      },
+      include: {
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
+      },
+    })
+
+    return NextResponse.json(seller)
+  } catch (error) {
+    console.error('Error updating seller:', error)
+    return NextResponse.json({ error: 'Failed to update seller' }, { status: 500 })
+  }
+}
+
+export async function DELETE(
+  request: Request,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const session = await getServerSession(authOptions)
+
+    if (!session || session.user?.role !== 'ADMIN') {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Check if seller has products
+    const seller = await prisma.seller.findUnique({
+      where: { id: params.id },
+      include: {
+        _count: {
+          select: {
+            products: true,
+          },
+        },
+      },
+    })
+
+    if (!seller) {
+      return NextResponse.json({ error: 'Seller not found' }, { status: 404 })
+    }
+
+    if (seller._count.products > 0) {
+      return NextResponse.json(
+        { error: 'Cannot delete seller with existing products' },
+        { status: 400 }
+      )
+    }
+
+    // Delete seller (this will also delete the user due to cascade)
+    await prisma.seller.delete({
+      where: { id: params.id },
+    })
+
+    return NextResponse.json({ message: 'Seller deleted successfully' })
+  } catch (error) {
+    console.error('Error deleting seller:', error)
+    return NextResponse.json({ error: 'Failed to delete seller' }, { status: 500 })
+  }
+}
