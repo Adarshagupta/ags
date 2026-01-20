@@ -62,7 +62,7 @@ export default function AdminLayout({
               </Link>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{user.name}</span>
+              <span className="text-sm text-gray-600">{user?.name || 'Admin'}</span>
               <Link href="/" className="text-sm text-orange-600 hover:text-orange-700 font-medium">
                 View Site →
               </Link>

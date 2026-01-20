@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { redis, REDIS_CHANNELS } from '@/lib/redis'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { generateOrderNumber } from '@/lib/utils'
+import { sendEmail, emailTemplates } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -82,8 +83,95 @@ export async function POST(request: NextRequest) {
         recipient: true,
         giftWrap: true,
         occasion: true,
+        user: {
+          select: {
+            name: true,
+            email: true,
+          },
+        },
       },
     })
+
+    // Send email notifications (non-blocking)
+    (async () => {
+      try {
+        // Customer confirmation email
+        if (order.user?.email) {
+          const addressText = order.address 
+            ? `${order.address.street}, ${order.address.city}, ${order.address.state} ${order.address.pincode}`
+            : 'Address not available'
+
+          await sendEmail({
+            to: order.user.email,
+            subject: `Order Confirmation - #${orderNumber}`,
+            html: emailTemplates.orderConfirmation({
+              orderNumber,
+              customerName: order.user.name || 'Customer',
+              items: order.items,
+              total: order.total,
+              deliveryAddress: addressText,
+            }),
+          })
+        }
+
+        // Notify sellers about their products in the order
+        const sellerProductMap = new Map<string, any[]>()
+        
+        for (const item of order.items) {
+          if (item.product.sellerId) {
+            if (!sellerProductMap.has(item.product.sellerId)) {
+              sellerProductMap.set(item.product.sellerId, [])
+            }
+            sellerProductMap.get(item.product.sellerId)!.push(item)
+          }
+        }
+
+        // Send email to each seller
+        for (const [sellerId, sellerItems] of sellerProductMap.entries()) {
+          const seller = await prisma.seller.findUnique({
+            where: { id: sellerId },
+            include: { user: true },
+          })
+
+          if (seller?.email) {
+            await sendEmail({
+              to: seller.email,
+              subject: `New Order Received - #${orderNumber}`,
+              html: emailTemplates.newOrderNotification({
+                sellerName: seller.businessName,
+                orderNumber,
+                customerName: order.user?.name || 'Customer',
+                items: sellerItems,
+                total: sellerItems.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+              }),
+            })
+          }
+        }
+
+        // Notify admin (fetch admin users)
+        const adminUsers = await prisma.user.findMany({
+          where: { role: 'ADMIN' },
+          select: { email: true },
+        })
+
+        for (const admin of adminUsers) {
+          if (admin.email) {
+            await sendEmail({
+              to: admin.email,
+              subject: `New Order Alert - #${orderNumber}`,
+              html: emailTemplates.adminNewOrder({
+                orderNumber,
+                customerName: order.user?.name || 'Customer',
+                total: order.total,
+                itemCount: order.items.length,
+              }),
+            })
+          }
+        }
+      } catch (emailError) {
+        console.error('Email notification error (non-critical):', emailError)
+      }
+    })()
 
     // Publish order update to Redis (optional - don't fail if Redis is unavailable)
     try {

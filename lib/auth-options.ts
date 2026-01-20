@@ -152,6 +152,17 @@ export const authOptions: NextAuthOptions = {
         }
       }
       return true
+    },
+    async redirect({ url, baseUrl }) {
+      // Get the user's role from the callback URL or session
+      if (url.includes('role=ADMIN')) {
+        return `${baseUrl}/admin`
+      }
+      if (url.includes('role=SELLER')) {
+        return `${baseUrl}/seller`
+      }
+      // Default redirect
+      return url.startsWith(baseUrl) ? url : baseUrl
     }
   },
   pages: {

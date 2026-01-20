@@ -62,6 +62,8 @@ export default function LoginPage() {
           
           if (session?.user?.role === 'ADMIN') {
             router.push('/admin')
+          } else if (session?.user?.role === 'SELLER') {
+            router.push('/seller')
           } else {
             router.push('/')
           }
@@ -87,6 +89,8 @@ export default function LoginPage() {
           if (result?.ok) {
             if (data.user.role === 'ADMIN') {
               router.push('/admin')
+            } else if (data.user.role === 'SELLER') {
+              router.push('/seller')
             } else {
               router.push('/')
             }

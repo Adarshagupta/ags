@@ -106,7 +106,7 @@ export default function ProfilePage() {
     }
   }
 
-  if (status === 'loading') {
+  if (!_hasHydrated || isLoading) {
     return (
       <div className="min-h-screen bg-white flex items-center justify-center">
         <div className="text-center">
@@ -132,7 +132,7 @@ export default function ProfilePage() {
             </Link>
             <div>
               <h1 className="text-lg font-bold text-gray-900">Profile</h1>
-              <p className="text-xs text-gray-500">{user.name}</p>
+              <p className="text-xs text-gray-500">{user?.name || 'User'}</p>
             </div>
           </div>
           <Link href="/account">
@@ -156,13 +156,13 @@ export default function ProfilePage() {
           <div className="flex items-center gap-4 mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-pink-100 to-rose-100 rounded-2xl flex items-center justify-center flex-shrink-0">
               <span className="text-3xl font-bold text-gray-700">
-                {user.name.charAt(0).toUpperCase()}
+                {user?.name?.charAt(0).toUpperCase() || '👤'}
               </span>
             </div>
             <div className="flex-1 min-w-0">
-              <h1 className="text-2xl font-bold text-gray-900 truncate">{user.name}</h1>
-              <p className="text-gray-500 text-sm truncate mt-0.5">{user.email}</p>
-              <p className="text-gray-500 text-sm">{user.phone}</p>
+              <h1 className="text-2xl font-bold text-gray-900 truncate">{user?.name || 'User'}</h1>
+              <p className="text-gray-500 text-sm truncate mt-0.5">{user?.email || ''}</p>
+              <p className="text-gray-500 text-sm">{user?.phone || ''}</p>
             </div>
           </div>
 
@@ -255,7 +255,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[11px] text-gray-400 uppercase tracking-wide font-medium">Full Name</p>
-                          <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">{user.name}</p>
+                          <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">{user?.name || 'User'}</p>
                         </div>
                       </div>
 
@@ -267,7 +267,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[11px] text-gray-400 uppercase tracking-wide font-medium">Email</p>
-                          <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">{user.email}</p>
+                          <p className="text-sm font-semibold text-gray-900 truncate mt-0.5">{user?.email || ''}</p>
                         </div>
                       </div>
 
@@ -279,7 +279,7 @@ export default function ProfilePage() {
                         </div>
                         <div className="flex-1 min-w-0">
                           <p className="text-[11px] text-gray-400 uppercase tracking-wide font-medium">Phone</p>
-                          <p className="text-sm font-semibold text-gray-900 mt-0.5">{user.phone}</p>
+                          <p className="text-sm font-semibold text-gray-900 mt-0.5">{user?.phone || 'Not provided'}</p>
                         </div>
                       </div>
                     </div>
