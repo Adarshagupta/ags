@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useSession } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 
 interface DashboardStats {
   totalProducts: number
@@ -14,8 +15,8 @@ interface DashboardStats {
 
 export default function SellerDashboard() {
   const { data: session } = useSession()
+  const router = useRouter()
   const [stats, setStats] = useState<DashboardStats | null>(null)
-  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchStats()
@@ -30,55 +31,84 @@ export default function SellerDashboard() {
       }
     } catch (error) {
       console.error('Failed to fetch stats:', error)
-    } finally {
-      setLoading(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
-      </div>
-    )
-  }
-
   return (
-    <div className="px-4 py-6">
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+    <div className="px-4 py-4 md:py-6 space-y-6">
+      {/* Welcome Section */}
+      <div className="bg-white border rounded-xl p-6 shadow-sm">
+        <h1 className="text-xl md:text-2xl font-bold text-gray-900 mb-1">
           Welcome back, {session?.user?.name}!
         </h1>
-        <p className="text-gray-600">Here's what's happening with your store today.</p>
+        <p className="text-gray-600 text-sm md:text-base">Here's your store overview</p>
       </div>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
         <StatCard
-          title="Total Products"
+          title="Products"
           value={stats?.totalProducts || 0}
           subtitle={`${stats?.activeProducts || 0} active`}
           icon="📦"
-          color="blue"
+          onClick={() => router.push('/seller/products')}
         />
         <StatCard
-          title="Total Orders"
+          title="Orders"
           value={stats?.totalOrders || 0}
           subtitle={`${stats?.pendingOrders || 0} pending`}
           icon="🛒"
-          color="green"
+          onClick={() => router.push('/seller/orders')}
         />
         <StatCard
-          title="Total Revenue"
-          value={`₹${stats?.totalRevenue?.toLocaleString() || 0}`}
-          subtitle={`₹${stats?.thisMonthRevenue?.toLocaleString() || 0} this month`}
+          title="Revenue"
+          value={`₹${(stats?.totalRevenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
+          subtitle={`₹${(stats?.thisMonthRevenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })} this month`}
           icon="💰"
-          color="pink"
+          className="col-span-2 lg:col-span-1"
         />
       </div>
 
-      <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <QuickActions />
-        <RecentActivity />
+      {/* Quick Actions */}
+      <div className="bg-white rounded-xl shadow-sm border p-4 md:p-6">
+        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <button
+            onClick={() => router.push('/seller/products/new')}
+            className="flex items-center gap-3 bg-gray-900 text-white p-4 rounded-lg hover:bg-gray-800 transition-colors shadow-sm"
+          >
+            <span className="text-2xl">➕</span>
+            <div className="text-left">
+              <div className="font-semibold">Add Product</div>
+              <div className="text-xs text-gray-300">Create new listing</div>
+            </div>
+          </button>
+          <button
+            onClick={() => router.push('/seller/orders')}
+            className="flex items-center gap-3 bg-white border-2 border-gray-900 text-gray-900 p-4 rounded-lg hover:bg-gray-50 transition-colors shadow-sm"
+          >
+            <span className="text-2xl">📋</span>
+            <div className="text-left">
+              <div className="font-semibold">View Orders</div>
+              <div className="text-xs text-gray-600">Manage deliveries</div>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* Tips Section */}
+      <div className="bg-gray-50 border rounded-xl p-4 md:p-6">
+        <div className="flex items-start gap-3">
+          <span className="text-3xl">💡</span>
+          <div>
+            <h3 className="font-semibold text-gray-900 mb-1">Seller Tips</h3>
+            <ul className="text-sm text-gray-700 space-y-1">
+              <li>• Keep your products updated with fresh images</li>
+              <li>• Respond to orders within 2 hours for better ratings</li>
+              <li>• Complete your profile for customer trust</li>
+            </ul>
+          </div>
+        </div>
       </div>
     </div>
   )
@@ -89,101 +119,29 @@ function StatCard({
   value,
   subtitle,
   icon,
-  color,
+  onClick,
+  className = '',
 }: {
   title: string
   value: string | number
   subtitle: string
   icon: string
-  color: string
+  onClick?: () => void
+  className?: string
 }) {
-  const colorClasses = {
-    blue: 'bg-blue-50 border-blue-200',
-    green: 'bg-green-50 border-green-200',
-    pink: 'bg-pink-50 border-pink-200',
-  }
-
   return (
-    <div className={`${colorClasses[color as keyof typeof colorClasses]} border rounded-lg p-6`}>
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
-          <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
+    <button
+      onClick={onClick}
+      className={`bg-white border hover:border-gray-400 text-left rounded-xl p-4 md:p-6 shadow-sm hover:shadow-md transition-all ${className}`}
+    >
+      <div className="flex items-start justify-between mb-2">
+        <div className="flex-1">
+          <p className="text-xs md:text-sm font-medium text-gray-600">{title}</p>
+          <p className="text-2xl md:text-3xl font-bold text-gray-900 mt-1 break-words">{value}</p>
         </div>
-        <div className="text-4xl">{icon}</div>
+        <div className="text-3xl md:text-4xl ml-2">{icon}</div>
       </div>
-    </div>
-  )
-}
-
-function QuickActions() {
-  return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-      <div className="space-y-3">
-        <a
-          href="/seller/products/new"
-          className="block w-full bg-pink-600 text-white text-center py-3 px-4 rounded-lg hover:bg-pink-700 transition"
-        >
-          + Add New Product
-        </a>
-        <a
-          href="/seller/products"
-          className="block w-full bg-gray-100 text-gray-900 text-center py-3 px-4 rounded-lg hover:bg-gray-200 transition"
-        >
-          View All Products
-        </a>
-        <a
-          href="/seller/orders"
-          className="block w-full bg-gray-100 text-gray-900 text-center py-3 px-4 rounded-lg hover:bg-gray-200 transition"
-        >
-          View Orders
-        </a>
-      </div>
-    </div>
-  )
-}
-
-function RecentActivity() {
-  return (
-    <div className="bg-white rounded-lg shadow p-6">
-      <h2 className="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
-      <div className="space-y-4">
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-green-100 rounded-full flex items-center justify-center">
-              <span className="text-green-600 text-sm">✓</span>
-            </div>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-900">New order received</p>
-            <p className="text-sm text-gray-500">2 minutes ago</p>
-          </div>
-        </div>
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-              <span className="text-blue-600 text-sm">+</span>
-            </div>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-900">Product added</p>
-            <p className="text-sm text-gray-500">1 hour ago</p>
-          </div>
-        </div>
-        <div className="flex items-start">
-          <div className="flex-shrink-0">
-            <div className="h-8 w-8 bg-yellow-100 rounded-full flex items-center justify-center">
-              <span className="text-yellow-600 text-sm">!</span>
-            </div>
-          </div>
-          <div className="ml-3">
-            <p className="text-sm font-medium text-gray-900">Low stock alert</p>
-            <p className="text-sm text-gray-500">3 hours ago</p>
-          </div>
-        </div>
-      </div>
-    </div>
+      <p className="text-xs text-gray-600 text-left">{subtitle}</p>
+    </button>
   )
 }
