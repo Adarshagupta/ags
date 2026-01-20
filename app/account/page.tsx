@@ -68,9 +68,9 @@ export default function AccountPage() {
               {user.name?.charAt(0).toUpperCase() || '👤'}
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xl font-bold truncate">{user.name}</h2>
-              <p className="text-white/90 text-sm truncate">{user.email}</p>
-              <p className="text-white/80 text-xs mt-1">{user.phone}</p>
+              <h2 className="text-xl font-bold truncate">{user?.name || 'User'}</h2>
+              <p className="text-white/90 text-sm truncate">{user?.email || ''}</p>
+              <p className="text-white/80 text-xs mt-1">{user?.phone || ''}</p>
             </div>
           </div>
         </div>
