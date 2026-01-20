@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -14,8 +14,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     const seller = await prisma.seller.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         user: true,
         _count: {
@@ -39,7 +41,7 @@ export async function GET(
 
 export async function PATCH(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -49,9 +51,10 @@ export async function PATCH(
     }
 
     const body = await request.json()
+    const { id } = await params
 
     const seller = await prisma.seller.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...(body.businessName && { businessName: body.businessName }),
         ...(body.businessAddress && { businessAddress: body.businessAddress }),
@@ -85,7 +88,7 @@ export async function PATCH(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const session = await getServerSession(authOptions)
@@ -94,9 +97,11 @@ export async function DELETE(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    const { id } = await params
+
     // Check if seller has products
     const seller = await prisma.seller.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         _count: {
           select: {
@@ -119,7 +124,7 @@ export async function DELETE(
 
     // Delete seller (this will also delete the user due to cascade)
     await prisma.seller.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: 'Seller deleted successfully' })
