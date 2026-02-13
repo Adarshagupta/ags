@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
+import { Suspense } from 'react'
 import './globals.css'
 import { Providers } from './providers'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
@@ -109,7 +110,9 @@ export default function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
-          <RouteLoader />
+          <Suspense fallback={null}>
+            <RouteLoader />
+          </Suspense>
           <SessionSync />
           <OfflineIndicator />
           <PWAInstallPrompt />
