@@ -149,7 +149,8 @@ const nextConfig = {
   experimental: {
     serverActions: {
       bodySizeLimit: '2mb'
-    }
+    },
+    optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
   },
   images: {
     domains: ['localhost', 'res.cloudinary.com'],
@@ -159,6 +160,10 @@ const nextConfig = {
         hostname: '**'
       }
     ]
+  },
+  // Optimize routing performance
+  compiler: {
+    removeConsole: process.env.NODE_ENV === 'production'
   }
 }
 

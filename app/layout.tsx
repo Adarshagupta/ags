@@ -5,8 +5,13 @@ import { Providers } from './providers'
 import PWAInstallPrompt from '@/components/PWAInstallPrompt'
 import OfflineIndicator from '@/components/OfflineIndicator'
 import { SessionSync } from '@/components/SessionSync'
+import RouteLoader from '@/components/RouteLoader'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: true
+})
 
 export function generateViewport(): Viewport {
   return {
@@ -104,6 +109,7 @@ export default function RootLayout({
       </head>
       <body className={inter.className} suppressHydrationWarning>
         <Providers>
+          <RouteLoader />
           <SessionSync />
           <OfflineIndicator />
           <PWAInstallPrompt />

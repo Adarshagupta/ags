@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
+import { sendEmail, emailTemplates } from '@/lib/email'
 
 export async function GET() {
   try {
@@ -91,7 +92,7 @@ export async function POST(request: Request) {
         },
       })
 
-      return await tx.seller.create({
+      return tx.seller.create({
         data: {
           userId: user.id,
           businessName,
@@ -116,7 +117,46 @@ export async function POST(request: Request) {
           },
         },
       })
-    })
+    });
+
+    // Send email notifications (non-blocking)
+    void (async () => {
+      try {
+        // Send welcome email to seller with credentials
+        await sendEmail({
+          to: email,
+          subject: 'Welcome to AGS Seller Platform',
+          html: emailTemplates.sellerAccountCreated({
+            sellerName: name,
+            businessName,
+            email,
+            password, // Send original password (only this one time)
+          }),
+        })
+
+        // Notify admin about new seller
+        const adminUsers = await prisma.user.findMany({
+          where: { role: 'ADMIN' },
+          select: { email: true },
+        })
+
+        for (const admin of adminUsers) {
+          if (admin.email) {
+            await sendEmail({
+              to: admin.email,
+              subject: 'New Seller Account Created',
+              html: emailTemplates.adminNewSeller({
+                businessName,
+                sellerName: name,
+                email,
+              }),
+            })
+          }
+        }
+      } catch (emailError) {
+        console.error('Email notification error (non-critical):', emailError)
+      }
+    })()
 
     return NextResponse.json(seller, { status: 201 })
   } catch (error) {
