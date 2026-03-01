@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import { resolveImageUrl } from '@/lib/image-url'
 
 interface Product {
   id: string
@@ -103,7 +104,7 @@ export default function SellerProductsPage() {
               <div className="p-4">
                 <div className="flex gap-4">
                   <img
-                    src={product.image}
+                    src={resolveImageUrl(product.image)}
                     alt={product.name}
                     className="h-20 w-20 md:h-24 md:w-24 rounded-lg object-cover flex-shrink-0"
                   />

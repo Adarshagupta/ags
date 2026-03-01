@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import Header from '@/components/Header'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { useCartStore } from '@/lib/store/cart'
+import { resolveImageUrl } from '@/lib/image-url'
 
 interface ProductVariant {
   color: string
@@ -110,7 +111,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       id: product.id,
       name: product.name,
       price: product.price - (product.price * (product.discount || 0) / 100),
-      image: selectedVariant?.image || product.image,
+      image: resolveImageUrl(selectedVariant?.image || product.image),
       isVeg: true,
       quantity
     })
@@ -133,10 +134,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const allImages = [product.image, ...(product.images || [])].filter(Boolean)
-  const variants = normalizeVariants(product.variants)
+  const variants = normalizeVariants(product.variants).map((variant) => ({
+    ...variant,
+    image: resolveImageUrl(variant.image),
+  }))
   const selectedVariant = selectedVariantIndex !== null ? variants[selectedVariantIndex] : null
+  const resolvedAllImages = allImages.map((img) => resolveImageUrl(String(img || ''))).filter(Boolean)
   const galleryImages = Array.from(
-    new Set([...(selectedVariant?.image ? [selectedVariant.image] : []), ...allImages])
+    new Set([...(selectedVariant?.image ? [selectedVariant.image] : []), ...resolvedAllImages])
   )
   const activeImage = galleryImages[Math.min(selectedImage, Math.max(0, galleryImages.length - 1))]
   const finalPrice = product.price - (product.price * (product.discount || 0) / 100)
@@ -168,8 +173,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             animate={{ opacity: 1 }}
             className="relative w-full aspect-square bg-gradient-to-br from-pink-50 to-rose-50"
           >
-            <Image
-              src={activeImage}
+            <Image unoptimized src={activeImage}
               alt={product.imageAlt || product.name}
               fill
               className="object-cover"
@@ -198,7 +202,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     selectedImage === idx ? 'border-pink-500 shadow-lg ring-2 ring-white' : 'border-white/80 opacity-70 hover:opacity-100'
                   }`}
                 >
-                  <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
+                  <Image unoptimized src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
                 </motion.button>
               ))}
             </div>
@@ -338,7 +342,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="flex-shrink-0 w-32 bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
                 >
                   <div className="relative h-32 bg-gray-100">
-                    <Image src={addon.image} alt={addon.name} fill className="object-cover" />
+                    <Image unoptimized src={resolveImageUrl(addon.image)} alt={addon.name} fill className="object-cover" />
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-semibold text-gray-900 truncate">{addon.name}</p>
@@ -369,8 +373,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="group bg-white rounded-2xl overflow-hidden cursor-pointer shadow-sm hover:shadow-xl transition-all duration-300"
                 >
                   <div className="relative h-44 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-                    <Image 
-                      src={relatedProduct.image} 
+                    <Image unoptimized src={resolveImageUrl(relatedProduct.image)} 
                       alt={relatedProduct.name} 
                       fill 
                       className="object-cover group-hover:scale-110 transition-transform duration-500" 
@@ -419,8 +422,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 animate={{ opacity: 1, y: 0 }}
                 className="relative aspect-square bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl overflow-hidden"
               >
-                <Image
-                  src={activeImage}
+                <Image unoptimized src={activeImage}
                   alt={product.imageAlt || product.name}
                   fill
                   className="object-cover"
@@ -444,7 +446,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         selectedImage === idx ? 'border-pink-500 shadow-lg ring-2 ring-white scale-105' : 'border-white/80 opacity-70 hover:opacity-100 hover:scale-105'
                       }`}
                     >
-                      <Image src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
+                      <Image unoptimized src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
                     </button>
                   ))}
                 </div>
@@ -571,7 +573,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
                 >
                   <div className="relative h-48 bg-gray-100">
-                    <Image src={addon.image} alt={addon.name} fill className="object-cover" />
+                    <Image unoptimized src={resolveImageUrl(addon.image)} alt={addon.name} fill className="object-cover" />
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-semibold text-gray-900 truncate">{addon.name}</p>
@@ -603,8 +605,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   className="group bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100"
                 >
                   <div className="relative h-72 bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-                    <Image 
-                      src={relatedProduct.image} 
+                    <Image unoptimized src={resolveImageUrl(relatedProduct.image)} 
                       alt={relatedProduct.name} 
                       fill 
                       className="object-cover group-hover:scale-110 transition-transform duration-700" 
@@ -662,3 +663,4 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     </div>
   )
 }
+

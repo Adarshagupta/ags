@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
+import { resolveImageUrl } from '@/lib/image-url'
 
 interface Product {
   id: string
@@ -139,8 +140,7 @@ export default function AdminProducts() {
                       <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                          <Image
-                            src={product.image}
+                          <Image unoptimized src={resolveImageUrl(product.image)}
                             alt={product.name}
                             width={48}
                             height={48}
@@ -219,3 +219,4 @@ export default function AdminProducts() {
     </div>
   )
 }
+

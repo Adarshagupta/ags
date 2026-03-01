@@ -3,22 +3,27 @@
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+}
+
 export default function PWAInstallPrompt() {
   const [showInstall, setShowInstall] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
 
   useEffect(() => {
     const handler = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e)
-      
       // Check if user has dismissed the prompt before
       const dismissed = localStorage.getItem('pwa-install-dismissed')
       const dismissedTime = dismissed ? parseInt(dismissed) : 0
       const daysSinceDismissed = (Date.now() - dismissedTime) / (1000 * 60 * 60 * 24)
       
-      // Show prompt if not dismissed or if 7 days have passed
+      // Only prevent the default banner when showing our custom prompt.
       if (!dismissed || daysSinceDismissed > 7) {
+        const installEvent = e as BeforeInstallPromptEvent
+        e.preventDefault()
+        setDeferredPrompt(installEvent)
         setTimeout(() => setShowInstall(true), 3000)
       }
     }
@@ -31,11 +36,13 @@ export default function PWAInstallPrompt() {
   const handleInstall = async () => {
     if (!deferredPrompt) return
 
-    deferredPrompt.prompt()
+    await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
 
     if (outcome === 'accepted') {
       console.log('PWA installed')
+    } else {
+      localStorage.setItem('pwa-install-dismissed', Date.now().toString())
     }
 
     setDeferredPrompt(null)

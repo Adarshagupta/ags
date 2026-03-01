@@ -8,10 +8,15 @@ import { useUserStore } from '@/lib/store/user'
 import { useLocationStore } from '@/lib/store/location'
 import LocationModal from './LocationModal'
 
+type BeforeInstallPromptEvent = Event & {
+  prompt: () => Promise<void>
+  userChoice: Promise<{ outcome: 'accepted' | 'dismissed'; platform: string }>
+}
+
 export default function Header() {
   const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<any>(null)
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallButton, setShowInstallButton] = useState(false)
   
   const totalItems = useCartStore((state) => state.getTotalItems())
@@ -26,8 +31,7 @@ export default function Header() {
     
     if (!isStandalone) {
       const handler = (e: Event) => {
-        e.preventDefault()
-        setDeferredPrompt(e)
+        setDeferredPrompt(e as BeforeInstallPromptEvent)
         setShowInstallButton(true)
       }
 
@@ -40,7 +44,7 @@ export default function Header() {
   const handleInstallClick = async () => {
     if (!deferredPrompt) return
 
-    deferredPrompt.prompt()
+    await deferredPrompt.prompt()
     const { outcome } = await deferredPrompt.userChoice
 
     if (outcome === 'accepted') {

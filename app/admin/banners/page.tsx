@@ -199,7 +199,7 @@ export default function AdminBanners() {
           banners.map((banner) => (
             <div key={banner.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
               <div className="relative h-48">
-                <Image src={banner.image} alt={banner.title} fill className="object-cover" />
+                <Image unoptimized src={banner.image} alt={banner.title} fill className="object-cover" />
                 {banner.isActive && (
                   <span className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
                     Active
@@ -228,3 +228,4 @@ export default function AdminBanners() {
     </div>
   )
 }
+

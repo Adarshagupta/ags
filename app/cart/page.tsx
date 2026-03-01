@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image-url'
 import BottomNav from '@/components/BottomNav'
 
 interface GiftWrap {
@@ -140,8 +141,7 @@ export default function CartPage() {
                 className="p-3 lg:p-4 flex items-start space-x-3 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
               >
                 <div className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
-                  <Image
-                    src={item.image}
+                  <Image unoptimized src={resolveImageUrl(item.image)}
                     alt={item.name}
                     fill
                     className="object-cover"
@@ -212,3 +212,4 @@ export default function CartPage() {
     </div>
   )
 }
+

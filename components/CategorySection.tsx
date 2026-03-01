@@ -76,8 +76,7 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
               } bg-gradient-to-br from-gray-50 to-gray-100`}
             >
               {category.image ? (
-                <Image
-                  src={category.image}
+                <Image unoptimized src={category.image}
                   alt={category.name}
                   width={64}
                   height={64}
@@ -102,3 +101,4 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
     </div>
   )
 }
+

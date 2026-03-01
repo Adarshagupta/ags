@@ -5,6 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image-url'
 
 interface ProductCardProps {
   product: {
@@ -31,7 +32,7 @@ export default function ProductCard({ product }: ProductCardProps) {
       id: product.id,
       name: product.name,
       price: product.price,
-      image: product.image,
+      image: imageUrl,
       isVeg: product.isVeg,
     })
   }
@@ -51,6 +52,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const discountedPrice = product.discount
     ? product.price - (product.price * product.discount) / 100
     : product.price
+  const imageUrl = resolveImageUrl(product.image)
 
   return (
     <Link href={`/products/${product.id}`}>
@@ -61,8 +63,7 @@ export default function ProductCard({ product }: ProductCardProps) {
         className="bg-white rounded-xl overflow-hidden border border-neutral-100 cursor-pointer"
       >
       <div className="relative aspect-square w-full">
-        <Image
-          src={product.image}
+        <Image unoptimized src={imageUrl}
           alt={product.name}
           fill
           className="object-cover"
@@ -147,3 +148,4 @@ export default function ProductCard({ product }: ProductCardProps) {
     </Link>
   )
 }
+

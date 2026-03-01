@@ -156,6 +156,7 @@ const nextConfig = {
     optimizePackageImports: ['lucide-react', '@radix-ui/react-icons']
   },
   images: {
+    unoptimized: true,
     domains: ['localhost', 'res.cloudinary.com'],
     remotePatterns: [
       {
