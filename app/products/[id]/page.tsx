@@ -8,6 +8,12 @@ import Header from '@/components/Header'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { useCartStore } from '@/lib/store/cart'
 
+interface ProductVariant {
+  color: string
+  size: string
+  image: string
+}
+
 interface Product {
   id: string
   name: string
@@ -16,6 +22,7 @@ interface Product {
   price: number
   image: string
   images: string[]
+  variants?: ProductVariant[]
   imageAlt?: string
   isVeg: boolean
   prepTime: number
@@ -24,12 +31,29 @@ interface Product {
   isAvailable: boolean
 }
 
+function normalizeVariants(input: unknown): ProductVariant[] {
+  if (!Array.isArray(input)) return []
+
+  return input
+    .map((raw) => {
+      const variant = raw as ProductVariant
+      const color = String(variant?.color || '').trim()
+      const size = String(variant?.size || '').trim()
+      const image = String(variant?.image || '').trim()
+
+      if (!image || (!color && !size)) return null
+      return { color, size, image }
+    })
+    .filter((variant): variant is ProductVariant => Boolean(variant))
+}
+
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(true)
   const [selectedImage, setSelectedImage] = useState(0)
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState<number | null>(null)
   const [quantity, setQuantity] = useState(1)
   const [addons, setAddons] = useState<Product[]>([])
   const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
@@ -38,6 +62,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     fetchProduct()
     fetchRelatedProducts()
+    setSelectedImage(0)
+    setSelectedVariantIndex(null)
   }, [id])
 
   const fetchProduct = async () => {
@@ -84,7 +110,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       id: product.id,
       name: product.name,
       price: product.price - (product.price * (product.discount || 0) / 100),
-      image: product.image,
+      image: selectedVariant?.image || product.image,
       isVeg: true,
       quantity
     })
@@ -107,6 +133,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const allImages = [product.image, ...(product.images || [])].filter(Boolean)
+  const variants = normalizeVariants(product.variants)
+  const selectedVariant = selectedVariantIndex !== null ? variants[selectedVariantIndex] : null
+  const galleryImages = Array.from(
+    new Set([...(selectedVariant?.image ? [selectedVariant.image] : []), ...allImages])
+  )
+  const activeImage = galleryImages[Math.min(selectedImage, Math.max(0, galleryImages.length - 1))]
   const finalPrice = product.price - (product.price * (product.discount || 0) / 100)
 
   return (
@@ -137,7 +169,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             className="relative w-full aspect-square bg-gradient-to-br from-pink-50 to-rose-50"
           >
             <Image
-              src={allImages[selectedImage]}
+              src={activeImage}
               alt={product.imageAlt || product.name}
               fill
               className="object-cover"
@@ -155,9 +187,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </motion.div>
 
           {/* Image Thumbnails - Overlapping bottom */}
-          {allImages.length > 1 && (
+          {galleryImages.length > 1 && (
             <div className="absolute bottom-4 left-0 right-0 flex gap-2 overflow-x-auto px-4 scrollbar-hide">
-              {allImages.map((img, idx) => (
+              {galleryImages.map((img, idx) => (
                 <motion.button
                   key={idx}
                   whileTap={{ scale: 0.95 }}
@@ -207,6 +239,34 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </>
             )}
           </div>
+
+          {variants.length > 0 && (
+            <div>
+              <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Variants</p>
+              <div className="flex flex-wrap gap-2">
+                {variants.map((variant, index) => {
+                  const label = [variant.color, variant.size].filter(Boolean).join(' / ')
+                  return (
+                    <button
+                      key={`${label}-${index}`}
+                      type="button"
+                      onClick={() => {
+                        setSelectedVariantIndex(index)
+                        setSelectedImage(0)
+                      }}
+                      className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                        selectedVariantIndex === index
+                          ? 'bg-pink-600 text-white border-pink-600'
+                          : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400'
+                      }`}
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          )}
 
           {/* Description */}
           <p className="text-gray-600 leading-relaxed">{product.description}</p>
@@ -360,7 +420,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 className="relative aspect-square bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl overflow-hidden"
               >
                 <Image
-                  src={allImages[selectedImage]}
+                  src={activeImage}
                   alt={product.imageAlt || product.name}
                   fill
                   className="object-cover"
@@ -374,9 +434,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </motion.div>
 
               {/* Image Thumbnails - Overlapping bottom */}
-              {allImages.length > 1 && (
+              {galleryImages.length > 1 && (
                 <div className="absolute bottom-6 left-6 right-6 flex gap-3">
-                  {allImages.map((img, idx) => (
+                  {galleryImages.map((img, idx) => (
                     <button
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
@@ -434,6 +494,34 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     {tag}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {variants.length > 0 && (
+              <div>
+                <p className="text-sm font-semibold text-gray-700 mb-2">Variants</p>
+                <div className="flex flex-wrap gap-2">
+                  {variants.map((variant, index) => {
+                    const label = [variant.color, variant.size].filter(Boolean).join(' / ')
+                    return (
+                      <button
+                        key={`${label}-${index}`}
+                        type="button"
+                        onClick={() => {
+                          setSelectedVariantIndex(index)
+                          setSelectedImage(0)
+                        }}
+                        className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                          selectedVariantIndex === index
+                            ? 'bg-pink-600 text-white border-pink-600'
+                            : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400'
+                        }`}
+                      >
+                        {label}
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
             )}
 

@@ -3,6 +3,28 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 
+type ProductVariantInput = {
+  color?: unknown
+  size?: unknown
+  image?: unknown
+}
+
+function normalizeVariants(input: unknown) {
+  if (!Array.isArray(input)) return []
+
+  return input
+    .map((raw) => {
+      const variant = raw as ProductVariantInput
+      const color = String(variant?.color || '').trim()
+      const size = String(variant?.size || '').trim()
+      const image = String(variant?.image || '').trim()
+
+      if (!image || (!color && !size)) return null
+      return { color, size, image }
+    })
+    .filter((variant): variant is { color: string; size: string; image: string } => Boolean(variant))
+}
+
 export async function GET() {
   try {
     const session = await getServerSession(authOptions)
@@ -58,6 +80,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
+    const variants = normalizeVariants(body?.variants)
 
     const product = await prisma.product.create({
       data: {
@@ -67,6 +90,7 @@ export async function POST(request: Request) {
         price: parseFloat(body.price),
         image: body.image,
         images: body.images || [],
+        variants,
         imageAlt: body.imageAlt,
         isAvailable: body.isAvailable !== false,
         isVeg: body.isVeg !== false,

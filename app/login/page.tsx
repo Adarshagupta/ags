@@ -110,7 +110,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-            🎁 AGS Gifts
+            🎁 Chapter Curus
           </Link>
           <p className="text-gray-600 mt-2">{isLogin ? 'Welcome back!' : 'Create your account'}</p>
         </div>
@@ -239,7 +239,7 @@ export default function LoginPage() {
         {/* Admin Login Hint */}
         {isLogin && (
           <div className="mt-4 p-3 bg-gray-50 rounded-lg text-xs text-gray-600 text-center">
-            <strong>Admin Login:</strong> admin@AGS.com / admin123
+            <strong>Admin Login:</strong> admin@fnp.com / admin123
           </div>
         )}
       </div>

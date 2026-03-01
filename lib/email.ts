@@ -32,7 +32,7 @@ function stripHtml(html: string): string {
 }
 
 function buildFromAddress(): string {
-  const fromName = process.env.SMTP_FROM_NAME || 'AGS Gifts'
+  const fromName = process.env.SMTP_FROM_NAME || 'Chapter Curus'
   const fromEmail = process.env.SMTP_FROM_EMAIL || 'no-reply@example.com'
   return `"${fromName}" <${fromEmail}>`
 }
@@ -112,7 +112,7 @@ export const emailTemplates = {
 
     return `
       <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #1f2937;">
-        <h2>Welcome to AGS Seller Platform</h2>
+        <h2>Welcome to Chapter Curus Seller Platform</h2>
         <p>Hello ${safeSellerName},</p>
         <p>Your seller account has been created for <strong>${safeBusinessName}</strong>.</p>
         <p>You can log in with the credentials below:</p>
@@ -147,3 +147,4 @@ export const emailTemplates = {
     `
   },
 }
+

@@ -3,12 +3,25 @@
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { uploadProductImage } from '@/lib/upload-image'
+
+type ProductVariant = {
+  color: string
+  size: string
+  image: string
+}
 
 export default function EditProduct({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
+  const [mainImageFile, setMainImageFile] = useState<File | null>(null)
+  const [additionalImageFile, setAdditionalImageFile] = useState<File | null>(null)
+  const [variantFiles, setVariantFiles] = useState<Array<File | null>>([])
+  const [uploadingMainImage, setUploadingMainImage] = useState(false)
+  const [uploadingAdditionalImage, setUploadingAdditionalImage] = useState(false)
+  const [uploadingVariantIndex, setUploadingVariantIndex] = useState<number | null>(null)
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -16,6 +29,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
     price: 0,
     image: '',
     images: [''],
+    variants: [] as ProductVariant[],
     imageAlt: '',
     isVeg: true,
     prepTime: 15,
@@ -23,6 +37,102 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
     discount: 0,
     isAvailable: true
   })
+
+  const setAdditionalImageUrl = (url: string) => {
+    setFormData((prev) => {
+      const firstEmptyIndex = prev.images.findIndex((img) => !img.trim())
+      if (firstEmptyIndex >= 0) {
+        const nextImages = [...prev.images]
+        nextImages[firstEmptyIndex] = url
+        return { ...prev, images: nextImages }
+      }
+
+      return { ...prev, images: [...prev.images, url] }
+    })
+  }
+
+  const handleMainImageUpload = async () => {
+    if (!mainImageFile) {
+      alert('Please choose an image file first')
+      return
+    }
+
+    try {
+      setUploadingMainImage(true)
+      const url = await uploadProductImage(mainImageFile)
+      setFormData((prev) => ({ ...prev, image: url }))
+      setMainImageFile(null)
+    } catch (error: any) {
+      alert(error?.message || 'Failed to upload image')
+    } finally {
+      setUploadingMainImage(false)
+    }
+  }
+
+  const handleAdditionalImageUpload = async () => {
+    if (!additionalImageFile) {
+      alert('Please choose an image file first')
+      return
+    }
+
+    try {
+      setUploadingAdditionalImage(true)
+      const url = await uploadProductImage(additionalImageFile)
+      setAdditionalImageUrl(url)
+      setAdditionalImageFile(null)
+    } catch (error: any) {
+      alert(error?.message || 'Failed to upload image')
+    } finally {
+      setUploadingAdditionalImage(false)
+    }
+  }
+
+  const addVariant = () => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: [...prev.variants, { color: '', size: '', image: '' }],
+    }))
+    setVariantFiles((prev) => [...prev, null])
+  }
+
+  const removeVariant = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      variants: prev.variants.filter((_, i) => i !== index),
+    }))
+    setVariantFiles((prev) => prev.filter((_, i) => i !== index))
+  }
+
+  const updateVariant = (index: number, field: keyof ProductVariant, value: string) => {
+    setFormData((prev) => {
+      const nextVariants = [...prev.variants]
+      nextVariants[index] = { ...nextVariants[index], [field]: value }
+      return { ...prev, variants: nextVariants }
+    })
+  }
+
+  const uploadVariantImage = async (index: number) => {
+    const file = variantFiles[index]
+    if (!file) {
+      alert('Please choose a variant image file first')
+      return
+    }
+
+    try {
+      setUploadingVariantIndex(index)
+      const url = await uploadProductImage(file)
+      updateVariant(index, 'image', url)
+      setVariantFiles((prev) => {
+        const nextFiles = [...prev]
+        nextFiles[index] = null
+        return nextFiles
+      })
+    } catch (error: any) {
+      alert(error?.message || 'Failed to upload variant image')
+    } finally {
+      setUploadingVariantIndex(null)
+    }
+  }
 
   useEffect(() => {
     fetchProduct()
@@ -33,6 +143,16 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
       const res = await fetch(`/api/admin/products/${id}`)
       if (res.ok) {
         const product = await res.json()
+        const variants = Array.isArray(product.variants)
+          ? product.variants
+              .map((variant: any) => ({
+                color: String(variant?.color || ''),
+                size: String(variant?.size || ''),
+                image: String(variant?.image || ''),
+              }))
+              .filter((variant: ProductVariant) => variant.image && (variant.color || variant.size))
+          : []
+
         setFormData({
           name: product.name,
           description: product.description,
@@ -40,6 +160,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
           price: product.price,
           image: product.image,
           images: Array.isArray(product.images) && product.images.length > 0 ? product.images : [''],
+          variants,
           imageAlt: product.imageAlt || '',
           isVeg: product.isVeg,
           prepTime: product.prepTime,
@@ -47,6 +168,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
           discount: product.discount || 0,
           isAvailable: product.isAvailable
         })
+        setVariantFiles(new Array(variants.length).fill(null))
       }
     } catch (error) {
       console.error('Error fetching product:', error)
@@ -66,7 +188,14 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
         body: JSON.stringify({
           ...formData,
           tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
-          images: formData.images.filter(img => img.trim())
+          images: formData.images.filter(img => img.trim()),
+          variants: formData.variants
+            .map((variant) => ({
+              color: variant.color.trim(),
+              size: variant.size.trim(),
+              image: variant.image.trim(),
+            }))
+            .filter((variant) => variant.image && (variant.color || variant.size)),
         })
       })
 
@@ -143,7 +272,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
             />
           </div>
 
-          <div>
+          <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL*</label>
             <input
               type="text"
@@ -152,6 +281,23 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
+            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp,image/gif"
+                onChange={(e) => setMainImageFile(e.target.files?.[0] || null)}
+                className="block w-full text-sm text-gray-700 sm:w-auto"
+              />
+              <button
+                type="button"
+                onClick={handleMainImageUpload}
+                disabled={!mainImageFile || uploadingMainImage}
+                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+              >
+                {uploadingMainImage ? 'Uploading...' : 'Upload Main Image'}
+              </button>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">JPG, PNG, WEBP or GIF. Max size 5MB.</p>
           </div>
 
           <div className="col-span-2">
@@ -188,6 +334,102 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
             >
               + Add Another Image
             </button>
+            <div className="mt-3 rounded-lg border border-dashed border-gray-300 p-3">
+              <p className="text-xs text-gray-600">Upload additional image</p>
+              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
+                <input
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={(e) => setAdditionalImageFile(e.target.files?.[0] || null)}
+                  className="block w-full text-sm text-gray-700 sm:w-auto"
+                />
+                <button
+                  type="button"
+                  onClick={handleAdditionalImageUpload}
+                  disabled={!additionalImageFile || uploadingAdditionalImage}
+                  className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                >
+                  {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="col-span-2">
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-medium text-gray-700">Product Variants</label>
+              <button
+                type="button"
+                onClick={addVariant}
+                className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-200"
+              >
+                + Add Variant
+              </button>
+            </div>
+            {formData.variants.length === 0 && (
+              <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg p-3">
+                Add color or size variants and upload a specific image for each variant.
+              </p>
+            )}
+            {formData.variants.map((variant, index) => (
+              <div key={index} className="mb-3 rounded-lg border border-gray-200 p-3">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                  <input
+                    type="text"
+                    value={variant.color}
+                    onChange={(e) => updateVariant(index, 'color', e.target.value)}
+                    placeholder="Color (e.g., Red)"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                  <input
+                    type="text"
+                    value={variant.size}
+                    onChange={(e) => updateVariant(index, 'size', e.target.value)}
+                    placeholder="Size (e.g., Large)"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                  <input
+                    type="text"
+                    value={variant.image}
+                    onChange={(e) => updateVariant(index, 'image', e.target.value)}
+                    placeholder="Variant Image URL"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
+                </div>
+                <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                    <input
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp,image/gif"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0] || null
+                        setVariantFiles((prev) => {
+                          const nextFiles = [...prev]
+                          nextFiles[index] = file
+                          return nextFiles
+                        })
+                      }}
+                      className="block w-full text-xs text-gray-700 sm:w-auto"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => uploadVariantImage(index)}
+                      disabled={!variantFiles[index] || uploadingVariantIndex === index}
+                      className="px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-medium hover:bg-black disabled:opacity-50"
+                    >
+                      {uploadingVariantIndex === index ? 'Uploading...' : 'Upload Variant Image'}
+                    </button>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => removeVariant(index)}
+                    className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 self-start"
+                  >
+                    Remove Variant
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
 
           <div>

@@ -6,6 +6,28 @@ function toNumber(value: unknown, fallback: number) {
   return Number.isFinite(n) ? n : fallback
 }
 
+type ProductVariantInput = {
+  color?: unknown
+  size?: unknown
+  image?: unknown
+}
+
+function normalizeVariants(input: unknown) {
+  if (!Array.isArray(input)) return []
+
+  return input
+    .map((raw) => {
+      const variant = raw as ProductVariantInput
+      const color = String(variant?.color || '').trim()
+      const size = String(variant?.size || '').trim()
+      const image = String(variant?.image || '').trim()
+
+      if (!image || (!color && !size)) return null
+      return { color, size, image }
+    })
+    .filter((variant): variant is { color: string; size: string; image: string } => Boolean(variant))
+}
+
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
@@ -76,6 +98,8 @@ export async function POST(request: NextRequest) {
           .filter((v: string) => v.length > 0)
       : []
 
+    const variants = normalizeVariants(body?.variants)
+
     const product = await prisma.product.create({
       data: {
         name,
@@ -84,6 +108,7 @@ export async function POST(request: NextRequest) {
         price,
         image,
         images,
+        variants,
         imageAlt: String(body?.imageAlt || '').trim() || name,
         isVeg: Boolean(body?.isVeg),
         prepTime: Math.max(1, Math.round(toNumber(body?.prepTime, 15))),

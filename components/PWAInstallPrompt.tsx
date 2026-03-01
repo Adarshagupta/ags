@@ -73,7 +73,7 @@ export default function PWAInstallPrompt() {
             </div>
 
             <div className="flex-1 min-w-0">
-              <h3 className="font-bold text-gray-900 text-sm mb-1">Install FNP App</h3>
+              <h3 className="font-bold text-gray-900 text-sm mb-1">Install Chapter Curus App</h3>
               <p className="text-xs text-gray-600 mb-3">
                 Get faster access and work offline! Install our app for the best experience.
               </p>

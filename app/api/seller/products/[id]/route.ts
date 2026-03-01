@@ -3,6 +3,28 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 
+type ProductVariantInput = {
+  color?: unknown
+  size?: unknown
+  image?: unknown
+}
+
+function normalizeVariants(input: unknown) {
+  if (!Array.isArray(input)) return []
+
+  return input
+    .map((raw) => {
+      const variant = raw as ProductVariantInput
+      const color = String(variant?.color || '').trim()
+      const size = String(variant?.size || '').trim()
+      const image = String(variant?.image || '').trim()
+
+      if (!image || (!color && !size)) return null
+      return { color, size, image }
+    })
+    .filter((variant): variant is { color: string; size: string; image: string } => Boolean(variant))
+}
+
 export async function GET(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -76,6 +98,7 @@ export async function PATCH(
         ...(body.price && { price: parseFloat(body.price) }),
         ...(body.image && { image: body.image }),
         ...(body.images && { images: body.images }),
+        ...(body.variants !== undefined && { variants: normalizeVariants(body.variants) }),
         ...(body.imageAlt !== undefined && { imageAlt: body.imageAlt }),
         ...(body.isAvailable !== undefined && { isAvailable: body.isAvailable }),
         ...(body.isVeg !== undefined && { isVeg: body.isVeg }),

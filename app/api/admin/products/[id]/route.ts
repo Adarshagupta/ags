@@ -1,6 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
+type ProductVariantInput = {
+  color?: unknown
+  size?: unknown
+  image?: unknown
+}
+
+function normalizeVariants(input: unknown) {
+  if (!Array.isArray(input)) return []
+
+  return input
+    .map((raw) => {
+      const variant = raw as ProductVariantInput
+      const color = String(variant?.color || '').trim()
+      const size = String(variant?.size || '').trim()
+      const image = String(variant?.image || '').trim()
+
+      if (!image || (!color && !size)) return null
+      return { color, size, image }
+    })
+    .filter((variant): variant is { color: string; size: string; image: string } => Boolean(variant))
+}
+
 export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -35,10 +57,15 @@ export async function PATCH(
   try {
     const body = await request.json()
     const { id } = await params
+    const data: Record<string, unknown> = { ...body }
+
+    if (body?.variants !== undefined) {
+      data.variants = normalizeVariants(body.variants)
+    }
 
     const product = await prisma.product.update({
       where: { id },
-      data: body
+      data,
     })
 
     return NextResponse.json(product)

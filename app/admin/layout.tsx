@@ -58,7 +58,7 @@ export default function AdminLayout({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                🎁 AGS Admin
+                🎁 Chapter Curus Admin
               </Link>
             </div>
             <div className="flex items-center gap-4">
@@ -99,3 +99,4 @@ export default function AdminLayout({
     </div>
   )
 }
+

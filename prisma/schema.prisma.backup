@@ -108,6 +108,7 @@ model Product {
   price           Float
   image           String
   images          String[]     @default([])
+  variants        Json[]       @default([])
   imageAlt        String?
   isAvailable     Boolean      @default(true)
   isVeg           Boolean      @default(true)

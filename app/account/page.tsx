@@ -108,7 +108,7 @@ export default function AccountPage() {
 
         {/* App Info */}
         <div className="mt-6 text-center text-sm text-gray-500">
-          <p>AGS - Gift Shopping App</p>
+          <p>Chapter Curus - Gift Shopping App</p>
           <p className="mt-1">Version 1.0.0</p>
         </div>
       </div>
