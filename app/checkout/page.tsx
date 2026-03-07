@@ -1,16 +1,14 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { useCartStore } from '@/lib/store/cart'
 import { useLocationStore } from '@/lib/store/location'
 import { useUserStore } from '@/lib/store/user'
 import { formatPrice } from '@/lib/utils'
-import LocationPicker from '@/components/LocationPicker'
-import BottomNav from '@/components/BottomNav'
+import LocationModal from '@/components/LocationModal'
 import SkeletonLoader from '@/components/SkeletonLoader'
-import { SessionSync } from '@/components/SessionSync'
 
 interface GiftWrap {
   id: string
@@ -36,7 +34,7 @@ interface Recipient {
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, getTotalPrice, clearCart, giftOptions, setGiftOptions } = useCartStore()
-  const { deliveryAddress } = useLocationStore()
+  const { setDeliveryAddress } = useLocationStore()
   const { user, _hasHydrated } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
@@ -49,19 +47,7 @@ export default function CheckoutPage() {
   const [recipients, setRecipients] = useState<Recipient[]>([])
   const [addresses, setAddresses] = useState<any[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
-  const [showAddressForm, setShowAddressForm] = useState(false)
-  const [newAddress, setNewAddress] = useState({
-    label: 'Home',
-    street: '',
-    apartment: '',
-    landmark: '',
-    city: '',
-    state: '',
-    pincode: '',
-    latitude: 0,
-    longitude: 0,
-    isDefault: true
-  })
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
   
   const subtotal = getTotalPrice()
   const giftWrapPrice = giftOptions.giftWrapId ? (giftWraps.find(w => w.id === giftOptions.giftWrapId)?.price || 0) : 0
@@ -84,6 +70,20 @@ export default function CheckoutPage() {
     fetchGiftData()
     fetchAddresses()
   }, [user, items, router, _hasHydrated, orderPlaced])
+
+  useEffect(() => {
+    if (!selectedAddressId) return
+
+    const selectedAddress = addresses.find((address) => address.id === selectedAddressId)
+    if (!selectedAddress) return
+
+    setDeliveryAddress({
+      latitude: selectedAddress.latitude,
+      longitude: selectedAddress.longitude,
+      address: `${selectedAddress.street}, ${selectedAddress.city}, ${selectedAddress.state} - ${selectedAddress.pincode}`,
+      label: selectedAddress.label || 'Saved Address',
+    })
+  }, [addresses, selectedAddressId, setDeliveryAddress])
 
   const fetchAddresses = async () => {
     try {
@@ -135,45 +135,19 @@ export default function CheckoutPage() {
     }
   }
 
-  const handleCreateAddress = async () => {
-    if (!newAddress.label || !newAddress.street || !newAddress.city || !newAddress.state || !newAddress.pincode) {
-      alert('Please fill all address fields')
-      return
+  const handleAddressSaved = async (address?: any) => {
+    await fetchAddresses()
+
+    if (address?.id) {
+      setSelectedAddressId(address.id)
     }
 
-    try {
-      const token = localStorage.getItem('token')
-      const res = await fetch('/api/addresses', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(newAddress)
-      })
-
-      if (res.ok) {
-        const data = await res.json()
-        const newAddresses = [...addresses, data.address]
-        setAddresses(newAddresses)
-        setSelectedAddressId(data.address.id)
-        setShowAddressForm(false)
-        setNewAddress({ label: 'Home', street: '', apartment: '', landmark: '', city: '', state: '', pincode: '', latitude: 0, longitude: 0, isDefault: true })
-        alert('Address saved successfully!')
-      } else {
-        const errorData = await res.json()
-        console.error('Address creation error:', errorData)
-        alert(errorData.error || 'Failed to create address')
-      }
-    } catch (error) {
-      console.error('Error creating address:', error)
-      alert('Failed to create address')
-    }
+    setIsLocationModalOpen(false)
   }
 
   const handlePlaceOrder = async () => {
     if (!selectedAddressId && addresses.length === 0) {
-      setShowAddressForm(true)
+      setIsLocationModalOpen(true)
       alert('Please add a delivery address first')
       return
     }
@@ -239,32 +213,6 @@ export default function CheckoutPage() {
     }
   }
 
-  if (!deliveryAddress) {
-    return (
-      <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-        <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
-          <div className="flex items-center justify-between px-3 lg:px-4 py-3">
-            <div className="flex items-center gap-3">
-              <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <div>
-                <h1 className="text-lg font-bold text-gray-900 lg:text-xl">Checkout</h1>
-                <p className="text-xs text-gray-500">Select delivery address</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-2xl mx-auto px-4 py-20">
-          <LocationPicker />
-        </div>
-        <BottomNav />
-      </div>
-    )
-  }
-
   const selectedWrap = giftWraps.find(w => w.id === giftOptions.giftWrapId)
   const selectedRecipient = recipients.find(r => r.id === giftOptions.recipientId)
 
@@ -325,101 +273,24 @@ export default function CheckoutPage() {
                     </label>
                   ))}
                   <button
-                    onClick={() => setShowAddressForm(true)}
+                    onClick={() => setIsLocationModalOpen(true)}
                     className="w-full py-3 lg:py-2.5 bg-white border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-pink-500 hover:text-pink-600 hover:shadow-sm transition-all text-sm lg:text-base active:scale-[0.98]"
                   >
-                    + Add New Address
+                    + Add New Address With Exact Location
                   </button>
                 </div>
               ) : (
                 <div className="text-center py-6 lg:py-8 bg-white rounded-xl border-2 border-dashed border-gray-300">
                   <p className="text-gray-600 mb-3 lg:mb-4 text-sm lg:text-base">No delivery address added</p>
                   <button
-                    onClick={() => setShowAddressForm(true)}
+                    onClick={() => setIsLocationModalOpen(true)}
                     className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-5 py-2.5 lg:px-6 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700 text-sm lg:text-base active:scale-95"
                   >
-                    Add Delivery Address
+                    Add Exact Delivery Location
                   </button>
                 </div>
               )}
 
-              {/* Add Address Form */}
-              {showAddressForm && (
-                <div className="mt-3 lg:mt-4 p-3 lg:p-4 bg-white border-2 border-pink-200 rounded-xl">
-                  <h3 className="font-semibold mb-2 lg:mb-3 text-sm lg:text-base">New Address</h3>
-                  <div className="space-y-2 lg:space-y-3">
-                    <select
-                      value={newAddress.label}
-                      onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
-                      className="w-full px-3 py-2 lg:px-4 border rounded-lg bg-white text-sm lg:text-base"
-                    >
-                      <option value="Home">Home</option>
-                      <option value="Work">Work</option>
-                      <option value="Other">Other</option>
-                    </select>
-                    <textarea
-                      placeholder="Full Address (Street, Building, etc.) *"
-                      value={newAddress.street}
-                      onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}
-                      className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
-                      rows={2}
-                    />
-                    <div className="grid grid-cols-2 gap-2 lg:gap-3">
-                      <input
-                        type="text"
-                        placeholder="Apt/Flat No."
-                        value={newAddress.apartment}
-                        onChange={(e) => setNewAddress({...newAddress, apartment: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Landmark"
-                        value={newAddress.landmark}
-                        onChange={(e) => setNewAddress({...newAddress, landmark: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
-                      />
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 lg:gap-3">
-                      <input
-                        type="text"
-                        placeholder="City *"
-                        value={newAddress.city}
-                        onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
-                      />
-                      <input
-                        type="text"
-                        placeholder="Province *"
-                        value={newAddress.state}
-                        onChange={(e) => setNewAddress({...newAddress, state: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
-                      />
-                    </div>
-                    <input
-                      type="text"
-                      placeholder="Postal Code *"
-                      value={newAddress.pincode}
-                      onChange={(e) => setNewAddress({...newAddress, pincode: e.target.value})}
-                      className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
-                    />
-                    <div className="flex gap-2">
-                      <button
-                        onClick={handleCreateAddress}
-                        className="flex-1 bg-gradient-to-r from-pink-500 to-rose-600 text-white py-2.5 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700 text-sm lg:text-base active:scale-95"
-                      >
-                        Save Address
-                      </button>
-                      <button
-                        onClick={() => setShowAddressForm(false)}
-                        className="px-4 lg:px-6 bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 text-sm lg:text-base active:scale-95"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
             </motion.div>
 
             {/* Gift Options - Open Design */}
@@ -764,6 +635,12 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSaved={handleAddressSaved}
+      />
     </div>
   )
 }

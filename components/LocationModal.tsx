@@ -9,9 +9,10 @@ import MapPicker from './MapPicker'
 interface LocationModalProps {
   isOpen: boolean
   onClose: () => void
+  onSaved?: (address: any) => void
 }
 
-export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
+export default function LocationModal({ isOpen, onClose, onSaved }: LocationModalProps) {
   const { setCurrentLocation, setDeliveryAddress, deliveryAddress } = useLocationStore()
   const { user } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
@@ -129,6 +130,11 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
           const errorData = await response.json()
           throw new Error(errorData.error || 'Failed to save address')
         }
+
+        const data = await response.json()
+        onSaved?.(data.address)
+      } else {
+        onSaved?.(location)
       }
 
       onClose()
