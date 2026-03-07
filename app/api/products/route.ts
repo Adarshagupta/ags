@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
+    const categoryId = searchParams.get('categoryId')
     const search = searchParams.get('search')
 
     const where: any = {
@@ -17,7 +18,37 @@ export async function GET(request: NextRequest) {
       },
     }
 
-    if (category && category !== 'all') {
+    if (categoryId) {
+      const selectedCategory = await prisma.category.findFirst({
+        where: {
+          id: categoryId,
+          isActive: true,
+        },
+        select: {
+          name: true,
+          type: true,
+        },
+      })
+
+      if (!selectedCategory) {
+        return NextResponse.json(
+          { products: [] },
+          {
+            headers: {
+              'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=30',
+            },
+          }
+        )
+      }
+
+      if (selectedCategory.type === 'PRODUCT') {
+        where.category = selectedCategory.name
+      } else {
+        where.tags = {
+          has: selectedCategory.name,
+        }
+      }
+    } else if (category && category !== 'all') {
       where.category = category
     }
 
@@ -33,11 +64,14 @@ export async function GET(request: NextRequest) {
       orderBy: { createdAt: 'desc' },
     })
 
-    return NextResponse.json({ products }, {
-      headers: {
-        'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=30'
+    return NextResponse.json(
+      { products },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=10, stale-while-revalidate=30',
+        },
       }
-    })
+    )
   } catch (error) {
     console.error('Error fetching products:', error)
     return NextResponse.json(

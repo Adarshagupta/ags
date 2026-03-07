@@ -3,7 +3,14 @@
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import ProductCategoryFields from '@/components/ProductCategoryFields'
 import { uploadProductImage } from '@/lib/upload-image'
+import {
+  EMPTY_PRODUCT_CATEGORY_GROUPS,
+  buildProductTags,
+  fetchProductCategoryGroups,
+  splitProductTags,
+} from '@/lib/product-categories'
 
 type ProductVariant = {
   color: string
@@ -22,6 +29,11 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
   const [uploadingMainImage, setUploadingMainImage] = useState(false)
   const [uploadingAdditionalImage, setUploadingAdditionalImage] = useState(false)
   const [uploadingVariantIndex, setUploadingVariantIndex] = useState<number | null>(null)
+  const [categoryGroups, setCategoryGroups] = useState(EMPTY_PRODUCT_CATEGORY_GROUPS)
+  const [categoryGroupsLoading, setCategoryGroupsLoading] = useState(true)
+  const [categoryError, setCategoryError] = useState<string | null>(null)
+  const [recipientSelections, setRecipientSelections] = useState<string[]>([])
+  const [occasionSelections, setOccasionSelections] = useState<string[]>([])
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -135,12 +147,32 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
   }
 
   useEffect(() => {
-    fetchProduct()
-  }, [])
+    void fetchProduct()
+  }, [id])
 
   const fetchProduct = async () => {
     try {
-      const res = await fetch(`/api/admin/products/${id}`)
+      const [productResult, categoriesResult] = await Promise.allSettled([
+        fetch(`/api/admin/products/${id}`),
+        fetchProductCategoryGroups(),
+      ])
+
+      let nextCategoryGroups = EMPTY_PRODUCT_CATEGORY_GROUPS
+
+      if (categoriesResult.status === 'fulfilled') {
+        nextCategoryGroups = categoriesResult.value
+        setCategoryGroups(categoriesResult.value)
+        setCategoryError(null)
+      } else {
+        console.error('Failed to load product categories:', categoriesResult.reason)
+        setCategoryError('Category options could not be loaded. You can still edit the main category manually.')
+      }
+
+      if (productResult.status === 'rejected') {
+        throw productResult.reason
+      }
+
+      const res = productResult.value
       if (res.ok) {
         const product = await res.json()
         const variants = Array.isArray(product.variants)
@@ -152,6 +184,11 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
               }))
               .filter((variant: ProductVariant) => variant.image && (variant.color || variant.size))
           : []
+        const tagState = splitProductTags(
+          product.tags,
+          nextCategoryGroups.recipientCategories,
+          nextCategoryGroups.occasionCategories
+        )
 
         setFormData({
           name: product.name,
@@ -164,15 +201,18 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
           imageAlt: product.imageAlt || '',
           isVeg: product.isVeg,
           prepTime: product.prepTime,
-          tags: Array.isArray(product.tags) ? product.tags.join(', ') : '',
+          tags: tagState.customTags,
           discount: product.discount || 0,
           isAvailable: product.isAvailable
         })
+        setRecipientSelections(tagState.recipientSelections)
+        setOccasionSelections(tagState.occasionSelections)
         setVariantFiles(new Array(variants.length).fill(null))
       }
     } catch (error) {
       console.error('Error fetching product:', error)
     } finally {
+      setCategoryGroupsLoading(false)
       setLoading(false)
     }
   }
@@ -187,7 +227,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          tags: formData.tags.split(',').map(t => t.trim()).filter(Boolean),
+          tags: buildProductTags(formData.tags, recipientSelections, occasionSelections),
           images: formData.images.filter(img => img.trim()),
           variants: formData.variants
             .map((variant) => ({
@@ -249,16 +289,20 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Category*</label>
-            <input
-              type="text"
-              required
-              value={formData.category}
-              onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
+          <ProductCategoryFields
+            categories={categoryGroups}
+            loading={categoryGroupsLoading}
+            error={categoryError}
+            category={formData.category}
+            customTags={formData.tags}
+            recipientSelections={recipientSelections}
+            occasionSelections={occasionSelections}
+            onCategoryChange={(value) => setFormData({ ...formData, category: value })}
+            onCustomTagsChange={(value) => setFormData({ ...formData, tags: value })}
+            onRecipientSelectionsChange={setRecipientSelections}
+            onOccasionSelectionsChange={setOccasionSelections}
+            accent="orange"
+          />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Price (NPR)*</label>
@@ -460,17 +504,6 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
               step="0.01"
               value={formData.discount}
               onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Tags (comma-separated)</label>
-            <input
-              type="text"
-              value={formData.tags}
-              onChange={(e) => setFormData({ ...formData, tags: e.target.value })}
-              placeholder="e.g., birthday, anniversary, romantic"
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
           </div>
