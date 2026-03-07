@@ -151,7 +151,7 @@ export default function AdminProducts() {
                       </div>
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">₹{product.price}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-gray-900">Rs. {product.price}</td>
                     <td className="px-6 py-4">
                       <button
                         onClick={() => toggleAvailability(product.id, product.isAvailable)}

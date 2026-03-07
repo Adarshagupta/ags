@@ -207,7 +207,7 @@ export default function AdminGiftWraps() {
                 <div>
                   <h3 className="font-bold text-gray-900">{wrap.name}</h3>
                   <p className="text-sm text-gray-500">{wrap.type}</p>
-                  <p className="text-lg font-semibold text-orange-600">₹{wrap.price.toFixed(2)}</p>
+                  <p className="text-lg font-semibold text-orange-600">Rs. {wrap.price.toFixed(2)}</p>
                 </div>
                 {wrap.isActive && (
                   <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">

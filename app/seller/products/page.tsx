@@ -128,7 +128,7 @@ export default function SellerProductsPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex gap-3 text-sm">
-                        <span className="font-semibold text-gray-900">₹{product.price}</span>
+                        <span className="font-semibold text-gray-900">Rs. {product.price}</span>
                         {product.discount > 0 && (
                           <span className="text-green-600">{product.discount}% off</span>
                         )}

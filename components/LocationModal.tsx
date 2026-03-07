@@ -224,8 +224,8 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                     <div className="h-[280px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
                       <MapPicker 
                         onLocationSelect={handleLocationSelect}
-                        initialLat={deliveryAddress?.latitude || 28.6139}
-                        initialLng={deliveryAddress?.longitude || 77.2090}
+                        initialLat={deliveryAddress?.latitude || 27.7172}
+                        initialLng={deliveryAddress?.longitude || 85.3240}
                       />
                     </div>
                   </div>
@@ -258,7 +258,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                     {/* Street Address */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                        House/Flat/Block No. <span className="text-pink-500">*</span>
+                        House/Flat No. <span className="text-pink-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -298,7 +298,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                       />
                     </div>
 
-                    {/* City, State, Pincode */}
+                    {/* City, Province, Postal Code */}
                     <div className="grid grid-cols-2 gap-3">
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
@@ -315,7 +315,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                          Pincode <span className="text-pink-500">*</span>
+                          Postal Code <span className="text-pink-500">*</span>
                         </label>
                         <input
                           type="text"
@@ -323,14 +323,14 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                           value={formData.pincode}
                           onChange={(e) => setFormData({ ...formData, pincode: e.target.value })}
                           className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 transition-all"
-                          placeholder="000000"
+                          placeholder="44600"
                         />
                       </div>
                     </div>
 
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-2 uppercase tracking-wider">
-                        State <span className="text-pink-500">*</span>
+                        Province <span className="text-pink-500">*</span>
                       </label>
                       <input
                         type="text"
@@ -338,7 +338,7 @@ export default function LocationModal({ isOpen, onClose }: LocationModalProps) {
                         value={formData.state}
                         onChange={(e) => setFormData({ ...formData, state: e.target.value })}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 transition-all"
-                        placeholder="State"
+                        placeholder="Province"
                       />
                     </div>
                   </form>

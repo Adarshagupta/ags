@@ -1,2 +1,2 @@
-# Chapter Curus
+# Chapter Kurus
 

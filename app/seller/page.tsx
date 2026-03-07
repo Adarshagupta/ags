@@ -62,8 +62,8 @@ export default function SellerDashboard() {
         />
         <StatCard
           title="Revenue"
-          value={`₹${(stats?.totalRevenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })}`}
-          subtitle={`₹${(stats?.thisMonthRevenue || 0).toLocaleString('en-IN', { maximumFractionDigits: 0 })} this month`}
+          value={`Rs. ${(stats?.totalRevenue || 0).toLocaleString('en-NP', { maximumFractionDigits: 0 })}`}
+          subtitle={`Rs. ${(stats?.thisMonthRevenue || 0).toLocaleString('en-NP', { maximumFractionDigits: 0 })} this month`}
           icon="💰"
           className="col-span-2 lg:col-span-1"
         />

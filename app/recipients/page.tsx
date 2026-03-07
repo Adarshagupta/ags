@@ -226,7 +226,7 @@ export default function RecipientsPage() {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
-                    placeholder="+91 9876543210"
+                    placeholder="+977 9812345678"
                   />
                 </div>
               </div>

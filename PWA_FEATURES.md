@@ -1,4 +1,4 @@
-# PWA Features - Flowers N Petals
+# PWA Features - Chapter Kurus
 
 ## 🚀 Implemented PWA Features
 
@@ -70,8 +70,8 @@ next.config.js                 # Updated with caching strategies
 
 ## 🎨 Manifest Features
 
-- **Name**: Flowers N Petals - Gift & Flower Delivery
-- **Short Name**: FNP
+- **Name**: Chapter Kurus - Gift & Flower Delivery
+- **Short Name**: Chapter Kurus
 - **Theme Color**: #ec4899 (Pink)
 - **Display Mode**: Standalone
 - **Orientation**: Portrait
@@ -99,7 +99,7 @@ next.config.js                 # Updated with caching strategies
 
 ### Desktop (Chrome/Edge)
 1. Click install icon in address bar
-2. Or click "Install FNP" in app prompt
+2. Or click "Install Chapter Kurus" in app prompt
 3. App opens in standalone window
 
 ## 🔍 Testing PWA Features

@@ -1,4 +1,4 @@
-# Google OAuth Setup Guide for FNP
+# Google OAuth Setup Guide for Chapter Kurus
 
 ## Prerequisites
 - A Google account
@@ -12,7 +12,7 @@ Visit: https://console.cloud.google.com/
 ### 2. Create a New Project (or select existing)
 - Click on the project dropdown at the top
 - Click "New Project"
-- Enter project name: "FNP Gifts" (or any name)
+- Enter project name: "Chapter Kurus" (or any name)
 - Click "Create"
 
 ### 3. Enable Google+ API
@@ -25,7 +25,7 @@ Visit: https://console.cloud.google.com/
 - Select "External" (for testing) or "Internal" (for organization)
 - Click "Create"
 - Fill in the required fields:
-  - App name: "FNP Gifts"
+  - App name: "Chapter Kurus"
   - User support email: your-email@example.com
   - Developer contact email: your-email@example.com
 - Click "Save and Continue"
@@ -37,7 +37,7 @@ Visit: https://console.cloud.google.com/
 - Go to "APIs & Services" > "Credentials"
 - Click "Create Credentials" > "OAuth client ID"
 - Select "Web application"
-- Name: "FNP Web Client"
+- Name: "Chapter Kurus Web Client"
 - Add Authorized JavaScript origins:
   - http://localhost:3000
   - http://172.16.0.2:3000 (your network IP)

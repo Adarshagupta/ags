@@ -188,7 +188,7 @@ export default function AdminOrders() {
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <div className="font-semibold text-gray-900">₹{(order.total || 0).toFixed(2)}</div>
+                      <div className="font-semibold text-gray-900">Rs. {(order.total || 0).toFixed(2)}</div>
                       <div className="text-xs text-gray-500">{order.items.length} items</div>
                     </td>
                     <td className="px-4 py-4">
@@ -317,9 +317,9 @@ export default function AdminOrders() {
                       <div className="text-2xl">🎁</div>
                       <div className="flex-1">
                         <p className="font-medium text-gray-900">{item.product.name}</p>
-                        <p className="text-sm text-gray-600">Qty: {item.quantity} × ₹{item.price.toFixed(2)}</p>
+                        <p className="text-sm text-gray-600">Qty: {item.quantity} × Rs. {item.price.toFixed(2)}</p>
                       </div>
-                      <p className="font-semibold text-gray-900">₹{(item.quantity * item.price).toFixed(2)}</p>
+                      <p className="font-semibold text-gray-900">Rs. {(item.quantity * item.price).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
@@ -345,7 +345,7 @@ export default function AdminOrders() {
                 </div>
                 <div className="flex justify-between items-center text-lg font-bold border-t border-gray-200 pt-4">
                   <span>Total Amount:</span>
-                  <span className="text-orange-600">₹{(selectedOrder.total || 0).toFixed(2)}</span>
+                  <span className="text-orange-600">Rs. {(selectedOrder.total || 0).toFixed(2)}</span>
                 </div>
               </div>
             </div>

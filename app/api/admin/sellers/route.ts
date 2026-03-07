@@ -125,7 +125,7 @@ export async function POST(request: Request) {
         // Send welcome email to seller with credentials
         await sendEmail({
           to: email,
-          subject: 'Welcome to Chapter Curus Seller Platform',
+          subject: 'Welcome to Chapter Kurus Seller Platform',
           html: emailTemplates.sellerAccountCreated({
             sellerName: name,
             businessName,

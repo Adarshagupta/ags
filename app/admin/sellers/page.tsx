@@ -140,7 +140,7 @@ export default function SellersPage() {
                     </div>
                     <div className="text-sm text-gray-500">{seller.businessAddress}</div>
                     {seller.gstin && (
-                      <div className="text-xs text-gray-400">GSTIN: {seller.gstin}</div>
+                      <div className="text-xs text-gray-400">VAT/PAN: {seller.gstin}</div>
                     )}
                   </div>
                 </td>
@@ -329,6 +329,7 @@ function SellerModal({
                 required
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="+977 9812345678"
                 className="w-full border rounded-lg px-3 py-2"
               />
             </div>
@@ -392,7 +393,7 @@ function SellerModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                GSTIN
+                VAT / PAN Registration
               </label>
               <input
                 type="text"
@@ -440,7 +441,7 @@ function SellerModal({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
-                IFSC Code
+                Bank Code / SWIFT
               </label>
               <input
                 type="text"

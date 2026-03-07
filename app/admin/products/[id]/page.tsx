@@ -261,7 +261,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (₹)*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price (NPR)*</label>
             <input
               type="number"
               required

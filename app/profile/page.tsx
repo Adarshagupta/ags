@@ -85,7 +85,7 @@ export default function ProfilePage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
+    return new Date(dateString).toLocaleDateString('en-NP', {
       year: 'numeric',
       month: 'short',
       day: 'numeric',
@@ -412,7 +412,7 @@ export default function ProfilePage() {
                               </div>
                               <span className="text-sm text-gray-600">{order.items?.length || 0} {order.items?.length === 1 ? 'item' : 'items'}</span>
                             </div>
-                            <p className="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">₹{order.total}</p>
+                            <p className="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">Rs. {order.total}</p>
                           </div>
                         </motion.div>
                       </Link>

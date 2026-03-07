@@ -1,8 +1,22 @@
-export function formatPrice(price: number): string {
-  return new Intl.NumberFormat('en-IN', {
-    style: 'currency',
-    currency: 'INR'
+const DEFAULT_LOCALE = 'en-NP'
+export function formatPrice(
+  price: number,
+  options: Intl.NumberFormatOptions = {}
+): string {
+  const formatted = new Intl.NumberFormat(DEFAULT_LOCALE, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+    ...options,
   }).format(price)
+
+  return `Rs. ${formatted}`
+}
+
+export function formatDate(
+  value: string | number | Date,
+  options: Intl.DateTimeFormatOptions = {}
+): string {
+  return new Intl.DateTimeFormat(DEFAULT_LOCALE, options).format(new Date(value))
 }
 
 export function formatDistance(meters: number): string {

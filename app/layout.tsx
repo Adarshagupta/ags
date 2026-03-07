@@ -30,42 +30,42 @@ export function generateViewport(): Viewport {
 
 export const metadata: Metadata = {
   metadataBase: new URL(metadataBaseUrl),
-  title: 'Chapter Curus - Gift & Flower Delivery | Same Day Delivery',
-  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with Chapter Curus - Your trusted gift delivery partner.',
+  title: 'Chapter Kurus - Gift & Flower Delivery in Nepal | Same Day Delivery',
+  description: 'Send flowers, cakes, and personalized gifts across Nepal with same-day delivery. Express your love with Chapter Kurus.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Chapter Curus - Flowers & Gifts',
+    title: 'Chapter Kurus - Flowers & Gifts',
   },
-  applicationName: 'Chapter Curus',
-  keywords: ['flowers', 'gifts', 'cakes', 'delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
-  authors: [{ name: 'Chapter Curus' }],
-  creator: 'Chapter Curus',
-  publisher: 'Chapter Curus',
+  applicationName: 'Chapter Kurus',
+  keywords: ['flowers', 'gifts', 'cakes', 'Nepal gift delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
+  authors: [{ name: 'Chapter Kurus' }],
+  creator: 'Chapter Kurus',
+  publisher: 'Chapter Kurus',
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: 'website',
-    locale: 'en_IN',
-    url: 'https://fnp.com',
-    siteName: 'Chapter Curus',
-    title: 'Chapter Curus - Gift & Flower Delivery',
-    description: 'Send flowers, cakes, and gifts with same-day delivery',
+    locale: 'en_NP',
+    url: metadataBaseUrl,
+    siteName: 'Chapter Kurus',
+    title: 'Chapter Kurus - Gift & Flower Delivery in Nepal',
+    description: 'Send flowers, cakes, and gifts across Nepal with same-day delivery',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Chapter Curus',
+        alt: 'Chapter Kurus',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chapter Curus - Gift & Flower Delivery',
-    description: 'Send flowers, cakes, and gifts with same-day delivery',
+    title: 'Chapter Kurus - Gift & Flower Delivery in Nepal',
+    description: 'Send flowers, cakes, and gifts across Nepal with same-day delivery',
     images: ['/og-image.png'],
   },
   icons: {
@@ -85,13 +85,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en-NP" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Chapter Curus" />
+        <meta name="apple-mobile-web-app-title" content="Chapter Kurus" />
         <meta name="mobile-web-app-capable" content="yes" />
         {!isProduction && (
           <script

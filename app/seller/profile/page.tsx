@@ -149,7 +149,7 @@ export default function SellerProfilePage() {
           <div className="bg-white border rounded-lg p-4">
             <p className="text-xs text-gray-600 mb-1">Member Since</p>
             <p className="text-sm font-medium text-gray-900">
-              {new Date(profile.createdAt).toLocaleDateString('en-IN', {
+              {new Date(profile.createdAt).toLocaleDateString('en-NP', {
                 month: 'short',
                 year: 'numeric',
               })}
@@ -246,7 +246,7 @@ export default function SellerProfilePage() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                  GSTIN
+                  VAT / PAN Registration
                 </label>
                 <input
                   type="text"
@@ -315,7 +315,7 @@ export default function SellerProfilePage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">
-                      IFSC Code
+                      Bank Code / SWIFT
                     </label>
                     <input
                       type="text"

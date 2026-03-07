@@ -390,7 +390,7 @@ export default function CheckoutPage() {
                       />
                       <input
                         type="text"
-                        placeholder="State *"
+                        placeholder="Province *"
                         value={newAddress.state}
                         onChange={(e) => setNewAddress({...newAddress, state: e.target.value})}
                         className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
@@ -398,7 +398,7 @@ export default function CheckoutPage() {
                     </div>
                     <input
                       type="text"
-                      placeholder="Pincode *"
+                      placeholder="Postal Code *"
                       value={newAddress.pincode}
                       onChange={(e) => setNewAddress({...newAddress, pincode: e.target.value})}
                       className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"

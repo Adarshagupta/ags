@@ -67,7 +67,7 @@ export default function SellerOrdersPage() {
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-IN', {
+    return new Date(dateString).toLocaleDateString('en-NP', {
       day: 'numeric',
       month: 'short',
       year: 'numeric',
@@ -199,12 +199,12 @@ export default function SellerOrdersPage() {
                             {item.product.name}
                           </p>
                           <p className="text-xs text-gray-600">
-                            Qty: {item.quantity} × ₹{item.price}
+                            Qty: {item.quantity} × Rs. {item.price}
                           </p>
                         </div>
                         <div className="text-right flex-shrink-0">
                           <p className="text-sm font-semibold text-gray-900">
-                            ₹{(item.quantity * item.price).toFixed(2)}
+                            Rs. {(item.quantity * item.price).toFixed(2)}
                           </p>
                         </div>
                       </div>

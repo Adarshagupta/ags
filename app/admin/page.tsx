@@ -51,7 +51,7 @@ export default function AdminDashboard() {
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome to Chapter Curus Admin Panel</p>
+        <p className="text-gray-600 mt-1">Welcome to Chapter Kurus Admin Panel</p>
       </div>
 
       {/* Stats Grid */}
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-              <p className="text-3xl font-bold text-gray-900">₹{stats?.totalRevenue || 0}</p>
+              <p className="text-3xl font-bold text-gray-900">Rs. {stats?.totalRevenue || 0}</p>
             </div>
             <div className="text-4xl">💰</div>
           </div>
@@ -125,7 +125,7 @@ export default function AdminDashboard() {
                       {order.orderNumber}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      ₹{(order.total || 0).toFixed(2)}
+                      Rs. {(order.total || 0).toFixed(2)}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">

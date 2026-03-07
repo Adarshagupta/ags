@@ -69,8 +69,8 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
             console.warn('Geolocation failed:', error.message)
             setLocationStatus('Using default location')
             // Fall back to initialLat/Lng or default
-            const fallbackLat = initialLat || 28.6139
-            const fallbackLng = initialLng || 77.2090
+            const fallbackLat = initialLat || 27.7172
+            const fallbackLng = initialLng || 85.3240
             initializeMap(google, fallbackLat, fallbackLng, 1000)
           },
           {
@@ -81,8 +81,8 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
         )
       } else {
         setLocationStatus('Geolocation not supported')
-        const fallbackLat = initialLat || 28.6139
-        const fallbackLng = initialLng || 77.2090
+        const fallbackLat = initialLat || 27.7172
+        const fallbackLng = initialLng || 85.3240
         initializeMap(google, fallbackLat, fallbackLng, 1000)
       }
     }).catch((error) => {

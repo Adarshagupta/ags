@@ -233,12 +233,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
           {/* Price */}
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-pink-600">₹{finalPrice.toFixed(2)}</span>
+            <span className="text-3xl font-bold text-pink-600">Rs. {finalPrice.toFixed(2)}</span>
             {product.discount > 0 && (
               <>
-                <span className="text-lg text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
+                <span className="text-lg text-gray-400 line-through">Rs. {product.price.toFixed(2)}</span>
                 <span className="text-sm font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">
-                  Save ₹{(product.price - finalPrice).toFixed(2)}
+                  Save Rs. {(product.price - finalPrice).toFixed(2)}
                 </span>
               </>
             )}
@@ -320,7 +320,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <>
                   <span>Add to Cart</span>
                   <span className="text-pink-100">•</span>
-                  <span>₹{(finalPrice * quantity).toFixed(2)}</span>
+                  <span>Rs. {(finalPrice * quantity).toFixed(2)}</span>
                 </>
               ) : (
                 'Currently Unavailable'
@@ -346,7 +346,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-semibold text-gray-900 truncate">{addon.name}</p>
-                    <p className="text-sm font-bold text-pink-600">₹{addon.price}</p>
+                    <p className="text-sm font-bold text-pink-600">Rs. {addon.price}</p>
                   </div>
                 </motion.div>
               ))}
@@ -389,9 +389,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <p className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] leading-tight">{relatedProduct.name}</p>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                        <span className="text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">Rs. {(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
                         {relatedProduct.discount > 0 && (
-                          <span className="text-xs text-gray-400 line-through">₹{relatedProduct.price}</span>
+                          <span className="text-xs text-gray-400 line-through">Rs. {relatedProduct.price}</span>
                         )}
                       </div>
                       <motion.div
@@ -468,12 +468,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <h1 className="text-4xl font-bold text-gray-900 leading-tight">{product.name}</h1>
 
             <div className="flex items-baseline gap-4">
-              <span className="text-4xl font-bold text-pink-600">₹{finalPrice.toFixed(2)}</span>
+              <span className="text-4xl font-bold text-pink-600">Rs. {finalPrice.toFixed(2)}</span>
               {product.discount > 0 && (
                 <>
-                  <span className="text-2xl text-gray-400 line-through">₹{product.price.toFixed(2)}</span>
+                  <span className="text-2xl text-gray-400 line-through">Rs. {product.price.toFixed(2)}</span>
                   <span className="text-base font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-lg">
-                    Save ₹{(product.price - finalPrice).toFixed(2)}
+                    Save Rs. {(product.price - finalPrice).toFixed(2)}
                   </span>
                 </>
               )}
@@ -554,7 +554,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               disabled={!product.isAvailable}
               className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-4 rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-lg text-lg"
             >
-              {product.isAvailable ? `Add to Cart • ₹${(finalPrice * quantity).toFixed(2)}` : 'Currently Unavailable'}
+              {product.isAvailable ? `Add to Cart • Rs. ${(finalPrice * quantity).toFixed(2)}` : 'Currently Unavailable'}
             </motion.button>
           </div>
         </div>
@@ -577,7 +577,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-semibold text-gray-900 truncate">{addon.name}</p>
-                    <p className="text-lg font-bold text-pink-600 mt-1">₹{addon.price}</p>
+                    <p className="text-lg font-bold text-pink-600 mt-1">Rs. {addon.price}</p>
                   </div>
                 </motion.div>
               ))}
@@ -638,9 +638,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                     <p className="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[3.5rem] leading-snug group-hover:text-pink-600 transition-colors">{relatedProduct.name}</p>
                     <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">₹{(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">Rs. {(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
                         {relatedProduct.discount > 0 && (
-                          <span className="text-sm text-gray-400 line-through">₹{relatedProduct.price}</span>
+                          <span className="text-sm text-gray-400 line-through">Rs. {relatedProduct.price}</span>
                         )}
                       </div>
                       <motion.button
