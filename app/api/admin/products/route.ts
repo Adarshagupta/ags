@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
 
 function toNumber(value: unknown, fallback: number) {
   const n = Number(value)
@@ -34,7 +35,13 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 
-    const where: any = {}
+    const where: any = {
+      NOT: {
+        tags: {
+          has: ARCHIVED_PRODUCT_TAG,
+        },
+      },
+    }
 
     if (category && category !== 'all') {
       where.category = category
@@ -92,11 +99,7 @@ export async function POST(request: NextRequest) {
           .filter((v: string) => v.length > 0)
       : []
 
-    const tags = Array.isArray(body?.tags)
-      ? body.tags
-          .map((v: unknown) => String(v || '').trim())
-          .filter((v: string) => v.length > 0)
-      : []
+    const tags = sanitizeProductTags(body?.tags)
 
     const variants = normalizeVariants(body?.variants)
 

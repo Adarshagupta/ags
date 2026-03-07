@@ -18,6 +18,7 @@ interface Product {
 export default function SellerProductsPage() {
   const router = useRouter()
   const [products, setProducts] = useState<Product[]>([])
+  const [message, setMessage] = useState('')
 
   useEffect(() => {
     fetchProducts()
@@ -32,6 +33,7 @@ export default function SellerProductsPage() {
       }
     } catch (error) {
       console.error('Failed to fetch products:', error)
+      setMessage('Failed to load products.')
     }
   }
 
@@ -60,10 +62,20 @@ export default function SellerProductsPage() {
       })
 
       if (res.ok) {
+        const data = await res.json()
+        setMessage(
+          data.archived
+            ? 'Product had existing orders, so it was archived and removed from your active list.'
+            : 'Product deleted successfully.'
+        )
         fetchProducts()
+      } else {
+        const data = await res.json().catch(() => null)
+        setMessage(data?.error || 'Failed to delete product.')
       }
     } catch (error) {
       console.error('Failed to delete product:', error)
+      setMessage('Failed to delete product.')
     }
   }
 
@@ -81,6 +93,12 @@ export default function SellerProductsPage() {
           + Add
         </button>
       </div>
+
+      {message && (
+        <div className="mb-4 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm">
+          {message}
+        </div>
+      )}
 
       {products.length === 0 ? (
         <div className="bg-white border rounded-xl shadow-sm p-12 text-center">

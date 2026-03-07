@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { redis, REDIS_CHANNELS } from '@/lib/redis'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { generateOrderNumber } from '@/lib/utils'
+import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 
 export async function POST(request: NextRequest) {
   try {
@@ -38,6 +39,30 @@ export async function POST(request: NextRequest) {
     if (!items || items.length === 0) {
       return NextResponse.json(
         { error: 'Cart is empty' },
+        { status: 400 }
+      )
+    }
+
+    const productIds = items
+      .map((item: any) => String(item?.id || '').trim())
+      .filter(Boolean)
+
+    const availableProducts = await prisma.product.findMany({
+      where: {
+        id: { in: productIds },
+        isAvailable: true,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
+      select: { id: true },
+    })
+
+    if (availableProducts.length !== productIds.length) {
+      return NextResponse.json(
+        { error: 'Some items are no longer available' },
         { status: 400 }
       )
     }

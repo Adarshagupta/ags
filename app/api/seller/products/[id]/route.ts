@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
 
 type ProductVariantInput = {
   color?: unknown
@@ -50,6 +51,11 @@ export async function GET(
       where: {
         id,
         sellerId: seller.id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
       },
     })
 
@@ -90,6 +96,11 @@ export async function PATCH(
       where: {
         id,
         sellerId: seller.id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
       },
       data: {
         ...(body.name && { name: body.name }),
@@ -103,7 +114,7 @@ export async function PATCH(
         ...(body.isAvailable !== undefined && { isAvailable: body.isAvailable }),
         ...(body.isVeg !== undefined && { isVeg: body.isVeg }),
         ...(body.prepTime && { prepTime: body.prepTime }),
-        ...(body.tags && { tags: body.tags }),
+        ...(body.tags !== undefined && { tags: sanitizeProductTags(body.tags) }),
         ...(body.discount !== undefined && { discount: body.discount }),
       },
     })
@@ -112,8 +123,16 @@ export async function PATCH(
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    const updatedProduct = await prisma.product.findUnique({
-      where: { id },
+    const updatedProduct = await prisma.product.findFirst({
+      where: {
+        id,
+        sellerId: seller.id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
     })
 
     return NextResponse.json(updatedProduct)
@@ -144,18 +163,54 @@ export async function DELETE(
 
     const { id } = await params
 
-    const product = await prisma.product.deleteMany({
+    const product = await prisma.product.findFirst({
       where: {
         id,
         sellerId: seller.id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
+      select: {
+        id: true,
+        tags: true,
+        _count: {
+          select: {
+            orderItems: true,
+          },
+        },
       },
     })
 
-    if (product.count === 0) {
+    if (!product) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    return NextResponse.json({ message: 'Product deleted successfully' })
+    if (product._count.orderItems > 0) {
+      await prisma.product.update({
+        where: { id: product.id },
+        data: {
+          isAvailable: false,
+          tags: appendArchivedProductTag(product.tags),
+        },
+      })
+
+      return NextResponse.json({
+        message: 'Product archived successfully',
+        archived: true,
+      })
+    }
+
+    await prisma.product.delete({
+      where: { id: product.id },
+    })
+
+    return NextResponse.json({
+      message: 'Product deleted successfully',
+      archived: false,
+    })
   } catch (error) {
     console.error('Error deleting product:', error)
     return NextResponse.json({ error: 'Failed to delete product' }, { status: 500 })

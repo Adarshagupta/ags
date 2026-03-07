@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
 
 type ProductVariantInput = {
   color?: unknown
@@ -44,7 +45,14 @@ export async function GET() {
 
     // Get seller's products
     const products = await prisma.product.findMany({
-      where: { sellerId: seller.id },
+      where: {
+        sellerId: seller.id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
     })
 
@@ -81,6 +89,7 @@ export async function POST(request: Request) {
 
     const body = await request.json()
     const variants = normalizeVariants(body?.variants)
+    const tags = sanitizeProductTags(body?.tags)
 
     const product = await prisma.product.create({
       data: {
@@ -95,7 +104,7 @@ export async function POST(request: Request) {
         isAvailable: body.isAvailable !== false,
         isVeg: body.isVeg !== false,
         prepTime: body.prepTime || 15,
-        tags: body.tags || [],
+        tags,
         discount: body.discount || 0,
         sellerId: seller.id,
       },

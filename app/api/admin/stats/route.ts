@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 
 export async function GET() {
   try {
@@ -13,7 +14,15 @@ export async function GET() {
     const totalRevenue = ordersWithAmount.reduce((sum, order) => sum + order.total, 0)
 
     // Get total products
-    const totalProducts = await prisma.product.count()
+    const totalProducts = await prisma.product.count({
+      where: {
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      }
+    })
 
     // Get total users
     const totalUsers = await prisma.user.count()

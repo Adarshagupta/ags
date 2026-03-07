@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
 
 type ProductVariantInput = {
   color?: unknown
@@ -30,8 +31,15 @@ export async function GET(
   try {
     const { id } = await params
 
-    const product = await prisma.product.findUnique({
-      where: { id }
+    const product = await prisma.product.findFirst({
+      where: {
+        id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      }
     })
 
     if (!product) {
@@ -63,12 +71,41 @@ export async function PATCH(
       data.variants = normalizeVariants(body.variants)
     }
 
-    const product = await prisma.product.update({
-      where: { id },
+    if (body?.tags !== undefined) {
+      data.tags = sanitizeProductTags(body.tags)
+    }
+
+    const product = await prisma.product.updateMany({
+      where: {
+        id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
       data,
     })
 
-    return NextResponse.json(product)
+    if (product.count === 0) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+
+    const updatedProduct = await prisma.product.findFirst({
+      where: {
+        id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      }
+    })
+
+    return NextResponse.json(updatedProduct)
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || 'Failed to update product' },
@@ -84,11 +121,50 @@ export async function DELETE(
   try {
     const { id } = await params
 
-    await prisma.product.delete({
-      where: { id }
+    const product = await prisma.product.findFirst({
+      where: {
+        id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
+      select: {
+        id: true,
+        tags: true,
+        _count: {
+          select: {
+            orderItems: true,
+          },
+        },
+      },
     })
 
-    return NextResponse.json({ success: true })
+    if (!product) {
+      return NextResponse.json(
+        { error: 'Product not found' },
+        { status: 404 }
+      )
+    }
+
+    if (product._count.orderItems > 0) {
+      await prisma.product.update({
+        where: { id: product.id },
+        data: {
+          isAvailable: false,
+          tags: appendArchivedProductTag(product.tags),
+        },
+      })
+
+      return NextResponse.json({ success: true, archived: true })
+    }
+
+    await prisma.product.delete({
+      where: { id: product.id }
+    })
+
+    return NextResponse.json({ success: true, archived: false })
   } catch (error: any) {
     return NextResponse.json(
       { error: error.message || 'Failed to delete product' },

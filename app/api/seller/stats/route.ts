@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 
 export async function GET() {
   try {
@@ -22,11 +23,26 @@ export async function GET() {
 
     // Calculate stats
     const totalProducts = await prisma.product.count({
-      where: { sellerId: seller.id },
+      where: {
+        sellerId: seller.id,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
     })
 
     const activeProducts = await prisma.product.count({
-      where: { sellerId: seller.id, isAvailable: true },
+      where: {
+        sellerId: seller.id,
+        isAvailable: true,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
     })
 
     // Get orders containing seller's products

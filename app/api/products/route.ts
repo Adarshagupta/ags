@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
 
 export async function GET(request: NextRequest) {
   try {
@@ -7,7 +8,14 @@ export async function GET(request: NextRequest) {
     const category = searchParams.get('category')
     const search = searchParams.get('search')
 
-    let where: any = { isAvailable: true }
+    const where: any = {
+      isAvailable: true,
+      NOT: {
+        tags: {
+          has: ARCHIVED_PRODUCT_TAG,
+        },
+      },
+    }
 
     if (category && category !== 'all') {
       where.category = category
@@ -54,7 +62,7 @@ export async function POST(request: NextRequest) {
         imageAlt: name,
         isVeg,
         prepTime: prepTime || 15,
-        tags: tags || [],
+        tags: sanitizeProductTags(tags),
         discount: discount || 0,
       },
     })

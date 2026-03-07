@@ -20,6 +20,7 @@ export default function AdminProducts() {
   const [loading, setLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
+  const [message, setMessage] = useState('')
   const itemsPerPage = 20
 
   useEffect(() => {
@@ -28,7 +29,7 @@ export default function AdminProducts() {
 
   const fetchProducts = async () => {
     try {
-      const res = await fetch('/api/products')
+      const res = await fetch('/api/admin/products')
       if (res.ok) {
         const data = await res.json()
         setProducts(Array.isArray(data.products) ? data.products : [])
@@ -36,6 +37,7 @@ export default function AdminProducts() {
     } catch (error) {
       console.error('Error fetching products:', error)
       setProducts([])
+      setMessage('Failed to load products.')
     } finally {
       setLoading(false)
     }
@@ -64,10 +66,20 @@ export default function AdminProducts() {
         method: 'DELETE'
       })
       if (res.ok) {
+        const data = await res.json()
+        setMessage(
+          data.archived
+            ? 'Product had existing orders, so it was archived instead of permanently deleted.'
+            : 'Product deleted successfully.'
+        )
         fetchProducts()
+      } else {
+        const data = await res.json().catch(() => null)
+        setMessage(data?.error || 'Failed to delete product.')
       }
     } catch (error) {
       console.error('Error deleting product:', error)
+      setMessage('Failed to delete product.')
     }
   }
 
@@ -114,6 +126,12 @@ export default function AdminProducts() {
           className="w-full max-w-md px-4 py-2.5 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
         />
       </div>
+
+      {message && (
+        <div className="mb-6 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
+          {message}
+        </div>
+      )}
 
       {/* Products Table */}
       <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">

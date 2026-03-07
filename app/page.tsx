@@ -4,6 +4,7 @@ import ProductCard from '@/components/ProductCard'
 import CategorySection from '@/components/CategorySection'
 import SearchBar from '@/components/SearchBar'
 import { prisma } from '@/lib/prisma'
+import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 
 // Disable caching for this page
 export const dynamic = 'force-dynamic'
@@ -12,7 +13,14 @@ export const revalidate = 0
 async function getProducts() {
   try {
     const products = await prisma.product.findMany({
-      where: { isAvailable: true },
+      where: {
+        isAvailable: true,
+        NOT: {
+          tags: {
+            has: ARCHIVED_PRODUCT_TAG,
+          },
+        },
+      },
       orderBy: { createdAt: 'desc' },
       take: 20,
     })
