@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useUserStore } from '@/lib/store/user'
 import { signIn } from 'next-auth/react'
+import { getGoogleOAuthConfigError } from '@/lib/google-auth'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -24,6 +25,12 @@ export default function LoginPage() {
     try {
       setGoogleLoading(true)
       setError('')
+      
+      const configError = getGoogleOAuthConfigError(window.location.origin)
+      if (configError) {
+        setError(configError)
+        return
+      }
       
       // Let NextAuth handle the redirect automatically
       await signIn('google', {
@@ -246,3 +253,4 @@ export default function LoginPage() {
     </div>
   )
 }
+
