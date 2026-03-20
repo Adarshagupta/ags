@@ -652,7 +652,7 @@ export default function CheckoutPage() {
                   />
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900 text-sm lg:text-base">Online Payment</p>
-                    <p className="text-xs lg:text-sm text-gray-600">Dodo checkout for UPI, cards and eligible banking methods</p>
+                    <p className="text-xs lg:text-sm text-gray-600">Dodo checkout charged in NPR with cards and supported local methods</p>
                   </div>
                 </label>
               </div>

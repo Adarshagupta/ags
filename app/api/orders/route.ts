@@ -180,7 +180,6 @@ export async function POST(request: NextRequest) {
             city: address.city,
             state: address.state,
             zipcode: address.pincode,
-            country: 'IN',
           },
           metadata: {
             orderId: order.id,

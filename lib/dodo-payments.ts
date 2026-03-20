@@ -35,6 +35,14 @@ function getDodoBaseUrl() {
     : 'https://test.dodopayments.com'
 }
 
+function getDodoCheckoutCurrency() {
+  return (process.env.DODO_PAYMENTS_CURRENCY || 'NPR').toUpperCase()
+}
+
+function getDodoCheckoutCountry() {
+  return (process.env.DODO_PAYMENTS_COUNTRY || 'NP').toUpperCase()
+}
+
 function getDodoConfig() {
   const apiKey = process.env.DODO_PAYMENTS_API_KEY
   const productId = process.env.DODO_PAYMENTS_PRODUCT_ID
@@ -88,6 +96,8 @@ export async function createDodoCheckoutSession({
   metadata,
 }: CreateDodoCheckoutSessionInput) {
   const { productId } = getDodoConfig()
+  const currency = getDodoCheckoutCurrency()
+  const country = getDodoCheckoutCountry()
 
   return dodoRequest<DodoCheckoutSessionResponse>('/checkouts', {
     method: 'POST',
@@ -110,10 +120,10 @@ export async function createDodoCheckoutSession({
             city: billingAddress.city || undefined,
             state: billingAddress.state || undefined,
             zipcode: billingAddress.zipcode || undefined,
-            country: billingAddress.country || 'IN',
+            country: billingAddress.country || country,
           }
         : undefined,
-      billing_currency: 'INR',
+      billing_currency: currency,
       feature_flags: {
         redirect_immediately: true,
       },
