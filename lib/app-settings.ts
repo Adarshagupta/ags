@@ -1,0 +1,63 @@
+import { prisma } from '@/lib/prisma'
+import { isMissingAppSettingsTableError } from '@/lib/product-db'
+
+export type PublicAppSettings = {
+  siteName: string
+  supportPhone: string
+  supportEmail: string
+  supportHours: string
+  supportMessage: string
+  deliveryEstimate: string
+  deliveryNote: string
+  announcementText: string
+  storeAddress: string
+  mapLatitude: number
+  mapLongitude: number
+}
+
+export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
+  siteName: 'Flowers N Petals',
+  supportPhone: '',
+  supportEmail: '',
+  supportHours: '9:00 AM - 9:00 PM',
+  supportMessage: 'Need help with your order? Our team is available during support hours.',
+  deliveryEstimate: 'Estimated delivery: 20-30 minutes',
+  deliveryNote: 'Delivery timings may vary depending on location and order volume.',
+  announcementText: 'Same day gifting with live support and doorstep delivery.',
+  storeAddress: '',
+  mapLatitude: 27.7172,
+  mapLongitude: 85.324,
+}
+
+export async function getAppSettings(): Promise<PublicAppSettings> {
+  try {
+    const settings = await prisma.appSettings.findUnique({
+      where: { id: 'default' },
+    })
+
+    if (!settings) {
+      return DEFAULT_APP_SETTINGS
+    }
+
+    return {
+      siteName: settings.siteName || DEFAULT_APP_SETTINGS.siteName,
+      supportPhone: settings.supportPhone || DEFAULT_APP_SETTINGS.supportPhone,
+      supportEmail: settings.supportEmail || DEFAULT_APP_SETTINGS.supportEmail,
+      supportHours: settings.supportHours || DEFAULT_APP_SETTINGS.supportHours,
+      supportMessage: settings.supportMessage || DEFAULT_APP_SETTINGS.supportMessage,
+      deliveryEstimate: settings.deliveryEstimate || DEFAULT_APP_SETTINGS.deliveryEstimate,
+      deliveryNote: settings.deliveryNote || DEFAULT_APP_SETTINGS.deliveryNote,
+      announcementText: settings.announcementText || DEFAULT_APP_SETTINGS.announcementText,
+      storeAddress: settings.storeAddress || DEFAULT_APP_SETTINGS.storeAddress,
+      mapLatitude: settings.mapLatitude ?? DEFAULT_APP_SETTINGS.mapLatitude,
+      mapLongitude: settings.mapLongitude ?? DEFAULT_APP_SETTINGS.mapLongitude,
+    }
+  } catch (error) {
+    if (isMissingAppSettingsTableError(error)) {
+      return DEFAULT_APP_SETTINGS
+    }
+
+    console.error('Error loading app settings, falling back to defaults:', error)
+    return DEFAULT_APP_SETTINGS
+  }
+}

@@ -1,0 +1,76 @@
+import { NextRequest, NextResponse } from 'next/server'
+import { prisma } from '@/lib/prisma'
+import { DEFAULT_APP_SETTINGS } from '@/lib/app-settings'
+
+function toNumber(value: unknown, fallback: number) {
+  if (value === '' || value === null || value === undefined) {
+    return fallback
+  }
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : fallback
+}
+
+export async function GET() {
+  try {
+    const settings = await prisma.appSettings.findUnique({
+      where: { id: 'default' },
+    })
+
+    return NextResponse.json({
+      id: 'default',
+      ...DEFAULT_APP_SETTINGS,
+      ...(settings || {}),
+    })
+  } catch (error) {
+    console.error('Error fetching admin settings:', error)
+    return NextResponse.json(
+      { error: 'Failed to fetch settings' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PATCH(request: NextRequest) {
+  try {
+    const body = await request.json()
+
+    const settings = await prisma.appSettings.upsert({
+      where: { id: 'default' },
+      update: {
+        siteName: String(body?.siteName || DEFAULT_APP_SETTINGS.siteName).trim(),
+        supportPhone: String(body?.supportPhone || '').trim() || null,
+        supportEmail: String(body?.supportEmail || '').trim() || null,
+        supportHours: String(body?.supportHours || '').trim() || null,
+        supportMessage: String(body?.supportMessage || '').trim() || null,
+        deliveryEstimate: String(body?.deliveryEstimate || DEFAULT_APP_SETTINGS.deliveryEstimate).trim(),
+        deliveryNote: String(body?.deliveryNote || '').trim() || null,
+        announcementText: String(body?.announcementText || '').trim() || null,
+        storeAddress: String(body?.storeAddress || '').trim() || null,
+        mapLatitude: toNumber(body?.mapLatitude, DEFAULT_APP_SETTINGS.mapLatitude),
+        mapLongitude: toNumber(body?.mapLongitude, DEFAULT_APP_SETTINGS.mapLongitude),
+      },
+      create: {
+        id: 'default',
+        siteName: String(body?.siteName || DEFAULT_APP_SETTINGS.siteName).trim(),
+        supportPhone: String(body?.supportPhone || '').trim() || null,
+        supportEmail: String(body?.supportEmail || '').trim() || null,
+        supportHours: String(body?.supportHours || '').trim() || null,
+        supportMessage: String(body?.supportMessage || '').trim() || null,
+        deliveryEstimate: String(body?.deliveryEstimate || DEFAULT_APP_SETTINGS.deliveryEstimate).trim(),
+        deliveryNote: String(body?.deliveryNote || '').trim() || null,
+        announcementText: String(body?.announcementText || '').trim() || null,
+        storeAddress: String(body?.storeAddress || '').trim() || null,
+        mapLatitude: toNumber(body?.mapLatitude, DEFAULT_APP_SETTINGS.mapLatitude),
+        mapLongitude: toNumber(body?.mapLongitude, DEFAULT_APP_SETTINGS.mapLongitude),
+      },
+    })
+
+    return NextResponse.json(settings)
+  } catch (error) {
+    console.error('Error updating admin settings:', error)
+    return NextResponse.json(
+      { error: 'Failed to update settings. Apply the latest Prisma migration first if this is a new setup.' },
+      { status: 500 }
+    )
+  }
+}

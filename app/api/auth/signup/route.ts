@@ -2,16 +2,25 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcryptjs'
 import { signToken } from '@/lib/auth'
-import crypto from 'crypto'
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { email, password, name, phone } = body
+    const email = String(body?.email || '').trim().toLowerCase()
+    const password = String(body?.password || '')
+    const name = String(body?.name || '').trim()
+    const phone = String(body?.phone || '').trim()
 
-    if (!email || !password) {
+    if (!name || !email || !password || !phone) {
       return NextResponse.json(
-        { error: 'Email and password are required' },
+        { error: 'Name, phone, email, and password are required' },
+        { status: 400 }
+      )
+    }
+
+    if (password.length < 6) {
+      return NextResponse.json(
+        { error: 'Password must be at least 6 characters long' },
         { status: 400 }
       )
     }
@@ -28,32 +37,24 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // If phone provided, check if it's already taken
-    if (phone) {
-      const existingPhone = await prisma.user.findUnique({
-        where: { phone },
-      })
-      if (existingPhone) {
-        return NextResponse.json(
-          { error: 'Phone number already registered' },
-          { status: 400 }
-        )
-      }
+    const existingPhone = await prisma.user.findUnique({
+      where: { phone },
+    })
+    if (existingPhone) {
+      return NextResponse.json(
+        { error: 'Phone number already registered' },
+        { status: 400 }
+      )
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10)
 
-    // Generate a truly unique phone placeholder if not provided
-    const userPhone = phone || `temp_${crypto.randomUUID()}`
-
-    // Create user
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
-        name: name || email.split('@')[0],
-        phone: userPhone,
+        name,
+        phone,
       },
       select: {
         id: true,

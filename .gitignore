@@ -45,3 +45,9 @@ public/worker-*.js.map
 
 # Prisma
 prisma/migrations/
+# Cloudflare
+.open-next/
+.wrangler/
+.dev.vars
+.dev.vars.*
+cloudflare-env.d.ts

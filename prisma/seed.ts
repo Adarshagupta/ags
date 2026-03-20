@@ -149,6 +149,25 @@ async function main() {
   }
 
   console.log(`✅ Created ${sampleProducts.length} products`)
+
+  await prisma.appSettings.upsert({
+    where: { id: 'default' },
+    update: {},
+    create: {
+      id: 'default',
+      siteName: 'Flowers N Petals',
+      supportPhone: '+977 9812345678',
+      supportEmail: 'support@fnp.com',
+      supportHours: '9:00 AM - 9:00 PM',
+      supportMessage: 'Same-day gifting support available every day.',
+      deliveryEstimate: 'Estimated delivery: 20-30 minutes',
+      deliveryNote: 'Delivery slots and support availability can be updated from the admin settings page.',
+      announcementText: 'Same day gifting with live support and doorstep delivery.',
+      storeAddress: 'Kathmandu, Nepal',
+    },
+  })
+  console.log('✅ Ensured default app settings')
+
   console.log('🎉 Seed completed!')
 }
 

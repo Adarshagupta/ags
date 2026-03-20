@@ -2,7 +2,6 @@
 
 import { use, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import ProductCategoryFields from '@/components/ProductCategoryFields'
 import ProductFoodTypeFields from '@/components/ProductFoodTypeFields'
 import { uploadProductImage } from '@/lib/upload-image'
@@ -19,7 +18,7 @@ type ProductVariant = {
   image: string
 }
 
-export default function EditProduct({ params }: { params: Promise<{ id: string }> }) {
+export default function EditSellerProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   const router = useRouter()
   const [loading, setLoading] = useState(true)
@@ -39,18 +38,93 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
     name: '',
     description: '',
     category: '',
-    price: 0,
+    price: '',
     image: '',
     images: [''],
     variants: [] as ProductVariant[],
     imageAlt: '',
+    isAvailable: true,
     showFoodTypeLabel: false,
     isVeg: true,
     prepTime: 15,
     tags: '',
     discount: 0,
-    isAvailable: true
   })
+
+  useEffect(() => {
+    void fetchProduct()
+  }, [id])
+
+  const fetchProduct = async () => {
+    try {
+      const [productResult, categoriesResult] = await Promise.allSettled([
+        fetch(`/api/seller/products/${id}`),
+        fetchProductCategoryGroups(),
+      ])
+
+      let nextCategoryGroups = EMPTY_PRODUCT_CATEGORY_GROUPS
+
+      if (categoriesResult.status === 'fulfilled') {
+        nextCategoryGroups = categoriesResult.value
+        setCategoryGroups(categoriesResult.value)
+        setCategoryError(null)
+      } else {
+        console.error('Failed to load product categories:', categoriesResult.reason)
+        setCategoryError('Category options could not be loaded. You can still edit the main category manually.')
+      }
+
+      if (productResult.status === 'rejected') {
+        throw productResult.reason
+      }
+
+      if (!productResult.value.ok) {
+        throw new Error('Failed to load product')
+      }
+
+      const product = await productResult.value.json()
+      const variants = Array.isArray(product.variants)
+        ? product.variants
+            .map((variant: any) => ({
+              color: String(variant?.color || ''),
+              size: String(variant?.size || ''),
+              image: String(variant?.image || ''),
+            }))
+            .filter((variant: ProductVariant) => variant.image && (variant.color || variant.size))
+        : []
+      const tagState = splitProductTags(
+        product.tags,
+        nextCategoryGroups.recipientCategories,
+        nextCategoryGroups.occasionCategories
+      )
+
+      setFormData({
+        name: product.name,
+        description: product.description,
+        category: product.category,
+        price: String(product.price ?? ''),
+        image: product.image,
+        images: Array.isArray(product.images) && product.images.length > 0 ? product.images : [''],
+        variants,
+        imageAlt: product.imageAlt || '',
+        isAvailable: product.isAvailable,
+        showFoodTypeLabel: Boolean(product.showFoodTypeLabel),
+        isVeg: product.isVeg,
+        prepTime: product.prepTime,
+        tags: tagState.customTags,
+        discount: product.discount || 0,
+      })
+      setRecipientSelections(tagState.recipientSelections)
+      setOccasionSelections(tagState.occasionSelections)
+      setVariantFiles(new Array(variants.length).fill(null))
+    } catch (error) {
+      console.error('Failed to fetch seller product:', error)
+      alert('Failed to load product')
+      router.push('/seller/products')
+    } finally {
+      setCategoryGroupsLoading(false)
+      setLoading(false)
+    }
+  }
 
   const setAdditionalImageUrl = (url: string) => {
     setFormData((prev) => {
@@ -148,76 +222,19 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
     }
   }
 
-  useEffect(() => {
-    void fetchProduct()
-  }, [id])
+  const addImageField = () => {
+    setFormData({ ...formData, images: [...formData.images, ''] })
+  }
 
-  const fetchProduct = async () => {
-    try {
-      const [productResult, categoriesResult] = await Promise.allSettled([
-        fetch(`/api/admin/products/${id}`),
-        fetchProductCategoryGroups(),
-      ])
+  const updateImage = (index: number, value: string) => {
+    const nextImages = [...formData.images]
+    nextImages[index] = value
+    setFormData({ ...formData, images: nextImages })
+  }
 
-      let nextCategoryGroups = EMPTY_PRODUCT_CATEGORY_GROUPS
-
-      if (categoriesResult.status === 'fulfilled') {
-        nextCategoryGroups = categoriesResult.value
-        setCategoryGroups(categoriesResult.value)
-        setCategoryError(null)
-      } else {
-        console.error('Failed to load product categories:', categoriesResult.reason)
-        setCategoryError('Category options could not be loaded. You can still edit the main category manually.')
-      }
-
-      if (productResult.status === 'rejected') {
-        throw productResult.reason
-      }
-
-      const res = productResult.value
-      if (res.ok) {
-        const product = await res.json()
-        const variants = Array.isArray(product.variants)
-          ? product.variants
-              .map((variant: any) => ({
-                color: String(variant?.color || ''),
-                size: String(variant?.size || ''),
-                image: String(variant?.image || ''),
-              }))
-              .filter((variant: ProductVariant) => variant.image && (variant.color || variant.size))
-          : []
-        const tagState = splitProductTags(
-          product.tags,
-          nextCategoryGroups.recipientCategories,
-          nextCategoryGroups.occasionCategories
-        )
-
-        setFormData({
-          name: product.name,
-          description: product.description,
-          category: product.category,
-          price: product.price,
-          image: product.image,
-          images: Array.isArray(product.images) && product.images.length > 0 ? product.images : [''],
-          variants,
-          imageAlt: product.imageAlt || '',
-          showFoodTypeLabel: Boolean(product.showFoodTypeLabel),
-          isVeg: product.isVeg,
-          prepTime: product.prepTime,
-          tags: tagState.customTags,
-          discount: product.discount || 0,
-          isAvailable: product.isAvailable
-        })
-        setRecipientSelections(tagState.recipientSelections)
-        setOccasionSelections(tagState.occasionSelections)
-        setVariantFiles(new Array(variants.length).fill(null))
-      }
-    } catch (error) {
-      console.error('Error fetching product:', error)
-    } finally {
-      setCategoryGroupsLoading(false)
-      setLoading(false)
-    }
+  const removeImage = (index: number) => {
+    const nextImages = formData.images.filter((_, i) => i !== index)
+    setFormData({ ...formData, images: nextImages.length > 0 ? nextImages : [''] })
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -225,13 +242,13 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
     setSaving(true)
 
     try {
-      const res = await fetch(`/api/admin/products/${id}`, {
+      const res = await fetch(`/api/seller/products/${id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
           tags: buildProductTags(formData.tags, recipientSelections, occasionSelections),
-          images: formData.images.filter(img => img.trim()),
+          images: formData.images.filter((img) => img.trim()),
           showFoodTypeLabel: formData.showFoodTypeLabel,
           variants: formData.variants
             .map((variant) => ({
@@ -240,56 +257,55 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
               image: variant.image.trim(),
             }))
             .filter((variant) => variant.image && (variant.color || variant.size)),
-        })
+        }),
       })
 
-      if (res.ok) {
-        router.push('/admin/products')
-      } else {
-        alert('Failed to update product')
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || 'Failed to update product')
       }
-    } catch (error) {
-      console.error('Error updating product:', error)
-      alert('Error updating product')
+
+      router.push('/seller/products')
+    } catch (error: any) {
+      console.error('Failed to update seller product:', error)
+      alert(error?.message || 'Failed to update product')
     } finally {
       setSaving(false)
     }
   }
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Loading...</div>
+    return <div className="p-8 text-center text-gray-500">Loading product...</div>
   }
 
   return (
-    <div className="max-w-4xl">
-      <div className="mb-6">
-        <Link href="/admin/products" className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-2 inline-block">
-          ← Back to Products
-        </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Edit Product</h1>
-      </div>
+    <div className="px-4 py-6">
+      <div className="max-w-3xl mx-auto">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
+          <p className="text-gray-600">Update your listed product details</p>
+        </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="grid grid-cols-2 gap-6">
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-lg bg-white p-6 shadow">
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Product Name *</label>
             <input
               type="text"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full rounded-lg border px-4 py-2"
             />
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description*</label>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Description *</label>
             <textarea
               required
-              rows={3}
+              rows={4}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full rounded-lg border px-4 py-2"
             />
           </div>
 
@@ -305,29 +321,54 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
             onCustomTagsChange={(value) => setFormData({ ...formData, tags: value })}
             onRecipientSelectionsChange={setRecipientSelections}
             onOccasionSelectionsChange={setOccasionSelections}
-            accent="orange"
           />
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (NPR)*</label>
-            <input
-              type="number"
-              required
-              step="0.01"
-              value={formData.price}
-              onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">Price (NPR)*</label>
+              <input
+                type="number"
+                required
+                min="0"
+                step="0.01"
+                value={formData.price}
+                onChange={(e) => setFormData({ ...formData, price: e.target.value })}
+                className="w-full rounded-lg border px-4 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">Discount (%)</label>
+              <input
+                type="number"
+                min="0"
+                max="100"
+                value={formData.discount}
+                onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
+                className="w-full rounded-lg border px-4 py-2"
+              />
+            </div>
+
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-700">Preparation Time (minutes)</label>
+              <input
+                type="number"
+                min="0"
+                value={formData.prepTime}
+                onChange={(e) => setFormData({ ...formData, prepTime: parseInt(e.target.value, 10) || 0 })}
+                className="w-full rounded-lg border px-4 py-2"
+              />
+            </div>
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL*</label>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Main Image URL *</label>
             <input
               type="text"
               required
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full rounded-lg border px-4 py-2"
             />
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
@@ -340,47 +381,35 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
                 type="button"
                 onClick={handleMainImageUpload}
                 disabled={!mainImageFile || uploadingMainImage}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black disabled:opacity-50"
               >
                 {uploadingMainImage ? 'Uploading...' : 'Upload Main Image'}
               </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">JPG, PNG, WEBP or GIF. Max size 5MB.</p>
           </div>
 
-          <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Additional Images</label>
+          <div>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Additional Images</label>
             {formData.images.map((img, index) => (
-              <div key={index} className="flex gap-2 mb-2">
+              <div key={index} className="mb-2 flex gap-2">
                 <input
                   type="text"
                   value={img}
-                  onChange={(e) => {
-                    const newImages = [...formData.images]
-                    newImages[index] = e.target.value
-                    setFormData({ ...formData, images: newImages })
-                  }}
+                  onChange={(e) => updateImage(index, e.target.value)}
+                  className="flex-1 rounded-lg border px-4 py-2"
                   placeholder={`Image ${index + 1} URL`}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
                 />
                 <button
                   type="button"
-                  onClick={() => {
-                    const newImages = formData.images.filter((_, i) => i !== index)
-                    setFormData({ ...formData, images: newImages })
-                  }}
-                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                  onClick={() => removeImage(index)}
+                  className="rounded-lg bg-red-100 px-4 py-2 text-red-600 hover:bg-red-200"
                 >
                   Remove
                 </button>
               </div>
             ))}
-            <button
-              type="button"
-              onClick={() => setFormData({ ...formData, images: [...formData.images, ''] })}
-              className="mt-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 text-sm font-medium"
-            >
-              + Add Another Image
+            <button type="button" onClick={addImageField} className="text-sm text-pink-600 hover:text-pink-700">
+              + Add Image
             </button>
             <div className="mt-3 rounded-lg border border-dashed border-gray-300 p-3">
               <p className="text-xs text-gray-600">Upload additional image</p>
@@ -395,7 +424,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
                   type="button"
                   onClick={handleAdditionalImageUpload}
                   disabled={!additionalImageFile || uploadingAdditionalImage}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                  className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black disabled:opacity-50"
                 >
                   {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
                 </button>
@@ -403,45 +432,45 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
             </div>
           </div>
 
-          <div className="col-span-2">
-            <div className="flex items-center justify-between mb-2">
+          <div>
+            <div className="mb-2 flex items-center justify-between">
               <label className="block text-sm font-medium text-gray-700">Product Variants</label>
               <button
                 type="button"
                 onClick={addVariant}
-                className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-200"
+                className="rounded-lg bg-indigo-100 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
               >
                 + Add Variant
               </button>
             </div>
             {formData.variants.length === 0 && (
-              <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg p-3">
+              <p className="rounded-lg border border-dashed border-gray-300 p-3 text-xs text-gray-500">
                 Add color or size variants and upload a specific image for each variant.
               </p>
             )}
             {formData.variants.map((variant, index) => (
               <div key={index} className="mb-3 rounded-lg border border-gray-200 p-3">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                   <input
                     type="text"
                     value={variant.color}
                     onChange={(e) => updateVariant(index, 'color', e.target.value)}
                     placeholder="Color (e.g., Red)"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
                   />
                   <input
                     type="text"
                     value={variant.size}
                     onChange={(e) => updateVariant(index, 'size', e.target.value)}
                     placeholder="Size (e.g., Large)"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
                   />
                   <input
                     type="text"
                     value={variant.image}
                     onChange={(e) => updateVariant(index, 'image', e.target.value)}
                     placeholder="Variant Image URL"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
                   />
                 </div>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -463,7 +492,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
                       type="button"
                       onClick={() => uploadVariantImage(index)}
                       disabled={!variantFiles[index] || uploadingVariantIndex === index}
-                      className="px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-medium hover:bg-black disabled:opacity-50"
+                      className="rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white hover:bg-black disabled:opacity-50"
                     >
                       {uploadingVariantIndex === index ? 'Uploading...' : 'Upload Variant Image'}
                     </button>
@@ -471,7 +500,7 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
                   <button
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 self-start"
+                    className="self-start rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100"
                   >
                     Remove Variant
                   </button>
@@ -481,73 +510,52 @@ export default function EditProduct({ params }: { params: Promise<{ id: string }
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Image Alt Text</label>
+            <label className="mb-2 block text-sm font-medium text-gray-700">Image Alt Text</label>
             <input
               type="text"
               value={formData.imageAlt}
               onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full rounded-lg border px-4 py-2"
+              placeholder="Description for accessibility"
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Prep Time (minutes)*</label>
-            <input
-              type="number"
-              required
-              value={formData.prepTime}
-              onChange={(e) => setFormData({ ...formData, prepTime: parseInt(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Discount (%)</label>
-            <input
-              type="number"
-              step="0.01"
-              value={formData.discount}
-              onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
-          </div>
-
-          <div className="col-span-2 space-y-4">
+          <div className="space-y-4">
             <ProductFoodTypeFields
               showFoodTypeLabel={formData.showFoodTypeLabel}
               isVeg={formData.isVeg}
-              accent="orange"
               onShowFoodTypeLabelChange={(value) => setFormData({ ...formData, showFoodTypeLabel: value })}
               onIsVegChange={(value) => setFormData({ ...formData, isVeg: value })}
             />
-            <label className="flex items-center gap-2 cursor-pointer">
+            <label className="flex items-center gap-2">
               <input
                 type="checkbox"
                 checked={formData.isAvailable}
                 onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-                className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                className="h-4 w-4"
               />
-              <span className="text-sm font-medium text-gray-700">Available</span>
+              <span className="text-sm text-gray-700">Available</span>
             </label>
           </div>
-        </div>
 
-        <div className="flex gap-3 mt-6">
-          <button
-            type="submit"
-            disabled={saving}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold disabled:opacity-50"
-          >
-            {saving ? 'Saving...' : 'Save Changes'}
-          </button>
-          <Link
-            href="/admin/products"
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-semibold"
-          >
-            Cancel
-          </Link>
-        </div>
-      </form>
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => router.back()}
+              className="rounded-lg border border-gray-300 px-6 py-2 hover:bg-gray-50"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving}
+              className="rounded-lg bg-pink-600 px-6 py-2 text-white hover:bg-pink-700 disabled:bg-gray-400"
+            >
+              {saving ? 'Saving...' : 'Save Changes'}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   )
 }

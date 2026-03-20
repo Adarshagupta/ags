@@ -18,6 +18,7 @@ export default function AuthPage() {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
+    confirmPassword: '',
     name: '',
     phone: '',
   })
@@ -67,6 +68,14 @@ export default function AuthPage() {
           router.push('/')
         }
       } else {
+        if (formData.password.length < 6) {
+          throw new Error('Password must be at least 6 characters long')
+        }
+
+        if (formData.password !== formData.confirmPassword) {
+          throw new Error('Passwords do not match')
+        }
+
         // Sign up then automatically sign in with NextAuth
         const response = await fetch('/api/auth/signup', {
           method: 'POST',
@@ -177,12 +186,30 @@ export default function AuthPage() {
               <input
                 type="password"
                 required
+                minLength={6}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
                 placeholder="••••••••"
               />
             </div>
+
+            {!isLogin && (
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <input
+                  type="password"
+                  required
+                  minLength={6}
+                  value={formData.confirmPassword}
+                  onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                  placeholder="Re-enter password"
+                />
+              </div>
+            )}
 
             <motion.button
               whileHover={{ scale: 1.02 }}
@@ -247,6 +274,7 @@ export default function AuthPage() {
               onClick={() => {
                 setIsLogin(!isLogin)
                 setError('')
+                setFormData({ email: '', password: '', confirmPassword: '', name: '', phone: '' })
               }}
               className="text-pink-600 font-semibold hover:underline"
             >

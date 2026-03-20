@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { useLocationStore } from '@/lib/store/location'
+import LocationModal from '@/components/LocationModal'
 
 interface LocationPickerProps {
   onLocationSelect?: (location: any) => void
@@ -12,6 +13,7 @@ export default function LocationPicker({ onLocationSelect }: LocationPickerProps
   const { setCurrentLocation, setDeliveryAddress } = useLocationStore()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
 
   const requestLocation = () => {
     setIsLoading(true)
@@ -90,7 +92,7 @@ export default function LocationPicker({ onLocationSelect }: LocationPickerProps
           Enable Location Access
         </h2>
         <p className="text-gray-600 mb-6">
-          We need your location to show nearby restaurants and calculate delivery time
+          We need your location to show the correct delivery area, delivery time, and available products
         </p>
 
         {error && (
@@ -130,11 +132,24 @@ export default function LocationPicker({ onLocationSelect }: LocationPickerProps
         </motion.button>
 
         <div className="mt-4">
-          <button className="text-primary font-semibold text-sm hover:underline">
-            Or enter address manually
+          <button
+            type="button"
+            onClick={() => setIsLocationModalOpen(true)}
+            className="text-primary font-semibold text-sm hover:underline"
+          >
+            Pick on Google Maps or enter address manually
           </button>
         </div>
       </div>
+
+      <LocationModal
+        isOpen={isLocationModalOpen}
+        onClose={() => setIsLocationModalOpen(false)}
+        onSaved={(location) => {
+          onLocationSelect?.(location)
+          setIsLocationModalOpen(false)
+        }}
+      />
     </div>
   )
 }

@@ -111,6 +111,7 @@ model Product {
   variants        Json[]       @default([])
   imageAlt        String?
   isAvailable     Boolean      @default(true)
+  showFoodTypeLabel Boolean    @default(false)
   isVeg           Boolean      @default(true)
   prepTime        Int          @default(15) // in minutes
   tags            String[]
@@ -334,4 +335,21 @@ model Occasion {
   isActive    Boolean   @default(true)
   orders      Order[]
   createdAt   DateTime  @default(now())
+}
+
+model AppSettings {
+  id               String   @id @default("default")
+  siteName         String   @default("Flowers N Petals")
+  supportPhone     String?
+  supportEmail     String?
+  supportHours     String?
+  supportMessage   String?
+  deliveryEstimate String   @default("Estimated delivery: 20-30 minutes")
+  deliveryNote     String?
+  announcementText String?
+  storeAddress     String?
+  mapLatitude      Float    @default(27.7172)
+  mapLongitude     Float    @default(85.3240)
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }

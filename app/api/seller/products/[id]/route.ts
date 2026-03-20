@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
+import { findFirstProductCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
@@ -47,7 +48,7 @@ export async function GET(
 
     const { id } = await params
 
-    const product = await prisma.product.findFirst({
+    const product = await findFirstProductCompat({
       where: {
         id,
         sellerId: seller.id,
@@ -92,7 +93,7 @@ export async function PATCH(
     const body = await request.json()
     const { id } = await params
 
-    const product = await prisma.product.updateMany({
+    const updateArgs = {
       where: {
         id,
         sellerId: seller.id,
@@ -106,24 +107,40 @@ export async function PATCH(
         ...(body.name && { name: body.name }),
         ...(body.description && { description: body.description }),
         ...(body.category && { category: body.category }),
-        ...(body.price && { price: parseFloat(body.price) }),
+        ...(body.price !== undefined && { price: parseFloat(body.price) }),
         ...(body.image && { image: body.image }),
         ...(body.images && { images: body.images }),
         ...(body.variants !== undefined && { variants: normalizeVariants(body.variants) }),
         ...(body.imageAlt !== undefined && { imageAlt: body.imageAlt }),
         ...(body.isAvailable !== undefined && { isAvailable: body.isAvailable }),
+        ...(body.showFoodTypeLabel !== undefined && { showFoodTypeLabel: body.showFoodTypeLabel }),
         ...(body.isVeg !== undefined && { isVeg: body.isVeg }),
-        ...(body.prepTime && { prepTime: body.prepTime }),
+        ...(body.prepTime !== undefined && { prepTime: body.prepTime }),
         ...(body.tags !== undefined && { tags: sanitizeProductTags(body.tags) }),
         ...(body.discount !== undefined && { discount: body.discount }),
       },
-    })
+    }
+
+    let product
+
+    try {
+      product = await prisma.product.updateMany(updateArgs)
+    } catch (error) {
+      if (!isMissingProductFoodTypeColumnError(error)) {
+        throw error
+      }
+
+      product = await prisma.product.updateMany({
+        ...updateArgs,
+        data: stripFoodTypeLabelField(updateArgs.data),
+      })
+    }
 
     if (product.count === 0) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })
     }
 
-    const updatedProduct = await prisma.product.findFirst({
+    const updatedProduct = await findFirstProductCompat({
       where: {
         id,
         sellerId: seller.id,

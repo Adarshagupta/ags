@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
+import { findFirstProductCompat } from '@/lib/product-db'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -12,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params
-    const product = await prisma.product.findFirst({
+    const product = await findFirstProductCompat({
       where: {
         id,
         NOT: {

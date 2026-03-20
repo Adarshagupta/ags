@@ -51,7 +51,7 @@ export default function AdminDashboard() {
     <div>
       <div className="mb-6">
         <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
-        <p className="text-gray-600 mt-1">Welcome to Chapter Kurus Admin Panel</p>
+        <p className="text-gray-600 mt-1">Welcome to Flowers N Petals Admin Panel</p>
       </div>
 
       {/* Stats Grid */}

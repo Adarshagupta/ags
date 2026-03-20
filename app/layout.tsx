@@ -8,8 +8,27 @@ import OfflineIndicator from '@/components/OfflineIndicator'
 import { SessionSync } from '@/components/SessionSync'
 import RouteLoader from '@/components/RouteLoader'
 
-const metadataBaseUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL || 'http://localhost:3000'
+function isLocalOrigin(value?: string | null) {
+  if (!value) return false
+
+  try {
+    const hostname = new URL(value).hostname
+    return hostname === 'localhost' || hostname === '127.0.0.1'
+  } catch {
+    return false
+  }
+}
+
 const isProduction = process.env.NODE_ENV === 'production'
+const metadataBaseUrl = (() => {
+  const configuredUrl = process.env.NEXT_PUBLIC_APP_URL || process.env.NEXTAUTH_URL
+
+  if (isProduction && isLocalOrigin(configuredUrl)) {
+    return undefined
+  }
+
+  return configuredUrl
+})()
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -29,43 +48,43 @@ export function generateViewport(): Viewport {
 }
 
 export const metadata: Metadata = {
-  metadataBase: new URL(metadataBaseUrl),
-  title: 'Chapter Kurus - Gift & Flower Delivery in Nepal | Same Day Delivery',
-  description: 'Send flowers, cakes, and personalized gifts across Nepal with same-day delivery. Express your love with Chapter Kurus.',
+  ...(metadataBaseUrl ? { metadataBase: new URL(metadataBaseUrl) } : {}),
+  title: 'Flowers N Petals - Gift & Flower Delivery | Same Day Delivery',
+  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with FNP - Your trusted gift delivery partner.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Chapter Kurus - Flowers & Gifts',
+    title: 'FNP - Flowers & Gifts',
   },
-  applicationName: 'Chapter Kurus',
-  keywords: ['flowers', 'gifts', 'cakes', 'Nepal gift delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
-  authors: [{ name: 'Chapter Kurus' }],
-  creator: 'Chapter Kurus',
-  publisher: 'Chapter Kurus',
+  applicationName: 'Flowers N Petals',
+  keywords: ['flowers', 'gifts', 'cakes', 'delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
+  authors: [{ name: 'Flowers N Petals' }],
+  creator: 'Flowers N Petals',
+  publisher: 'Flowers N Petals',
   formatDetection: {
     telephone: false,
   },
   openGraph: {
     type: 'website',
-    locale: 'en_NP',
-    url: metadataBaseUrl,
-    siteName: 'Chapter Kurus',
-    title: 'Chapter Kurus - Gift & Flower Delivery in Nepal',
-    description: 'Send flowers, cakes, and gifts across Nepal with same-day delivery',
+    locale: 'en_IN',
+    url: 'https://fnp.com',
+    siteName: 'Flowers N Petals',
+    title: 'Flowers N Petals - Gift & Flower Delivery',
+    description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Chapter Kurus',
+        alt: 'Flowers N Petals',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chapter Kurus - Gift & Flower Delivery in Nepal',
-    description: 'Send flowers, cakes, and gifts across Nepal with same-day delivery',
+    title: 'Flowers N Petals - Gift & Flower Delivery',
+    description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: ['/og-image.png'],
   },
   icons: {
@@ -85,13 +104,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en-NP" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" />
+        <link rel="icon" href="/icons/icon-512x512.png" type="image/png" />
         <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Chapter Kurus" />
+        <meta name="apple-mobile-web-app-title" content="FNP" />
         <meta name="mobile-web-app-capable" content="yes" />
         {!isProduction && (
           <script
@@ -141,4 +160,3 @@ export default function RootLayout({
     </html>
   )
 }
-

@@ -23,6 +23,7 @@ interface Product {
   price: number
   image: string
   isVeg: boolean
+  showFoodTypeLabel?: boolean
   discount: number
   prepTime: number
   categoryId: string

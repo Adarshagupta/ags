@@ -40,21 +40,30 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
         `/api/location/reverse-geocode?lat=${lat}&lng=${lng}`
       )
       const data = await response.json()
+
+      if (data.address) {
+        setSelectedAddress(data.address)
+      }
       
       // Use the pre-parsed data from API for more accuracy
       if (data.parsed) {
-        setFormData({
-          ...formData,
+        setFormData((prev) => ({
+          ...prev,
           street: data.parsed.street || '',
           landmark: data.parsed.landmark || '',
           city: data.parsed.city || '',
           state: data.parsed.state || '',
           pincode: data.parsed.pincode || '',
-        })
+        }))
       } else {
         // Fallback to manual parsing
         const addressComponents = data.fullResult?.address_components || []
         const street = data.fullResult?.formatted_address?.split(',')[0] || ''
+        const formattedAddress = data.fullResult?.formatted_address
+
+        if (formattedAddress) {
+          setSelectedAddress(formattedAddress)
+        }
         
         let city = '', state = '', pincode = ''
         addressComponents.forEach((component: any) => {
@@ -69,13 +78,13 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
           }
         })
         
-        setFormData({
-          ...formData,
+        setFormData((prev) => ({
+          ...prev,
           street,
           city,
           state,
           pincode,
-        })
+        }))
       }
     } catch (err) {
       console.error('Error parsing address:', err)
@@ -230,8 +239,8 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
                     <div className="h-[280px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
                       <MapPicker 
                         onLocationSelect={handleLocationSelect}
-                        initialLat={deliveryAddress?.latitude || 27.7172}
-                        initialLng={deliveryAddress?.longitude || 85.3240}
+                        initialLat={deliveryAddress?.latitude}
+                        initialLng={deliveryAddress?.longitude}
                       />
                     </div>
                   </div>

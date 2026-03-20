@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
+import { findManyProductsCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
 
 function toNumber(value: unknown, fallback: number) {
   const n = Number(value)
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    const products = await prisma.product.findMany({
+    const products = await findManyProductsCompat({
       where,
       orderBy: { createdAt: 'desc' },
     })
@@ -103,23 +104,36 @@ export async function POST(request: NextRequest) {
 
     const variants = normalizeVariants(body?.variants)
 
-    const product = await prisma.product.create({
-      data: {
-        name,
-        description,
-        category,
-        price,
-        image,
-        images,
-        variants,
-        imageAlt: String(body?.imageAlt || '').trim() || name,
-        isVeg: Boolean(body?.isVeg),
-        prepTime: Math.max(1, Math.round(toNumber(body?.prepTime, 15))),
-        tags,
-        discount: Math.max(0, toNumber(body?.discount, 0)),
-        isAvailable: body?.isAvailable !== false,
-      },
-    })
+    const data = {
+      name,
+      description,
+      category,
+      price,
+      image,
+      images,
+      variants,
+      imageAlt: String(body?.imageAlt || '').trim() || name,
+      showFoodTypeLabel: body?.showFoodTypeLabel === true,
+      isVeg: Boolean(body?.isVeg),
+      prepTime: Math.max(1, Math.round(toNumber(body?.prepTime, 15))),
+      tags,
+      discount: Math.max(0, toNumber(body?.discount, 0)),
+      isAvailable: body?.isAvailable !== false,
+    }
+
+    let product
+
+    try {
+      product = await prisma.product.create({ data })
+    } catch (error) {
+      if (!isMissingProductFoodTypeColumnError(error)) {
+        throw error
+      }
+
+      product = await prisma.product.create({
+        data: stripFoodTypeLabelField(data),
+      })
+    }
 
     return NextResponse.json({ product }, { status: 201 })
   } catch (error) {

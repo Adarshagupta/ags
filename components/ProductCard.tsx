@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
 import { resolveImageUrl } from '@/lib/image-url'
+import FoodTypeBadge from '@/components/FoodTypeBadge'
 
 interface ProductCardProps {
   product: {
@@ -15,6 +16,7 @@ interface ProductCardProps {
     price: number
     image: string
     isVeg: boolean
+    showFoodTypeLabel?: boolean
     discount?: number | null
     prepTime: number
   }
@@ -71,11 +73,11 @@ export default function ProductCard({ product }: ProductCardProps) {
         />
         
         {/* Veg/Non-veg indicator */}
-        <div className="absolute top-2 left-2">
-          <div className={`w-4 h-4 border ${product.isVeg ? 'border-green-600' : 'border-red-500'} flex items-center justify-center bg-white rounded-sm`}>
-            <div className={`w-2 h-2 rounded-full ${product.isVeg ? 'bg-green-600' : 'bg-red-500'}`} />
+        {product.showFoodTypeLabel && (
+          <div className="absolute top-2 left-2">
+            <FoodTypeBadge isVeg={product.isVeg} />
           </div>
-        </div>
+        )}
 
         {/* Discount badge */}
         {product.discount && product.discount > 0 && (

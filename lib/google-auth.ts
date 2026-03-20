@@ -2,11 +2,24 @@ function normalizeOrigin(value?: string | null) {
   return value?.trim().replace(/\/$/, '') || ''
 }
 
+function isLocalOrigin(value: string) {
+  try {
+    const hostname = new URL(value).hostname
+    return hostname === 'localhost' || hostname === '127.0.0.1'
+  } catch {
+    return false
+  }
+}
+
 export function getGoogleOAuthConfigError(currentOrigin: string) {
   const configuredOrigin = normalizeOrigin(process.env.NEXT_PUBLIC_APP_URL)
   const activeOrigin = normalizeOrigin(currentOrigin)
 
   if (!configuredOrigin || !activeOrigin || configuredOrigin === activeOrigin) {
+    return null
+  }
+
+  if (isLocalOrigin(configuredOrigin) && !isLocalOrigin(activeOrigin)) {
     return null
   }
 

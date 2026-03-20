@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
+import { findFirstProductCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
@@ -31,7 +32,7 @@ export async function GET(
   try {
     const { id } = await params
 
-    const product = await prisma.product.findFirst({
+    const product = await findFirstProductCompat({
       where: {
         id,
         NOT: {
@@ -75,17 +76,37 @@ export async function PATCH(
       data.tags = sanitizeProductTags(body.tags)
     }
 
-    const product = await prisma.product.updateMany({
-      where: {
-        id,
-        NOT: {
-          tags: {
-            has: ARCHIVED_PRODUCT_TAG,
+    let product
+
+    try {
+      product = await prisma.product.updateMany({
+        where: {
+          id,
+          NOT: {
+            tags: {
+              has: ARCHIVED_PRODUCT_TAG,
+            },
           },
         },
-      },
-      data,
-    })
+        data,
+      })
+    } catch (error) {
+      if (!isMissingProductFoodTypeColumnError(error)) {
+        throw error
+      }
+
+      product = await prisma.product.updateMany({
+        where: {
+          id,
+          NOT: {
+            tags: {
+              has: ARCHIVED_PRODUCT_TAG,
+            },
+          },
+        },
+        data: stripFoodTypeLabelField(data),
+      })
+    }
 
     if (product.count === 0) {
       return NextResponse.json(
@@ -94,7 +115,7 @@ export async function PATCH(
       )
     }
 
-    const updatedProduct = await prisma.product.findFirst({
+    const updatedProduct = await findFirstProductCompat({
       where: {
         id,
         NOT: {

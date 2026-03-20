@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
+import { findManyProductsCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
@@ -44,7 +45,7 @@ export async function GET() {
     }
 
     // Get seller's products
-    const products = await prisma.product.findMany({
+    const products = await findManyProductsCompat({
       where: {
         sellerId: seller.id,
         NOT: {
@@ -91,24 +92,37 @@ export async function POST(request: Request) {
     const variants = normalizeVariants(body?.variants)
     const tags = sanitizeProductTags(body?.tags)
 
-    const product = await prisma.product.create({
-      data: {
-        name: body.name,
-        description: body.description,
-        category: body.category,
-        price: parseFloat(body.price),
-        image: body.image,
-        images: body.images || [],
-        variants,
-        imageAlt: body.imageAlt,
-        isAvailable: body.isAvailable !== false,
-        isVeg: body.isVeg !== false,
-        prepTime: body.prepTime || 15,
-        tags,
-        discount: body.discount || 0,
-        sellerId: seller.id,
-      },
-    })
+    const data = {
+      name: body.name,
+      description: body.description,
+      category: body.category,
+      price: parseFloat(body.price),
+      image: body.image,
+      images: body.images || [],
+      variants,
+      imageAlt: body.imageAlt,
+      isAvailable: body.isAvailable !== false,
+      showFoodTypeLabel: body.showFoodTypeLabel === true,
+      isVeg: body.isVeg !== false,
+      prepTime: body.prepTime || 15,
+      tags,
+      discount: body.discount || 0,
+      sellerId: seller.id,
+    }
+
+    let product
+
+    try {
+      product = await prisma.product.create({ data })
+    } catch (error) {
+      if (!isMissingProductFoodTypeColumnError(error)) {
+        throw error
+      }
+
+      product = await prisma.product.create({
+        data: stripFoodTypeLabelField(data),
+      })
+    }
 
     return NextResponse.json(product, { status: 201 })
   } catch (error) {

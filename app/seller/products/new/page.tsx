@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import ProductCategoryFields from '@/components/ProductCategoryFields'
+import ProductFoodTypeFields from '@/components/ProductFoodTypeFields'
 import { uploadProductImage } from '@/lib/upload-image'
 import {
   EMPTY_PRODUCT_CATEGORY_GROUPS,
@@ -40,6 +41,7 @@ export default function NewProductPage() {
     variants: [] as ProductVariant[],
     imageAlt: '',
     isAvailable: true,
+    showFoodTypeLabel: false,
     isVeg: true,
     prepTime: 15,
     tags: '',
@@ -171,6 +173,7 @@ export default function NewProductPage() {
           ...formData,
           tags: buildProductTags(formData.tags, recipientSelections, occasionSelections),
           images: formData.images.filter((img) => img.trim()),
+          showFoodTypeLabel: formData.showFoodTypeLabel,
           variants: formData.variants
             .map((variant) => ({
               color: variant.color.trim(),
@@ -479,17 +482,13 @@ export default function NewProductPage() {
             />
           </div>
 
-          <div className="flex gap-6">
-            <label className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                checked={formData.isVeg}
-                onChange={(e) => setFormData({ ...formData, isVeg: e.target.checked })}
-                className="w-4 h-4"
-              />
-              <span className="text-sm text-gray-700">Vegetarian</span>
-            </label>
-
+          <div className="space-y-4">
+            <ProductFoodTypeFields
+              showFoodTypeLabel={formData.showFoodTypeLabel}
+              isVeg={formData.isVeg}
+              onShowFoodTypeLabelChange={(value) => setFormData({ ...formData, showFoodTypeLabel: value })}
+              onIsVegChange={(value) => setFormData({ ...formData, isVeg: value })}
+            />
             <label className="flex items-center gap-2">
               <input
                 type="checkbox"

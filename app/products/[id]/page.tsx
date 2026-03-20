@@ -8,6 +8,7 @@ import Header from '@/components/Header'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { useCartStore } from '@/lib/store/cart'
 import { resolveImageUrl } from '@/lib/image-url'
+import FoodTypeBadge from '@/components/FoodTypeBadge'
 
 interface ProductVariant {
   color: string
@@ -26,6 +27,7 @@ interface Product {
   variants?: ProductVariant[]
   imageAlt?: string
   isVeg: boolean
+  showFoodTypeLabel?: boolean
   prepTime: number
   tags: string[]
   discount: number
@@ -112,7 +114,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       name: product.name,
       price: product.price - (product.price * (product.discount || 0) / 100),
       image: resolveImageUrl(selectedVariant?.image || product.image),
-      isVeg: true,
+      isVeg: product.isVeg,
       quantity
     })
     router.push('/cart')
@@ -213,11 +215,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="px-4 py-4 space-y-4">
           {/* Category & Tags */}
           <div className="flex items-center gap-2 flex-wrap">
-            {product.isVeg && (
-              <div className="w-4 h-4 border-2 border-green-600 flex items-center justify-center flex-shrink-0">
-                <div className="w-1.5 h-1.5 rounded-full bg-green-600"></div>
-              </div>
-            )}
+            {product.showFoodTypeLabel && <FoodTypeBadge isVeg={product.isVeg} />}
             <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">{product.category}</span>
             <span className="text-gray-300">•</span>
             <div className="flex items-center gap-1 text-pink-500">
@@ -457,11 +455,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           {/* Product Details */}
           <div className="flex flex-col space-y-6">
             <div className="flex items-center gap-2">
-              {product.isVeg && (
-                <div className="w-5 h-5 border-2 border-green-600 flex items-center justify-center">
-                  <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                </div>
-              )}
+              {product.showFoodTypeLabel && <FoodTypeBadge isVeg={product.isVeg} className="h-5 w-5" />}
               <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">{product.category}</span>
             </div>
 

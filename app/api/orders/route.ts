@@ -4,6 +4,7 @@ import { redis, REDIS_CHANNELS } from '@/lib/redis'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { generateOrderNumber } from '@/lib/utils'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
+import { LEGACY_PRODUCT_SELECT } from '@/lib/product-db'
 
 export async function POST(request: NextRequest) {
   try {
@@ -100,7 +101,9 @@ export async function POST(request: NextRequest) {
       include: {
         items: {
           include: {
-            product: true,
+            product: {
+              select: LEGACY_PRODUCT_SELECT,
+            },
           },
         },
         address: true,

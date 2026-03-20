@@ -44,8 +44,8 @@ export default function AdminLayout({
     { icon: '📂', label: 'Categories', href: '/admin/categories' },
     { icon: '📦', label: 'Orders', href: '/admin/orders' },
     { icon: '👥', label: 'Users', href: '/admin/users' },
-    { icon: '�', label: 'Sellers', href: '/admin/sellers' },
-    { icon: '�🎀', label: 'Gift Wraps', href: '/admin/gift-wraps' },
+    { icon: '🏪', label: 'Sellers', href: '/admin/sellers' },
+    { icon: '🎀', label: 'Gift Wraps', href: '/admin/gift-wraps' },
     { icon: '🎉', label: 'Occasions', href: '/admin/occasions' },
     { icon: '⚙️', label: 'Settings', href: '/admin/settings' },
   ]
@@ -58,7 +58,7 @@ export default function AdminLayout({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                🎁 Chapter Kurus Admin
+                Flowers N Petals Admin
               </Link>
             </div>
             <div className="flex items-center gap-4">

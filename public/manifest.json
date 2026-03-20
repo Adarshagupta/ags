@@ -1,6 +1,6 @@
 {
-  "name": "Chapter Kurus - Gift & Flower Delivery in Nepal",
-  "short_name": "Chapter Kurus",
+  "name": "Flowers N Petals - Gift & Flower Delivery in Nepal",
+  "short_name": "FNP",
   "description": "Send flowers, cakes, and gifts across Nepal with same-day delivery. Express your love with personalized gifts.",
   "start_url": "/",
   "display": "standalone",
@@ -21,14 +21,14 @@
       "name": "Browse Flowers",
       "short_name": "Flowers",
       "description": "Browse flower collections",
-      "url": "/categories/Flowers",
+      "url": "/search",
       "icons": [{ "src": "/icons/icon-512x512.png", "sizes": "512x512" }]
     },
     {
       "name": "Browse Cakes",
       "short_name": "Cakes",
       "description": "Order delicious cakes",
-      "url": "/categories/Cakes",
+      "url": "/search",
       "icons": [{ "src": "/icons/icon-512x512.png", "sizes": "512x512" }]
     },
     {

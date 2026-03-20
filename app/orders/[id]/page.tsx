@@ -6,6 +6,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import Header from '@/components/Header'
 import SkeletonLoader from '@/components/SkeletonLoader'
+import FoodTypeBadge from '@/components/FoodTypeBadge'
 import { useUserStore } from '@/lib/store/user'
 import { formatPrice } from '@/lib/utils'
 
@@ -218,17 +219,9 @@ export default function OrderTrackingPage() {
             {order.items.map((item: any) => (
               <div key={item.id} className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
-                  <div
-                    className={`w-5 h-5 border-2 ${
-                      item.product.isVeg ? 'border-green-600' : 'border-red-600'
-                    } flex items-center justify-center rounded`}
-                  >
-                    <div
-                      className={`w-2.5 h-2.5 rounded-full ${
-                        item.product.isVeg ? 'bg-green-600' : 'bg-red-600'
-                      }`}
-                    />
-                  </div>
+                  {item.product.showFoodTypeLabel ? (
+                    <FoodTypeBadge isVeg={item.product.isVeg} className="h-5 w-5" />
+                  ) : null}
                   <div>
                     <p className="font-semibold text-gray-900">{item.product.name}</p>
                     <p className="text-sm text-gray-600">Qty: {item.quantity}</p>

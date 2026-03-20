@@ -1,35 +1,68 @@
-import Redis from 'ioredis'
-
-const globalForRedis = globalThis as unknown as {
-  redis: Redis | undefined
+type RedisClient = {
+  publish: (channel: string, message: string) => Promise<number>
+  on: (event: 'error', listener: (error: Error) => void) => void
 }
 
-// Create Redis client with error handling
-const createRedisClient = () => {
-  const client = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+const globalForRedis = globalThis as unknown as {
+  redisPromise: Promise<RedisClient | null> | undefined
+}
+
+async function createRedisClient(): Promise<RedisClient | null> {
+  const redisUrl = process.env.REDIS_URL
+
+  if (!redisUrl) {
+    return null
+  }
+
+  const { default: Redis } = await import('ioredis')
+  const client = new Redis(redisUrl, {
     maxRetriesPerRequest: 3,
     retryStrategy: (times) => {
       if (times > 3) {
         console.warn('Redis connection failed after 3 retries')
-        return null // Stop retrying
+        return null
       }
+
       return Math.min(times * 100, 3000)
     },
     lazyConnect: true,
+  }) as RedisClient
+
+  client.on('error', (error) => {
+    console.warn('Redis connection error:', error.message)
   })
-  
-  client.on('error', (err) => {
-    console.warn('Redis connection error:', err.message)
-  })
-  
+
   return client
 }
 
-export const redis = globalForRedis.redis ?? createRedisClient()
+function getRedisClient() {
+  if (!globalForRedis.redisPromise) {
+    globalForRedis.redisPromise = createRedisClient().catch((error) => {
+      console.warn('Redis client setup failed:', error)
+      return null
+    })
+  }
 
-if (process.env.NODE_ENV !== 'production') globalForRedis.redis = redis
+  return globalForRedis.redisPromise
+}
 
-// Redis keys
+export const redis = {
+  async publish(channel: string, message: string) {
+    try {
+      const client = await getRedisClient()
+
+      if (!client) {
+        return 0
+      }
+
+      return await client.publish(channel, message)
+    } catch (error) {
+      console.warn('Redis publish failed:', error)
+      return 0
+    }
+  },
+}
+
 export const REDIS_KEYS = {
   CART: (userId: string) => `cart:${userId}`,
   ORDER_STATUS: (orderId: string) => `order:${orderId}:status`,
@@ -38,7 +71,6 @@ export const REDIS_KEYS = {
   RATE_LIMIT: (ip: string) => `ratelimit:${ip}`
 }
 
-// Pub/Sub channels
 export const REDIS_CHANNELS = {
   ORDER_UPDATES: 'order:updates',
   DELIVERY_LOCATION: 'delivery:location'

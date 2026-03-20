@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
+import { findManyProductsCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
 
 export async function GET(request: NextRequest) {
   try {
@@ -59,7 +60,7 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    const products = await prisma.product.findMany({
+    const products = await findManyProductsCompat({
       where,
       orderBy: { createdAt: 'desc' },
     })
@@ -84,22 +85,35 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, description, category, price, image, isVeg, prepTime, tags, discount } = body
+    const { name, description, category, price, image, isVeg, showFoodTypeLabel, prepTime, tags, discount } = body
 
-    const product = await prisma.product.create({
-      data: {
-        name,
-        description,
-        category,
-        price,
-        image,
-        imageAlt: name,
-        isVeg,
-        prepTime: prepTime || 15,
-        tags: sanitizeProductTags(tags),
-        discount: discount || 0,
-      },
-    })
+    const data = {
+      name,
+      description,
+      category,
+      price,
+      image,
+      imageAlt: name,
+      showFoodTypeLabel: showFoodTypeLabel === true,
+      isVeg,
+      prepTime: prepTime || 15,
+      tags: sanitizeProductTags(tags),
+      discount: discount || 0,
+    }
+
+    let product
+
+    try {
+      product = await prisma.product.create({ data })
+    } catch (error) {
+      if (!isMissingProductFoodTypeColumnError(error)) {
+        throw error
+      }
+
+      product = await prisma.product.create({
+        data: stripFoodTypeLabelField(data),
+      })
+    }
 
     return NextResponse.json({ product }, { status: 201 })
   } catch (error) {

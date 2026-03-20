@@ -30,66 +30,83 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
     if (mapInitialized.current) return
     mapInitialized.current = true
 
-    const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
-    
-    if (!apiKey) {
-      console.error('Google Maps API key not found')
-      setIsLoading(false)
-      setLocationStatus('Map unavailable')
-      return
+    const loadMap = async () => {
+      const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY
+
+      if (!apiKey) {
+        console.error('Google Maps API key not found')
+        setIsLoading(false)
+        setLocationStatus('Map unavailable')
+        return
+      }
+
+      let fallbackLat = initialLat ?? 27.7172
+      let fallbackLng = initialLng ?? 85.324
+
+      if (initialLat === undefined || initialLng === undefined) {
+        try {
+          const response = await fetch('/api/settings', { cache: 'no-store' })
+          if (response.ok) {
+            const settings = await response.json()
+            fallbackLat = initialLat ?? Number(settings.mapLatitude ?? fallbackLat)
+            fallbackLng = initialLng ?? Number(settings.mapLongitude ?? fallbackLng)
+          }
+        } catch (error) {
+          console.error('Failed to load map defaults:', error)
+        }
+      }
+
+      const loader = new Loader({
+        apiKey,
+        version: 'weekly',
+        libraries: ['places'],
+      })
+
+      loader
+        .load()
+        .then(() => {
+          if (!mapRef.current) return
+
+          const google = window.google
+
+          if ('geolocation' in navigator) {
+            setLocationStatus('Getting your precise delivery location...')
+
+            navigator.geolocation.getCurrentPosition(
+              (position) => {
+                const userLat = position.coords.latitude
+                const userLng = position.coords.longitude
+                const accuracy = position.coords.accuracy
+
+                console.log(`Got location: ${userLat}, ${userLng} (accuracy: ${accuracy}m)`)
+                setLocationStatus(`Location found (±${Math.round(accuracy)}m)`)
+
+                initializeMap(google, userLat, userLng, accuracy)
+              },
+              (error) => {
+                console.warn('Geolocation failed:', error.message)
+                setLocationStatus('Using store delivery area as default')
+                initializeMap(google, fallbackLat, fallbackLng, 1000)
+              },
+              {
+                enableHighAccuracy: true,
+                timeout: 20000,
+                maximumAge: 0,
+              }
+            )
+          } else {
+            setLocationStatus('Geolocation not supported')
+            initializeMap(google, fallbackLat, fallbackLng, 1000)
+          }
+        })
+        .catch((error) => {
+          console.error('Error loading Google Maps:', error)
+          setIsLoading(false)
+          setLocationStatus('Failed to load map')
+        })
     }
 
-    const loader = new Loader({
-      apiKey: apiKey,
-      version: 'weekly',
-      libraries: ['places']
-    })
-
-    loader.load().then(() => {
-      if (!mapRef.current) return
-      
-      const google = window.google
-      
-      // First, try to get user's current location
-      if ('geolocation' in navigator) {
-        setLocationStatus('Getting your precise location...')
-        
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const userLat = position.coords.latitude
-            const userLng = position.coords.longitude
-            const accuracy = position.coords.accuracy
-            
-            console.log(`Got location: ${userLat}, ${userLng} (accuracy: ${accuracy}m)`)
-            setLocationStatus(`Location found (±${Math.round(accuracy)}m)`)
-            
-            initializeMap(google, userLat, userLng, accuracy)
-          },
-          (error) => {
-            console.warn('Geolocation failed:', error.message)
-            setLocationStatus('Using default location')
-            // Fall back to initialLat/Lng or default
-            const fallbackLat = initialLat || 27.7172
-            const fallbackLng = initialLng || 85.3240
-            initializeMap(google, fallbackLat, fallbackLng, 1000)
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 20000,
-            maximumAge: 0
-          }
-        )
-      } else {
-        setLocationStatus('Geolocation not supported')
-        const fallbackLat = initialLat || 27.7172
-        const fallbackLng = initialLng || 85.3240
-        initializeMap(google, fallbackLat, fallbackLng, 1000)
-      }
-    }).catch((error) => {
-      console.error('Error loading Google Maps:', error)
-      setIsLoading(false)
-      setLocationStatus('Failed to load map')
-    })
+    void loadMap()
   }, [initialLat, initialLng])
 
   const initializeMap = (google: any, lat: number, lng: number, accuracy: number) => {
@@ -151,9 +168,15 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
   }
 
   const reverseGeocode = (lat: number, lng: number, geocoderInstance: any) => {
+    const fallbackAddress = 'Resolving exact address...'
+
     geocoderInstance.geocode({ location: { lat, lng } }, (results: any, status: any) => {
       if (status === 'OK' && results && results[0]) {
         onLocationSelect(lat, lng, results[0].formatted_address)
+      } else {
+        // Keep selection usable even when geocoding is unavailable.
+        console.warn('Reverse geocoding failed:', status)
+        onLocationSelect(lat, lng, fallbackAddress)
       }
     })
   }
