@@ -21,9 +21,8 @@ export const LEGACY_PRODUCT_SELECT = {
   updatedAt: true,
 } satisfies Prisma.ProductSelect
 
-type ProductWithOptionalFoodType = {
-  showFoodTypeLabel?: boolean | null
-}
+type LegacyProductShape = Prisma.ProductGetPayload<{ select: typeof LEGACY_PRODUCT_SELECT }>
+export type ProductCompatResult = LegacyProductShape & { showFoodTypeLabel: boolean }
 
 export function isMissingAppSettingsTableError(error: unknown) {
   const code = (error as { code?: string } | null)?.code
@@ -42,10 +41,12 @@ export function isMissingProductFoodTypeColumnError(error: unknown) {
   )
 }
 
-export function withProductCompatibility<T extends ProductWithOptionalFoodType>(product: T): T & { showFoodTypeLabel: boolean } {
+export function withProductCompatibility<T extends Record<string, unknown>>(product: T): T & { showFoodTypeLabel: boolean } {
+  const value = (product as { showFoodTypeLabel?: boolean | null }).showFoodTypeLabel
+
   return {
     ...product,
-    showFoodTypeLabel: Boolean(product.showFoodTypeLabel),
+    showFoodTypeLabel: Boolean(value),
   }
 }
 
@@ -56,10 +57,10 @@ export function stripFoodTypeLabelField<T extends Record<string, unknown>>(data:
 
 export async function findManyProductsCompat(
   args: Omit<Prisma.ProductFindManyArgs, 'select'>
-) {
+): Promise<ProductCompatResult[]> {
   try {
     const products = await prisma.product.findMany(args)
-    return products.map((product) => withProductCompatibility(product))
+    return products.map((product) => withProductCompatibility(product)) as ProductCompatResult[]
   } catch (error) {
     if (!isMissingProductFoodTypeColumnError(error)) {
       throw error
@@ -70,16 +71,16 @@ export async function findManyProductsCompat(
       select: LEGACY_PRODUCT_SELECT,
     })
 
-    return products.map((product) => withProductCompatibility(product))
+    return products.map((product) => withProductCompatibility(product)) as ProductCompatResult[]
   }
 }
 
 export async function findFirstProductCompat(
   args: Omit<Prisma.ProductFindFirstArgs, 'select'>
-) {
+): Promise<ProductCompatResult | null> {
   try {
     const product = await prisma.product.findFirst(args)
-    return product ? withProductCompatibility(product) : null
+    return product ? (withProductCompatibility(product) as ProductCompatResult) : null
   } catch (error) {
     if (!isMissingProductFoodTypeColumnError(error)) {
       throw error
@@ -90,6 +91,6 @@ export async function findFirstProductCompat(
       select: LEGACY_PRODUCT_SELECT,
     })
 
-    return product ? withProductCompatibility(product) : null
+    return product ? (withProductCompatibility(product) as ProductCompatResult) : null
   }
 }

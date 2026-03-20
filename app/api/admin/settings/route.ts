@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { DEFAULT_APP_SETTINGS } from '@/lib/app-settings'
+import { isMissingAppSettingsTableError } from '@/lib/product-db'
 
 function toNumber(value: unknown, fallback: number) {
   if (value === '' || value === null || value === undefined) {
@@ -22,6 +23,13 @@ export async function GET() {
       ...(settings || {}),
     })
   } catch (error) {
+    if (isMissingAppSettingsTableError(error)) {
+      return NextResponse.json({
+        id: 'default',
+        ...DEFAULT_APP_SETTINGS,
+      })
+    }
+
     console.error('Error fetching admin settings:', error)
     return NextResponse.json(
       { error: 'Failed to fetch settings' },
@@ -67,6 +75,13 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(settings)
   } catch (error) {
+    if (isMissingAppSettingsTableError(error)) {
+      return NextResponse.json(
+        { error: 'Settings storage is not available yet. Run the latest Prisma migration to enable admin settings.' },
+        { status: 400 }
+      )
+    }
+
     console.error('Error updating admin settings:', error)
     return NextResponse.json(
       { error: 'Failed to update settings. Apply the latest Prisma migration first if this is a new setup.' },

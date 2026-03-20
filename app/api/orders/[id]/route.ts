@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { LEGACY_PRODUCT_SELECT } from '@/lib/product-db'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -28,7 +29,9 @@ export async function GET(
       include: {
         items: {
           include: {
-            product: true,
+            product: {
+              select: LEGACY_PRODUCT_SELECT,
+            },
           },
         },
         address: true,
