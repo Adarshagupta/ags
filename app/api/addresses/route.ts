@@ -1,21 +1,33 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
+import { authOptions } from '@/lib/auth-options'
+
+async function resolveUserId(request: NextRequest) {
+  const token = getTokenFromRequest(request)
+
+  if (token) {
+    const payload = await verifyToken(token)
+    if (payload?.userId) {
+      return String(payload.userId)
+    }
+  }
+
+  const session = await getServerSession(authOptions)
+  if (session?.user?.id) {
+    return String(session.user.id)
+  }
+
+  return null
+}
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const token = getTokenFromRequest(request)
-    if (!token) {
+    const userId = await resolveUserId(request)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
-
-    const payload = await verifyToken(token)
-    if (!payload) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
-    }
-
-    const userId = payload.userId as string
     
     // Verify user exists in database
     const userExists = await prisma.user.findUnique({
@@ -81,20 +93,14 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify authentication
-    const token = getTokenFromRequest(request)
-    if (!token) {
+    const userId = await resolveUserId(request)
+    if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const payload = await verifyToken(token)
-    if (!payload) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     // Fetch user addresses
     const addresses = await prisma.address.findMany({
-      where: { userId: payload.userId as string },
+      where: { userId },
       orderBy: { isDefault: 'desc' },
     })
 

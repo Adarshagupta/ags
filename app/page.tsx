@@ -1,9 +1,7 @@
 import Link from 'next/link'
-import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 import ProductCard from '@/components/ProductCard'
-import CategorySection from '@/components/CategorySection'
-import SearchBar from '@/components/SearchBar'
+import HomepageTopLayout from '@/components/HomepageTopLayout'
 import HomepageBannerCarousel from '@/components/HomepageBannerCarousel'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
@@ -15,11 +13,23 @@ export const revalidate = 0
 
 async function getHomeData() {
   try {
-    const [settings, categories, products, banners] = await Promise.all([
+    const [settings, categories, occasionCategories, products, banners] = await Promise.all([
       getAppSettings(),
       prisma.category.findMany({
         where: {
           type: 'PRODUCT',
+          isActive: true,
+        },
+        orderBy: { name: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      }),
+      prisma.category.findMany({
+        where: {
+          type: 'OCCASION',
           isActive: true,
         },
         orderBy: { name: 'asc' },
@@ -73,6 +83,8 @@ async function getHomeData() {
 
     return {
       settings,
+      categories,
+      occasionCategories,
       groupedCategories,
       latestProducts,
       homepageBanners,
@@ -81,6 +93,8 @@ async function getHomeData() {
     console.error('Error fetching home data:', error)
     return {
       settings: await getAppSettings(),
+      categories: [],
+      occasionCategories: [],
       groupedCategories: [],
       latestProducts: [],
       homepageBanners: [],
@@ -89,45 +103,23 @@ async function getHomeData() {
 }
 
 export default async function Home() {
-  const { settings, groupedCategories, latestProducts, homepageBanners } = await getHomeData()
+  const { categories, occasionCategories, groupedCategories, latestProducts, homepageBanners } = await getHomeData()
 
   return (
-    <main className="min-h-screen bg-neutral-50">
-      <Header />
-
-      <SearchBar />
-
+    <main className="min-h-screen bg-[#f4f7fb]">
       <div className="px-4 pt-3">
+        <div className="mx-auto max-w-7xl">
+          <HomepageTopLayout categories={categories} occasionCategories={occasionCategories} />
+        </div>
+      </div>
+
+      <div className="px-4 pt-2">
         <div className="mx-auto max-w-7xl">
           <HomepageBannerCarousel banners={homepageBanners} />
         </div>
       </div>
 
-      <div className="px-4 py-3">
-        <div className="mx-auto max-w-7xl">
-          <CategorySection type="PRODUCT" title="Shop by Category" />
-        </div>
-      </div>
-
-      <div className="px-4 py-4">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-gray-900">Occasions</h2>
-          </div>
-          <CategorySection type="OCCASION" title="" />
-        </div>
-      </div>
-
-      <div className="px-4 py-4">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-3 flex items-center justify-between">
-            <h2 className="text-sm font-medium text-gray-900">For Whom?</h2>
-          </div>
-          <CategorySection type="RECIPIENT" title="" />
-        </div>
-      </div>
-
-      <div className="space-y-6 px-4 py-2 pb-24 lg:pb-8">
+      <div id="featured" className="space-y-6 px-4 py-2 pb-24 lg:pb-8">
         <div className="mx-auto max-w-7xl space-y-6">
           {groupedCategories.length === 0 && latestProducts.length === 0 ? (
             <div className="rounded-2xl border border-neutral-200 bg-white py-12 text-center">
@@ -160,7 +152,7 @@ export default async function Home() {
               ))}
 
               {latestProducts.length > 0 ? (
-                <section className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm">
+                <section id="latest" className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm">
                   <div className="mb-4 flex items-center justify-between">
                     <div>
                       <h2 className="text-lg font-semibold text-gray-900">Latest Arrivals</h2>

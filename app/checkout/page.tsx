@@ -106,12 +106,7 @@ export default function CheckoutPage() {
   const fetchAddresses = async () => {
     try {
       setAddressesLoading(true)
-      const token = localStorage.getItem('token')
-      if (!token) return
-      
-      const res = await fetch('/api/addresses', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const res = await fetch('/api/addresses')
       if (res.ok) {
         const data = await res.json()
         const userAddresses = data.addresses || []
@@ -178,12 +173,10 @@ export default function CheckoutPage() {
     }
 
     try {
-      const token = localStorage.getItem('token')
       const res = await fetch('/api/addresses', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(newAddress)
       })

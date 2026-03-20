@@ -120,12 +120,10 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
 
       // If user is logged in, save to database
       if (user) {
-        const token = localStorage.getItem('token')
         const response = await fetch('/api/addresses', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': `Bearer ${token}`,
           },
           body: JSON.stringify({
             ...formData,

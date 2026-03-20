@@ -64,9 +64,7 @@ export default function ProfilePage() {
       }
 
       // Fetch saved addresses
-      const addressesRes = await fetch('/api/addresses', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
+      const addressesRes = await fetch('/api/addresses')
       if (addressesRes.ok) {
         const addressesData = await addressesRes.json()
         setAddresses(addressesData.addresses || [])
