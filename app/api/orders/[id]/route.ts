@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { LEGACY_PRODUCT_SELECT } from '@/lib/product-db'
+import { resolveUserId } from '@/lib/request-auth'
 
 interface RouteParams {
   params: Promise<{ id: string }>
@@ -12,13 +12,8 @@ export async function GET(
   { params }: RouteParams
 ) {
   try {
-    const token = getTokenFromRequest(request)
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const payload = await verifyToken(token)
-    if (!payload) {
+    const userId = await resolveUserId(request)
+    if (!userId) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
@@ -49,7 +44,7 @@ export async function GET(
     }
 
     // Verify order belongs to user
-    if (order.userId !== payload.userId) {
+    if (order.userId !== userId) {
       return NextResponse.json(
         { error: 'Unauthorized' },
         { status: 403 }

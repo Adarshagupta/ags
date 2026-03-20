@@ -1,21 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { redis, REDIS_CHANNELS } from '@/lib/redis'
-import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { generateOrderNumber } from '@/lib/utils'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 import { LEGACY_PRODUCT_SELECT } from '@/lib/product-db'
+import { resolveUserId } from '@/lib/request-auth'
+import { createDodoCheckoutSession, isDodoConfigured } from '@/lib/dodo-payments'
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify authentication
-    const token = getTokenFromRequest(request)
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const payload = await verifyToken(token)
-    if (!payload) {
+    const userId = await resolveUserId(request)
+    if (!userId) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
@@ -36,6 +31,17 @@ export async function POST(request: NextRequest) {
       senderName,
       showSenderName,
     } = body
+
+    if (paymentMethod !== 'CASH' && paymentMethod !== 'ONLINE') {
+      return NextResponse.json({ error: 'Invalid payment method' }, { status: 400 })
+    }
+
+    if (paymentMethod === 'ONLINE' && !isDodoConfigured()) {
+      return NextResponse.json(
+        { error: 'Online payments are not configured yet. Add Dodo Payments credentials first.' },
+        { status: 500 }
+      )
+    }
 
     if (!items || items.length === 0) {
       return NextResponse.json(
@@ -68,6 +74,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
+    const [user, address] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          email: true,
+          name: true,
+          phone: true,
+        },
+      }),
+      addressId
+        ? prisma.address.findUnique({
+            where: { id: addressId },
+            select: {
+              id: true,
+              street: true,
+              city: true,
+              state: true,
+              pincode: true,
+            },
+          })
+        : Promise.resolve(null),
+    ])
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    if (!addressId || !address) {
+      return NextResponse.json({ error: 'Please select a delivery address' }, { status: 400 })
+    }
+
     // Generate order number
     const orderNumber = generateOrderNumber()
 
@@ -75,7 +113,7 @@ export async function POST(request: NextRequest) {
     const order = await prisma.order.create({
       data: {
         orderNumber,
-        userId: payload.userId as string,
+        userId,
         addressId,
         subtotal,
         deliveryFee,
@@ -127,6 +165,54 @@ export async function POST(request: NextRequest) {
       console.warn('Redis publish failed (non-critical):', redisError)
     }
 
+    if (paymentMethod === 'ONLINE') {
+      try {
+        const session = await createDodoCheckoutSession({
+          amountInMinor: Math.round(Number(total) * 100),
+          returnUrl: `${request.nextUrl.origin}/checkout/dodo-return?orderId=${order.id}`,
+          customer: {
+            email: user.email,
+            name: user.name,
+            phoneNumber: user.phone,
+          },
+          billingAddress: {
+            street: address.street,
+            city: address.city,
+            state: address.state,
+            zipcode: address.pincode,
+            country: 'IN',
+          },
+          metadata: {
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            userId,
+          },
+        })
+
+        return NextResponse.json(
+          {
+            order,
+            paymentUrl: session.checkout_url,
+            paymentProvider: 'DODO',
+          },
+          { status: 201 }
+        )
+      } catch (paymentError: any) {
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { paymentStatus: 'FAILED' },
+        })
+
+        return NextResponse.json(
+          {
+            error: 'Failed to start Dodo payment',
+            details: paymentError?.message || 'Unknown payment error',
+          },
+          { status: 500 }
+        )
+      }
+    }
+
     return NextResponse.json({ order }, { status: 201 })
   } catch (error: any) {
     console.error('Error creating order:', error)
@@ -140,19 +226,13 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    // Verify authentication
-    const token = getTokenFromRequest(request)
-    if (!token) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
-    const payload = await verifyToken(token)
-    if (!payload) {
+    const userId = await resolveUserId(request)
+    if (!userId) {
       return NextResponse.json({ error: 'Invalid token' }, { status: 401 })
     }
 
     const orders = await prisma.order.findMany({
-      where: { userId: payload.userId as string },
+      where: { userId },
       include: {
         items: {
           include: {

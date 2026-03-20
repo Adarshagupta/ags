@@ -128,11 +128,10 @@ export default function CheckoutPage() {
   const fetchGiftData = async () => {
     try {
       setGiftDataLoading(true)
-      const token = localStorage.getItem('token')
       const [wrapsRes, occasionsRes, recipientsRes] = await Promise.all([
         fetch('/api/gift-wraps'),
         fetch('/api/occasions'),
-        fetch('/api/recipients', { headers: { 'Authorization': `Bearer ${token}` } })
+        fetch('/api/recipients')
       ])
 
       if (wrapsRes.ok) setGiftWraps(await wrapsRes.json())
@@ -220,12 +219,10 @@ export default function CheckoutPage() {
     setIsLoading(true)
 
     try {
-      const token = localStorage.getItem('token')
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           items,
@@ -253,8 +250,13 @@ export default function CheckoutPage() {
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to place order')
+      if (paymentMethod === 'ONLINE') {
+        if (!data.paymentUrl) {
+          throw new Error(data.error || 'Failed to start online payment')
+        }
+
+        window.location.href = data.paymentUrl
+        return
       }
 
       // Set flag before clearing cart to prevent redirect
@@ -507,7 +509,8 @@ export default function CheckoutPage() {
                         </button>
                       ))}
                     </div>
-                    )}\n                  </div>
+                    )}
+                  </div>
 
                   {/* Recipient */}
                   <div>
@@ -568,7 +571,8 @@ export default function CheckoutPage() {
                         </button>
                       ))}
                     </div>
-                    )}\n                  </div>
+                    )}
+                  </div>
 
                   {/* Greeting Message */}
                   <div>
@@ -648,7 +652,7 @@ export default function CheckoutPage() {
                   />
                   <div className="flex-1">
                     <p className="font-semibold text-gray-900 text-sm lg:text-base">Online Payment</p>
-                    <p className="text-xs lg:text-sm text-gray-600">UPI, Card, Net Banking</p>
+                    <p className="text-xs lg:text-sm text-gray-600">Dodo checkout for UPI, cards and eligible banking methods</p>
                   </div>
                 </label>
               </div>
@@ -726,10 +730,16 @@ export default function CheckoutPage() {
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                    <span>Placing order...</span>
+                    <span>{paymentMethod === 'ONLINE' ? 'Redirecting to payment...' : 'Placing order...'}</span>
                   </div>
                 ) : (
-                  <span>{giftOptions.isGift ? '🎁 Send as Gift' : 'Place Order'}</span>
+                  <span>
+                    {paymentMethod === 'ONLINE'
+                      ? 'Continue to Payment'
+                      : giftOptions.isGift
+                        ? '🎁 Send as Gift'
+                        : 'Place Order'}
+                  </span>
                 )}
               </motion.button>
             </motion.div>
@@ -789,10 +799,16 @@ export default function CheckoutPage() {
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span className="text-sm">Processing...</span>
+                        <span className="text-sm">{paymentMethod === 'ONLINE' ? 'Opening...' : 'Processing...'}</span>
                       </div>
                     ) : (
-                      <span className="text-sm">{giftOptions.isGift ? '🎁 Send Gift' : 'Place Order'}</span>
+                      <span className="text-sm">
+                        {paymentMethod === 'ONLINE'
+                          ? 'Pay Online'
+                          : giftOptions.isGift
+                            ? '🎁 Send Gift'
+                            : 'Place Order'}
+                      </span>
                     )}
                   </motion.button>
                 </div>
