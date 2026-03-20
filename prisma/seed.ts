@@ -155,7 +155,7 @@ async function main() {
     update: {},
     create: {
       id: 'default',
-      siteName: 'Flowers N Petals',
+      siteName: 'Chapter Kurus',
       supportPhone: '+977 9812345678',
       supportEmail: 'support@fnp.com',
       supportHours: '9:00 AM - 9:00 PM',

@@ -104,23 +104,6 @@ export default async function Home() {
       </div>
 
       <div className="px-4 py-3">
-        <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl border border-pink-100 bg-white">
-          <div className="flex flex-col gap-4 px-4 py-4 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">Store Update</p>
-              <h2 className="mt-1 text-lg font-semibold text-gray-900">{settings.announcementText || settings.deliveryEstimate}</h2>
-              <p className="mt-1 text-sm text-gray-600">{settings.supportMessage}</p>
-            </div>
-            <div className="grid gap-2 text-sm text-gray-600 md:text-right">
-              {settings.supportHours ? <p>Support Hours: {settings.supportHours}</p> : null}
-              {settings.supportPhone ? <p>Call: {settings.supportPhone}</p> : null}
-              {settings.storeAddress ? <p>{settings.storeAddress}</p> : null}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="px-4 py-3">
         <div className="mx-auto max-w-7xl">
           <CategorySection type="PRODUCT" title="Shop by Category" />
         </div>

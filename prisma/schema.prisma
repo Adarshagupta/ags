@@ -339,7 +339,7 @@ model Occasion {
 
 model AppSettings {
   id               String   @id @default("default")
-  siteName         String   @default("Flowers N Petals")
+  siteName         String   @default("Chapter Kurus")
   supportPhone     String?
   supportEmail     String?
   supportHours     String?

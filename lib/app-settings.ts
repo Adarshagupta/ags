@@ -16,7 +16,7 @@ export type PublicAppSettings = {
 }
 
 export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
-  siteName: 'Flowers N Petals',
+  siteName: 'Chapter Kurus',
   supportPhone: '',
   supportEmail: '',
   supportHours: '9:00 AM - 9:00 PM',
@@ -40,7 +40,10 @@ export async function getAppSettings(): Promise<PublicAppSettings> {
     }
 
     return {
-      siteName: settings.siteName || DEFAULT_APP_SETTINGS.siteName,
+      siteName:
+        !settings.siteName || settings.siteName === 'Flowers N Petals'
+          ? DEFAULT_APP_SETTINGS.siteName
+          : settings.siteName,
       supportPhone: settings.supportPhone || DEFAULT_APP_SETTINGS.supportPhone,
       supportEmail: settings.supportEmail || DEFAULT_APP_SETTINGS.supportEmail,
       supportHours: settings.supportHours || DEFAULT_APP_SETTINGS.supportHours,

@@ -117,7 +117,7 @@ export default function LoginPage() {
         {/* Logo */}
         <div className="text-center mb-8">
           <Link href="/" className="text-3xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-            Flowers N Petals
+            Chapter Kurus
           </Link>
           <p className="text-gray-600 mt-2">{isLogin ? 'Welcome back!' : 'Create your account'}</p>
         </div>

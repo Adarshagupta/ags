@@ -49,19 +49,19 @@ export function generateViewport(): Viewport {
 
 export const metadata: Metadata = {
   ...(metadataBaseUrl ? { metadataBase: new URL(metadataBaseUrl) } : {}),
-  title: 'Flowers N Petals - Gift & Flower Delivery | Same Day Delivery',
-  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with FNP - Your trusted gift delivery partner.',
+  title: 'Chapter Kurus - Gift & Flower Delivery | Same Day Delivery',
+  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with Chapter Kurus - Your trusted gift delivery partner.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'FNP - Flowers & Gifts',
+    title: 'Chapter Kurus - Flowers & Gifts',
   },
-  applicationName: 'Flowers N Petals',
+  applicationName: 'Chapter Kurus',
   keywords: ['flowers', 'gifts', 'cakes', 'delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
-  authors: [{ name: 'Flowers N Petals' }],
-  creator: 'Flowers N Petals',
-  publisher: 'Flowers N Petals',
+  authors: [{ name: 'Chapter Kurus' }],
+  creator: 'Chapter Kurus',
+  publisher: 'Chapter Kurus',
   formatDetection: {
     telephone: false,
   },
@@ -69,21 +69,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: 'https://fnp.com',
-    siteName: 'Flowers N Petals',
-    title: 'Flowers N Petals - Gift & Flower Delivery',
+    siteName: 'Chapter Kurus',
+    title: 'Chapter Kurus - Gift & Flower Delivery',
     description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Flowers N Petals',
+        alt: 'Chapter Kurus',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Flowers N Petals - Gift & Flower Delivery',
+    title: 'Chapter Kurus - Gift & Flower Delivery',
     description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: ['/og-image.png'],
   },
@@ -110,7 +110,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="FNP" />
+        <meta name="apple-mobile-web-app-title" content="Chapter Kurus" />
         <meta name="mobile-web-app-capable" content="yes" />
         {!isProduction && (
           <script
