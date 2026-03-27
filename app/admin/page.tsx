@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { formatPriceNoDecimals } from '@/lib/utils'
 
 interface Stats {
   totalOrders: number
@@ -70,7 +71,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-              <p className="text-3xl font-bold text-gray-900">Rs. {stats?.totalRevenue || 0}</p>
+              <p className="text-3xl font-bold text-gray-900">{formatPriceNoDecimals(stats?.totalRevenue || 0)}</p>
             </div>
             <div className="text-4xl">💰</div>
           </div>
@@ -125,7 +126,7 @@ export default function AdminDashboard() {
                       {order.orderNumber}
                     </td>
                     <td className="px-6 py-4 text-sm text-gray-900">
-                      Rs. {(order.total || 0).toFixed(2)}
+                      {formatPriceNoDecimals(order.total || 0)}
                     </td>
                     <td className="px-6 py-4 text-sm">
                       <span className="px-2 py-1 text-xs font-medium rounded-full bg-blue-100 text-blue-800">

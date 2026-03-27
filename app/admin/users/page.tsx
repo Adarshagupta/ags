@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { formatPriceNoDecimals } from '@/lib/utils'
 
 interface User {
   id: string
@@ -15,10 +16,39 @@ interface User {
   }
 }
 
+interface Address {
+  id: string
+  label: string
+  street: string
+  apartment?: string | null
+  landmark?: string | null
+  city: string
+  state: string
+  pincode: string
+  createdAt: string
+}
+
+interface Order {
+  id: string
+  orderNumber: string
+  total: number
+  status: string
+  createdAt: string
+  address: Address | null
+}
+
+interface UserDetails extends User {
+  addresses: Address[]
+  orders: Order[]
+}
+
 export default function AdminUsers() {
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
+  const [selectedUser, setSelectedUser] = useState<UserDetails | null>(null)
+  const [detailsLoading, setDetailsLoading] = useState(false)
+  const [detailsError, setDetailsError] = useState('')
 
   useEffect(() => {
     fetchUsers()
@@ -61,6 +91,32 @@ export default function AdminUsers() {
       if (res.ok) fetchUsers()
     } catch (error) {
       console.error('Error deleting user:', error)
+    }
+  }
+
+  const openUserDetails = async (userId: string) => {
+    setDetailsError('')
+    setDetailsLoading(true)
+    const baseUser = users.find((user) => user.id === userId)
+    if (baseUser) {
+      setSelectedUser({
+        ...baseUser,
+        addresses: [],
+        orders: [],
+      })
+    }
+    try {
+      const res = await fetch(`/api/admin/users/${userId}`)
+      if (!res.ok) {
+        throw new Error('Failed to load user details')
+      }
+      const data = await res.json()
+      setSelectedUser(data)
+    } catch (error) {
+      console.error('Error fetching user details:', error)
+      setDetailsError('Failed to load user details.')
+    } finally {
+      setDetailsLoading(false)
     }
   }
 
@@ -146,6 +202,12 @@ export default function AdminUsers() {
                     </td>
                     <td className="px-4 py-4">
                       <button
+                        onClick={() => openUserDetails(user.id)}
+                        className="text-blue-600 hover:text-blue-700 text-sm font-medium mr-3"
+                      >
+                        View
+                      </button>
+                      <button
                         onClick={() => deleteUser(user.id)}
                         className="text-red-600 hover:text-red-700 text-sm font-medium"
                       >
@@ -175,6 +237,117 @@ export default function AdminUsers() {
           <div className="text-2xl font-bold text-blue-600">{users.filter(u => u.role === 'CUSTOMER').length}</div>
         </div>
       </div>
+
+      {selectedUser && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+          <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto rounded-xl bg-white">
+            <div className="sticky top-0 flex items-center justify-between border-b border-gray-200 bg-white p-6">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">User Details</h2>
+                <p className="text-sm text-gray-600">{selectedUser.email}</p>
+              </div>
+              <button
+                onClick={() => setSelectedUser(null)}
+                className="text-2xl text-gray-400 hover:text-gray-600"
+              >
+                ×
+              </button>
+            </div>
+
+            <div className="space-y-6 p-6">
+              {detailsError ? (
+                <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+                  {detailsError}
+                </div>
+              ) : null}
+
+              {detailsLoading ? (
+                <div className="text-center text-gray-500">Loading details...</div>
+              ) : (
+                <>
+                  <section className="rounded-lg border border-gray-200 bg-gray-50 p-4">
+                    <h3 className="mb-3 text-sm font-semibold text-gray-900">Profile</h3>
+                    <div className="grid gap-3 text-sm md:grid-cols-2">
+                      <div>
+                        <div className="text-gray-500">Name</div>
+                        <div className="font-medium text-gray-900">{selectedUser.name}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Phone</div>
+                        <div className="font-medium text-gray-900">{selectedUser.phone || 'Not provided'}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Role</div>
+                        <div className="font-medium text-gray-900">{selectedUser.role}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Joined</div>
+                        <div className="font-medium text-gray-900">
+                          {new Date(selectedUser.createdAt).toLocaleDateString()}
+                        </div>
+                      </div>
+                    </div>
+                  </section>
+
+                  <section>
+                    <h3 className="mb-3 text-sm font-semibold text-gray-900">Saved Addresses</h3>
+                    {selectedUser.addresses.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-center text-sm text-gray-500">
+                        No addresses saved.
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {selectedUser.addresses.map((address) => (
+                          <div key={address.id} className="rounded-lg border border-gray-200 p-4 text-sm">
+                            <div className="font-medium text-gray-900">{address.label}</div>
+                            <div className="text-gray-600">{address.street}</div>
+                            {address.apartment ? <div className="text-gray-600">Apt: {address.apartment}</div> : null}
+                            {address.landmark ? <div className="text-gray-600">Landmark: {address.landmark}</div> : null}
+                            <div className="text-gray-600">
+                              {address.city}, {address.state} - {address.pincode}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+
+                  <section>
+                    <h3 className="mb-3 text-sm font-semibold text-gray-900">Recent Orders</h3>
+                    {selectedUser.orders.length === 0 ? (
+                      <div className="rounded-lg border border-dashed border-gray-200 px-4 py-6 text-center text-sm text-gray-500">
+                        No orders placed yet.
+                      </div>
+                    ) : (
+                      <div className="space-y-3">
+                        {selectedUser.orders.map((order) => (
+                          <div key={order.id} className="rounded-lg border border-gray-200 p-4 text-sm">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div>
+                                <div className="font-medium text-gray-900">{order.orderNumber}</div>
+                                <div className="text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</div>
+                              </div>
+                              <div className="text-right">
+                                <div className="font-semibold text-gray-900">{formatPriceNoDecimals(order.total)}</div>
+                                <div className="text-xs text-gray-500">{order.status}</div>
+                              </div>
+                            </div>
+                            {order.address ? (
+                              <div className="mt-2 text-xs text-gray-500">
+                                {order.address.city}, {order.address.state}
+                              </div>
+                            ) : null}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </section>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

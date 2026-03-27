@@ -14,6 +14,13 @@ type SettingsForm = {
   storeAddress: string
   mapLatitude: string
   mapLongitude: string
+  homepageShowBanner: boolean
+  homepageShowTopCategories: boolean
+  homepageShowCategorySections: boolean
+  homepageShowOccasionTabs: boolean
+  homepageShowRecommendations: boolean
+  homepageRecommendationMode: string
+  homepageRecommendationTitle: string
 }
 
 const EMPTY_FORM: SettingsForm = {
@@ -28,6 +35,13 @@ const EMPTY_FORM: SettingsForm = {
   storeAddress: '',
   mapLatitude: '',
   mapLongitude: '',
+  homepageShowBanner: true,
+  homepageShowTopCategories: true,
+  homepageShowCategorySections: true,
+  homepageShowOccasionTabs: true,
+  homepageShowRecommendations: true,
+  homepageRecommendationMode: 'LATEST',
+  homepageRecommendationTitle: '',
 }
 
 export default function AdminSettingsPage() {
@@ -60,6 +74,13 @@ export default function AdminSettingsPage() {
         storeAddress: String(data.storeAddress || ''),
         mapLatitude: String(data.mapLatitude ?? ''),
         mapLongitude: String(data.mapLongitude ?? ''),
+        homepageShowBanner: Boolean(data.homepageShowBanner ?? true),
+        homepageShowTopCategories: Boolean(data.homepageShowTopCategories ?? true),
+        homepageShowCategorySections: Boolean(data.homepageShowCategorySections ?? true),
+        homepageShowOccasionTabs: Boolean(data.homepageShowOccasionTabs ?? true),
+        homepageShowRecommendations: Boolean(data.homepageShowRecommendations ?? true),
+        homepageRecommendationMode: String(data.homepageRecommendationMode || 'LATEST'),
+        homepageRecommendationTitle: String(data.homepageRecommendationTitle || ''),
       })
     } catch (error) {
       console.error('Failed to load settings:', error)
@@ -136,6 +157,84 @@ export default function AdminSettingsPage() {
                 value={formData.announcementText}
                 onChange={(e) => setFormData((prev) => ({ ...prev, announcementText: e.target.value }))}
                 className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-xl border border-gray-200 bg-white p-6">
+          <h2 className="text-lg font-semibold text-gray-900">Homepage Layout</h2>
+          <div className="mt-4 grid gap-4 md:grid-cols-2">
+            <label className="flex items-center gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={formData.homepageShowBanner}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowBanner: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              Show homepage banner
+            </label>
+
+            <label className="flex items-center gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={formData.homepageShowTopCategories}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowTopCategories: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              Show top category cards
+            </label>
+
+            <label className="flex items-center gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={formData.homepageShowOccasionTabs}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowOccasionTabs: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              Show occasion tabs row
+            </label>
+
+            <label className="flex items-center gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={formData.homepageShowCategorySections}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowCategorySections: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              Show category sections
+            </label>
+
+            <label className="flex items-center gap-3 text-sm text-gray-700">
+              <input
+                type="checkbox"
+                checked={formData.homepageShowRecommendations}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowRecommendations: e.target.checked }))}
+                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+              />
+              Show recommended products section
+            </label>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Recommendation Type</label>
+              <select
+                value={formData.homepageRecommendationMode}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageRecommendationMode: e.target.value }))}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="LATEST">Latest Arrivals</option>
+                <option value="BEST_OFFER">Best Offers</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="mb-1 block text-sm font-medium text-gray-700">Recommendation Title</label>
+              <input
+                type="text"
+                value={formData.homepageRecommendationTitle}
+                onChange={(e) => setFormData((prev) => ({ ...prev, homepageRecommendationTitle: e.target.value }))}
+                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                placeholder="Latest Arrivals"
               />
             </div>
           </div>

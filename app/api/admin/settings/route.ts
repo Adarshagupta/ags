@@ -56,6 +56,18 @@ export async function PATCH(request: NextRequest) {
         storeAddress: String(body?.storeAddress || '').trim() || null,
         mapLatitude: toNumber(body?.mapLatitude, DEFAULT_APP_SETTINGS.mapLatitude),
         mapLongitude: toNumber(body?.mapLongitude, DEFAULT_APP_SETTINGS.mapLongitude),
+        homepageShowBanner: body?.homepageShowBanner ?? DEFAULT_APP_SETTINGS.homepageShowBanner,
+        homepageShowTopCategories: body?.homepageShowTopCategories ?? DEFAULT_APP_SETTINGS.homepageShowTopCategories,
+        homepageShowCategorySections:
+          body?.homepageShowCategorySections ?? DEFAULT_APP_SETTINGS.homepageShowCategorySections,
+        homepageShowOccasionTabs:
+          body?.homepageShowOccasionTabs ?? DEFAULT_APP_SETTINGS.homepageShowOccasionTabs,
+        homepageShowRecommendations:
+          body?.homepageShowRecommendations ?? DEFAULT_APP_SETTINGS.homepageShowRecommendations,
+        homepageRecommendationMode:
+          String(body?.homepageRecommendationMode || DEFAULT_APP_SETTINGS.homepageRecommendationMode).trim(),
+        homepageRecommendationTitle:
+          String(body?.homepageRecommendationTitle || DEFAULT_APP_SETTINGS.homepageRecommendationTitle).trim(),
       },
       create: {
         id: 'default',
@@ -70,6 +82,18 @@ export async function PATCH(request: NextRequest) {
         storeAddress: String(body?.storeAddress || '').trim() || null,
         mapLatitude: toNumber(body?.mapLatitude, DEFAULT_APP_SETTINGS.mapLatitude),
         mapLongitude: toNumber(body?.mapLongitude, DEFAULT_APP_SETTINGS.mapLongitude),
+        homepageShowBanner: body?.homepageShowBanner ?? DEFAULT_APP_SETTINGS.homepageShowBanner,
+        homepageShowTopCategories: body?.homepageShowTopCategories ?? DEFAULT_APP_SETTINGS.homepageShowTopCategories,
+        homepageShowCategorySections:
+          body?.homepageShowCategorySections ?? DEFAULT_APP_SETTINGS.homepageShowCategorySections,
+        homepageShowOccasionTabs:
+          body?.homepageShowOccasionTabs ?? DEFAULT_APP_SETTINGS.homepageShowOccasionTabs,
+        homepageShowRecommendations:
+          body?.homepageShowRecommendations ?? DEFAULT_APP_SETTINGS.homepageShowRecommendations,
+        homepageRecommendationMode:
+          String(body?.homepageRecommendationMode || DEFAULT_APP_SETTINGS.homepageRecommendationMode).trim(),
+        homepageRecommendationTitle:
+          String(body?.homepageRecommendationTitle || DEFAULT_APP_SETTINGS.homepageRecommendationTitle).trim(),
       },
     })
 

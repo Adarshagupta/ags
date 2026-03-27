@@ -13,6 +13,13 @@ export type PublicAppSettings = {
   storeAddress: string
   mapLatitude: number
   mapLongitude: number
+  homepageShowBanner: boolean
+  homepageShowTopCategories: boolean
+  homepageShowCategorySections: boolean
+  homepageShowOccasionTabs: boolean
+  homepageShowRecommendations: boolean
+  homepageRecommendationMode: string
+  homepageRecommendationTitle: string
 }
 
 export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
@@ -27,6 +34,13 @@ export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
   storeAddress: '',
   mapLatitude: 27.7172,
   mapLongitude: 85.324,
+  homepageShowBanner: true,
+  homepageShowTopCategories: true,
+  homepageShowCategorySections: true,
+  homepageShowOccasionTabs: true,
+  homepageShowRecommendations: true,
+  homepageRecommendationMode: 'LATEST',
+  homepageRecommendationTitle: 'Latest Arrivals',
 }
 
 export async function getAppSettings(): Promise<PublicAppSettings> {
@@ -54,6 +68,17 @@ export async function getAppSettings(): Promise<PublicAppSettings> {
       storeAddress: settings.storeAddress || DEFAULT_APP_SETTINGS.storeAddress,
       mapLatitude: settings.mapLatitude ?? DEFAULT_APP_SETTINGS.mapLatitude,
       mapLongitude: settings.mapLongitude ?? DEFAULT_APP_SETTINGS.mapLongitude,
+      homepageShowBanner: settings.homepageShowBanner ?? DEFAULT_APP_SETTINGS.homepageShowBanner,
+      homepageShowTopCategories: settings.homepageShowTopCategories ?? DEFAULT_APP_SETTINGS.homepageShowTopCategories,
+      homepageShowCategorySections:
+        settings.homepageShowCategorySections ?? DEFAULT_APP_SETTINGS.homepageShowCategorySections,
+      homepageShowOccasionTabs: settings.homepageShowOccasionTabs ?? DEFAULT_APP_SETTINGS.homepageShowOccasionTabs,
+      homepageShowRecommendations:
+        settings.homepageShowRecommendations ?? DEFAULT_APP_SETTINGS.homepageShowRecommendations,
+      homepageRecommendationMode:
+        settings.homepageRecommendationMode || DEFAULT_APP_SETTINGS.homepageRecommendationMode,
+      homepageRecommendationTitle:
+        settings.homepageRecommendationTitle || DEFAULT_APP_SETTINGS.homepageRecommendationTitle,
     }
   } catch (error) {
     if (isMissingAppSettingsTableError(error)) {

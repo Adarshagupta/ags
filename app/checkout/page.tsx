@@ -83,8 +83,8 @@ export default function CheckoutPage() {
   const subtotal = getTotalPrice()
   const giftWrapPrice = giftOptions.giftWrapId ? (giftWraps.find(w => w.id === giftOptions.giftWrapId)?.price || 0) : 0
   const deliveryFee = (subtotal + giftWrapPrice) > 199 ? 0 : 40
-  const tax = (subtotal + giftWrapPrice) * 0.05
-  const total = subtotal + giftWrapPrice + deliveryFee + tax
+  const tax = 0
+  const total = subtotal + giftWrapPrice + deliveryFee
 
   useEffect(() => {
     if (!_hasHydrated) return
@@ -687,13 +687,9 @@ export default function CheckoutPage() {
                     {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
                   </span>
                 </div>
-                <div className="flex justify-between text-gray-600">
-                  <span>Tax</span>
-                  <span>{formatPrice(tax)}</span>
-                </div>
                 <div className="border-t pt-3 flex justify-between text-xl font-bold text-gray-900">
                   <span>Total</span>
-                  <span>{formatPrice(total)}</span>
+                  <span>{formatPriceNoDecimals(total)}</span>
                 </div>
               </div>
 
@@ -769,10 +765,6 @@ export default function CheckoutPage() {
                       {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
                     </span>
                   </div>
-                  <div className="flex justify-between text-gray-600">
-                    <span>Tax</span>
-                    <span>{formatPrice(tax)}</span>
-                  </div>
                 </div>
               </motion.div>
 
@@ -788,7 +780,7 @@ export default function CheckoutPage() {
                       <span className="ml-1">View details</span>
                     </button>
                     <p className="text-xs text-gray-600">Total Amount</p>
-                    <p className="text-xl font-bold text-gray-900">{formatPrice(total)}</p>
+                    <p className="text-xl font-bold text-gray-900">{formatPriceNoDecimals(total)}</p>
                   </div>
                   <motion.button
                     whileTap={{ scale: 0.95 }}

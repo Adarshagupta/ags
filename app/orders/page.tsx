@@ -7,7 +7,7 @@ import Link from 'next/link'
 import BottomNav from '@/components/BottomNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { useUserStore } from '@/lib/store/user'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, formatPriceNoDecimals } from '@/lib/utils'
 
 interface OrderItem {
   id: string
@@ -189,7 +189,7 @@ export default function OrdersPage() {
                   )}
                   <div className="flex justify-between text-base font-semibold">
                     <span className="text-gray-900">Total Amount:</span>
-                    <span className="text-orange-600">{formatPrice(order.total)}</span>
+                    <span className="text-orange-600">{formatPriceNoDecimals(order.total)}</span>
                   </div>
                 </div>
 

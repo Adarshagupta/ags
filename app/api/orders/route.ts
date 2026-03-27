@@ -21,7 +21,6 @@ export async function POST(request: NextRequest) {
       paymentMethod, 
       subtotal, 
       deliveryFee, 
-      tax, 
       total,
       isGift,
       recipientId,
@@ -109,16 +108,23 @@ export async function POST(request: NextRequest) {
     // Generate order number
     const orderNumber = generateOrderNumber()
 
+    const resolvedSubtotal = Number(subtotal) || 0
+    const resolvedDeliveryFee = Number(deliveryFee) || 0
+    const resolvedTax = 0
+    const resolvedTotal = Number.isFinite(Number(total))
+      ? Number(total)
+      : resolvedSubtotal + resolvedDeliveryFee
+
     // Create order with items
     const order = await prisma.order.create({
       data: {
         orderNumber,
         userId,
         addressId,
-        subtotal,
-        deliveryFee,
-        tax,
-        total,
+        subtotal: resolvedSubtotal,
+        deliveryFee: resolvedDeliveryFee,
+        tax: resolvedTax,
+        total: resolvedTotal,
         paymentMethod,
         estimatedTime: 30,
         isGift: isGift || false,

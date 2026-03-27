@@ -9,6 +9,7 @@ import { useUserStore } from '@/lib/store/user'
 import { useLocationStore } from '@/lib/store/location'
 import BottomNav from '@/components/BottomNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
+import { formatPriceNoDecimals } from '@/lib/utils'
 
 interface Order {
   id: string
@@ -410,7 +411,9 @@ export default function ProfilePage() {
                               </div>
                               <span className="text-sm text-gray-600">{order.items?.length || 0} {order.items?.length === 1 ? 'item' : 'items'}</span>
                             </div>
-                            <p className="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">Rs. {order.total}</p>
+                            <p className="text-xl font-bold bg-gradient-to-r from-pink-500 to-rose-600 bg-clip-text text-transparent">
+                              {formatPriceNoDecimals(order.total)}
+                            </p>
                           </div>
                         </motion.div>
                       </Link>

@@ -12,6 +12,15 @@ export function formatPrice(
   return `Rs. ${formatted}`
 }
 
+export function formatPriceNoDecimals(price: number): string {
+  const formatted = new Intl.NumberFormat(DEFAULT_LOCALE, {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(price)
+
+  return `Rs. ${formatted}`
+}
+
 export function formatDate(
   value: string | number | Date,
   options: Intl.DateTimeFormatOptions = {}

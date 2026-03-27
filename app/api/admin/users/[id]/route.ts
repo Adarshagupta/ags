@@ -26,6 +26,45 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
   }
 }
 
+export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+  try {
+    const { id } = await params
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: {
+        addresses: true,
+        orders: {
+          include: {
+            items: {
+              include: {
+                product: true,
+              },
+            },
+            address: true,
+          },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+        _count: {
+          select: {
+            orders: true,
+            addresses: true,
+          },
+        },
+      },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    return NextResponse.json(user)
+  } catch (error) {
+    console.error('Error fetching user details:', error)
+    return NextResponse.json({ error: 'Failed to fetch user details' }, { status: 500 })
+  }
+}
+
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await params

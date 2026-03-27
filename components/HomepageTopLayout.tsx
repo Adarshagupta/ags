@@ -17,6 +17,8 @@ type Category = {
 type HomepageTopLayoutProps = {
   categories: Category[]
   occasionCategories: Category[]
+  showTopCategories?: boolean
+  showOccasionTabs?: boolean
 }
 
 const cardBackgrounds = [
@@ -68,6 +70,8 @@ function StaticTabIcon({ type }: { type: 'home' | 'latest' }) {
 export default function HomepageTopLayout({
   categories,
   occasionCategories,
+  showTopCategories = true,
+  showOccasionTabs = true,
 }: HomepageTopLayoutProps) {
   const router = useRouter()
   const deliveryAddress = useLocationStore((state) => state.deliveryAddress)
@@ -79,9 +83,14 @@ export default function HomepageTopLayout({
     setMounted(true)
   }, [])
 
-  const featuredCategories = categories.slice(0, 4)
-  const quickOccasions =
-    occasionCategories.length > 0 ? occasionCategories.slice(0, 6) : categories.length > 4 ? categories.slice(4, 8) : categories.slice(0, 4)
+  const featuredCategories = showTopCategories ? categories.slice(0, 4) : []
+  const quickOccasions = showOccasionTabs
+    ? occasionCategories.length > 0
+      ? occasionCategories.slice(0, 6)
+      : categories.length > 4
+        ? categories.slice(4, 8)
+        : categories.slice(0, 4)
+    : []
   const locationLabel = mounted
     ? deliveryAddress?.address || currentLocation?.address || deliveryAddress?.label || currentLocation?.label || 'Choose current location'
     : 'Choose current location'

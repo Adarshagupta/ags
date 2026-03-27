@@ -8,7 +8,7 @@ import Header from '@/components/Header'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import FoodTypeBadge from '@/components/FoodTypeBadge'
 import { useUserStore } from '@/lib/store/user'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, formatPriceNoDecimals } from '@/lib/utils'
 
 const orderStatuses = [
   { key: 'PENDING', label: 'Order Placed', icon: '📝' },
@@ -105,7 +105,7 @@ export default function OrderTrackingPage() {
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Total</p>
-              <p className="text-2xl font-bold text-primary">{formatPrice(order.total)}</p>
+              <p className="text-2xl font-bold text-primary">{formatPriceNoDecimals(order.total)}</p>
             </div>
           </div>
 
@@ -237,19 +237,15 @@ export default function OrderTrackingPage() {
           <div className="border-t mt-4 pt-4 space-y-2">
             <div className="flex justify-between text-gray-600">
               <span>Subtotal</span>
-              <span>{formatPrice(order.subtotal)}</span>
+              <span>{formatPriceNoDecimals(order.subtotal)}</span>
             </div>
             <div className="flex justify-between text-gray-600">
               <span>Delivery Fee</span>
-              <span>{formatPrice(order.deliveryFee)}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Tax</span>
-              <span>{formatPrice(order.tax)}</span>
+              <span>{formatPriceNoDecimals(order.deliveryFee)}</span>
             </div>
             <div className="flex justify-between text-xl font-bold text-gray-900">
               <span>Total</span>
-              <span>{formatPrice(order.total)}</span>
+              <span>{formatPriceNoDecimals(order.total)}</span>
             </div>
           </div>
         </motion.div>

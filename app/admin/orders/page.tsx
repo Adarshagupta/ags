@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { formatPriceNoDecimals } from '@/lib/utils'
 
 interface Address {
   label: string
@@ -188,7 +189,7 @@ export default function AdminOrders() {
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <div className="font-semibold text-gray-900">Rs. {(order.total || 0).toFixed(2)}</div>
+                      <div className="font-semibold text-gray-900">{formatPriceNoDecimals(order.total || 0)}</div>
                       <div className="text-xs text-gray-500">{order.items.length} items</div>
                     </td>
                     <td className="px-4 py-4">
@@ -345,7 +346,7 @@ export default function AdminOrders() {
                 </div>
                 <div className="flex justify-between items-center text-lg font-bold border-t border-gray-200 pt-4">
                   <span>Total Amount:</span>
-                  <span className="text-orange-600">Rs. {(selectedOrder.total || 0).toFixed(2)}</span>
+                  <span className="text-orange-600">{formatPriceNoDecimals(selectedOrder.total || 0)}</span>
                 </div>
               </div>
             </div>
