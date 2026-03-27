@@ -103,6 +103,16 @@ export default function CheckoutPage() {
     fetchAppSettings()
   }, [user, items, router, _hasHydrated, orderPlaced])
 
+  useEffect(() => {
+    if (deliveryAddress?.latitude && deliveryAddress?.longitude) {
+      setNewAddress((prev) => ({
+        ...prev,
+        latitude: deliveryAddress.latitude,
+        longitude: deliveryAddress.longitude,
+      }))
+    }
+  }, [deliveryAddress])
+
   const fetchAddresses = async () => {
     try {
       setAddressesLoading(true)
@@ -186,7 +196,18 @@ export default function CheckoutPage() {
         setAddresses(newAddresses)
         setSelectedAddressId(data.address.id)
         setShowAddressForm(false)
-        setNewAddress({ label: 'Home', street: '', apartment: '', landmark: '', city: '', state: '', pincode: '', latitude: 0, longitude: 0, isDefault: true })
+        setNewAddress({
+          label: 'Home',
+          street: '',
+          apartment: '',
+          landmark: '',
+          city: '',
+          state: '',
+          pincode: '',
+          latitude: deliveryAddress?.latitude || 0,
+          longitude: deliveryAddress?.longitude || 0,
+          isDefault: true
+        })
         alert('Address saved successfully!')
       } else {
         const errorData = await res.json()
