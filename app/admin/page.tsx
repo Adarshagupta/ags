@@ -51,17 +51,17 @@ export default function AdminDashboard() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-gray-600 mt-1">Welcome to Chapter Kurus Admin Panel</p>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 md:gap-6 mb-6 md:mb-8">
         <div className="bg-white rounded-xl p-6 border border-gray-200">
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Orders</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.totalOrders || 0}</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">{stats?.totalOrders || 0}</p>
             </div>
             <div className="text-4xl">📦</div>
           </div>
@@ -71,7 +71,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Revenue</p>
-              <p className="text-3xl font-bold text-gray-900">{formatPriceNoDecimals(stats?.totalRevenue || 0)}</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">{formatPriceNoDecimals(stats?.totalRevenue || 0)}</p>
             </div>
             <div className="text-4xl">💰</div>
           </div>
@@ -81,7 +81,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Products</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.totalProducts || 0}</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">{stats?.totalProducts || 0}</p>
             </div>
             <div className="text-4xl">🎁</div>
           </div>
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
           <div className="flex items-center justify-between">
             <div>
               <p className="text-sm text-gray-600 mb-1">Total Users</p>
-              <p className="text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
+              <p className="text-2xl md:text-3xl font-bold text-gray-900">{stats?.totalUsers || 0}</p>
             </div>
             <div className="text-4xl">👥</div>
           </div>
@@ -100,15 +100,15 @@ export default function AdminDashboard() {
 
       {/* Recent Orders */}
       <div className="bg-white rounded-xl border border-gray-200">
-        <div className="p-6 border-b border-gray-200">
+        <div className="p-4 md:p-6 border-b border-gray-200">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">Recent Orders</h2>
+            <h2 className="text-lg md:text-xl font-bold text-gray-900">Recent Orders</h2>
             <Link href="/admin/orders" className="text-sm text-orange-600 hover:text-orange-700 font-medium">
               View All →
             </Link>
           </div>
         </div>
-        <div className="overflow-x-auto">
+        <div className="overflow-x-auto hidden md:block">
           <table className="w-full">
             <thead className="bg-gray-50">
               <tr>
@@ -147,6 +147,26 @@ export default function AdminDashboard() {
               )}
             </tbody>
           </table>
+        </div>
+        <div className="md:hidden divide-y divide-gray-100">
+          {stats?.recentOrders && stats.recentOrders.length > 0 ? (
+            stats.recentOrders.map((order) => (
+              <div key={order.id} className="p-4">
+                <div className="flex items-center justify-between">
+                  <div className="text-sm font-semibold text-gray-900">{order.orderNumber}</div>
+                  <span className="rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
+                    {order.status}
+                  </span>
+                </div>
+                <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                  <span>{new Date(order.createdAt).toLocaleDateString()}</span>
+                  <span className="font-semibold text-gray-900">{formatPriceNoDecimals(order.total || 0)}</span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="px-6 py-6 text-center text-gray-500">No orders yet</div>
+          )}
         </div>
       </div>
     </div>

@@ -51,29 +51,44 @@ export default function AdminLayout({
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 md:bg-gray-50">
       {/* Header */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="px-4 py-4">
+        <div className="px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
+              <Link href="/" className="text-lg md:text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
                 Chapter Kurus Admin
               </Link>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-600">{user?.name || 'Admin'}</span>
-              <Link href="/" className="text-sm text-orange-600 hover:text-orange-700 font-medium">
+            <div className="flex items-center gap-3 md:gap-4">
+              <span className="hidden md:inline text-sm text-gray-600">{user?.name || 'Admin'}</span>
+              <Link href="/" className="text-xs md:text-sm text-orange-600 hover:text-orange-700 font-medium">
                 View Site →
               </Link>
             </div>
+          </div>
+        </div>
+        {/* Mobile quick pills */}
+        <div className="md:hidden border-t border-gray-100 px-3 py-2">
+          <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+            {menuItems.map((item) => (
+              <Link
+                key={`${item.href}-mobile-pill`}
+                href={item.href}
+                className="flex items-center gap-2 whitespace-nowrap rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm"
+              >
+                <span>{item.icon}</span>
+                <span>{item.label}</span>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)] sticky top-[73px]">
+        <aside className="hidden w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)] sticky top-[73px] md:block">
           <nav className="p-4">
             <ul className="space-y-1">
               {menuItems.map((item) => (
@@ -92,9 +107,25 @@ export default function AdminLayout({
         </aside>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-4 md:p-6 pb-24 md:pb-6">
           {children}
         </main>
+      </div>
+
+      {/* Mobile App Bottom Nav */}
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur md:hidden">
+        <div className="grid grid-cols-5 py-2">
+          {menuItems.slice(0, 5).map((item) => (
+            <Link
+              key={`${item.href}-mobile-tab`}
+              href={item.href}
+              className="flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium text-gray-500"
+            >
+              <span className="text-base">{item.icon}</span>
+              <span>{item.label}</span>
+            </Link>
+          ))}
+        </div>
       </div>
     </div>
   )

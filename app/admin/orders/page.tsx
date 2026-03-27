@@ -49,6 +49,11 @@ export default function AdminOrders() {
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const hasSelectedOrderCoords =
+    !!selectedOrder?.address &&
+    Number.isFinite(selectedOrder.address.latitude) &&
+    Number.isFinite(selectedOrder.address.longitude) &&
+    !(selectedOrder.address.latitude === 0 && selectedOrder.address.longitude === 0)
 
   useEffect(() => {
     fetchOrders()
@@ -131,7 +136,7 @@ export default function AdminOrders() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Orders</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Orders</h1>
         <p className="text-gray-600 mt-1">Manage customer orders and deliveries</p>
       </div>
 
@@ -142,7 +147,7 @@ export default function AdminOrders() {
           placeholder="Search by order number, customer name or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
         />
       </div>
 
@@ -153,13 +158,14 @@ export default function AdminOrders() {
         ) : filteredOrders.length === 0 ? (
           <div className="p-8 text-center text-gray-500">No orders found</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</th>
+          <>
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Payment</th>
@@ -229,7 +235,31 @@ export default function AdminOrders() {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredOrders.map((order) => (
+                <button
+                  key={`${order.id}-mobile`}
+                  onClick={() => setSelectedOrder(order)}
+                  className="w-full text-left p-4 hover:bg-gray-50"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="text-sm font-semibold text-gray-900">{order.orderNumber}</div>
+                    <span className={`text-[10px] px-2 py-1 rounded-full font-semibold ${getStatusColor(order.status)}`}>
+                      {order.status}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                    <span>{order.user.name}</span>
+                    <span>{formatPriceNoDecimals(order.total || 0)}</span>
+                  </div>
+                  <div className="mt-1 text-xs text-gray-500 truncate">
+                    {order.address ? `${order.address.city} • ${order.address.street}` : 'No address'}
+                  </div>
+                </button>
+              ))}
+            </div>
+          </>
         )}
       </div>
 
@@ -284,7 +314,7 @@ export default function AdminOrders() {
                       </div>
                     </div>
                     {/* Google Maps Embed */}
-                    {selectedOrder.address.latitude && selectedOrder.address.longitude && (
+                    {hasSelectedOrderCoords ? (
                       <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
                         <iframe
                           width="100%"
@@ -295,14 +325,28 @@ export default function AdminOrders() {
                           referrerPolicy="no-referrer-when-downgrade"
                           src={`https://www.google.com/maps?q=${selectedOrder.address.latitude},${selectedOrder.address.longitude}&z=15&output=embed`}
                         />
-                        <a
-                          href={`https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.address.latitude},${selectedOrder.address.longitude}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block w-full py-2 bg-blue-500 text-white text-center text-sm font-medium hover:bg-blue-600 transition-colors"
-                        >
-                          🧭 Get Directions
-                        </a>
+                        <div className="grid grid-cols-2 gap-2 border-t border-gray-200 bg-white p-2">
+                          <a
+                            href={`https://www.google.com/maps/search/?api=1&query=${selectedOrder.address.latitude},${selectedOrder.address.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-lg border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                          >
+                            📍 Open Map
+                          </a>
+                          <a
+                            href={`https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.address.latitude},${selectedOrder.address.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="rounded-lg bg-blue-500 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-blue-600"
+                          >
+                            🧭 Directions
+                          </a>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="mt-3 rounded-lg border border-dashed border-gray-200 px-4 py-3 text-xs text-gray-500">
+                        No map coordinates saved for this address.
                       </div>
                     )}
                   </div>

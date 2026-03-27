@@ -18,6 +18,8 @@ export async function POST(request: NextRequest) {
     const { 
       items, 
       addressId, 
+      addressLatitude,
+      addressLongitude,
       paymentMethod, 
       subtotal, 
       deliveryFee, 
@@ -103,6 +105,20 @@ export async function POST(request: NextRequest) {
 
     if (!addressId || !address) {
       return NextResponse.json({ error: 'Please select a delivery address' }, { status: 400 })
+    }
+
+    const lat = typeof addressLatitude === 'number' ? addressLatitude : Number(addressLatitude)
+    const lng = typeof addressLongitude === 'number' ? addressLongitude : Number(addressLongitude)
+    const hasIncomingCoords = Number.isFinite(lat) && Number.isFinite(lng)
+
+    if (hasIncomingCoords && address.latitude === 0 && address.longitude === 0) {
+      await prisma.address.update({
+        where: { id: address.id },
+        data: {
+          latitude: lat,
+          longitude: lng,
+        },
+      })
     }
 
     // Generate order number

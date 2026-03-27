@@ -128,7 +128,7 @@ export default function AdminUsers() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Users</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Users</h1>
         <p className="text-gray-600 mt-1">Manage customer and admin accounts</p>
       </div>
 
@@ -139,7 +139,7 @@ export default function AdminUsers() {
           placeholder="Search by name or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
         />
       </div>
 
@@ -150,13 +150,14 @@ export default function AdminUsers() {
         ) : filteredUsers.length === 0 ? (
           <div className="p-8 text-center text-gray-500">No users found</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-gray-50 border-b border-gray-200">
-                <tr>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
+          <>
+            <div className="overflow-x-auto hidden md:block">
+              <table className="w-full">
+                <thead className="bg-gray-50 border-b border-gray-200">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">User</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Orders</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Joined</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
@@ -218,7 +219,48 @@ export default function AdminUsers() {
                 ))}
               </tbody>
             </table>
-          </div>
+            </div>
+            <div className="md:hidden divide-y divide-gray-100">
+              {filteredUsers.map((user) => (
+                <div key={`${user.id}-mobile`} className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="h-10 w-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-600 font-bold">
+                        {user.name.charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <div className="text-sm font-semibold text-gray-900">{user.name}</div>
+                        <div className="text-xs text-gray-500">{user.email}</div>
+                      </div>
+                    </div>
+                    <span className={`text-[10px] px-2 py-1 rounded-full font-semibold ${
+                      user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'
+                    }`}>
+                      {user.role}
+                    </span>
+                  </div>
+                  <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                    <span>{user.phone || 'No phone'}</span>
+                    <span>{user._count.orders} orders</span>
+                  </div>
+                  <div className="mt-3 flex gap-2">
+                    <button
+                      onClick={() => openUserDetails(user.id)}
+                      className="flex-1 rounded-lg border border-gray-200 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    >
+                      View
+                    </button>
+                    <button
+                      onClick={() => deleteUser(user.id)}
+                      className="flex-1 rounded-lg border border-red-200 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
 

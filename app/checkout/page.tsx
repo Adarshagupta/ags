@@ -8,6 +8,7 @@ import { useLocationStore } from '@/lib/store/location'
 import { useUserStore } from '@/lib/store/user'
 import { formatPrice, formatPriceNoDecimals } from '@/lib/utils'
 import LocationPicker from '@/components/LocationPicker'
+import LocationModal from '@/components/LocationModal'
 import BottomNav from '@/components/BottomNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { SessionSync } from '@/components/SessionSync'
@@ -52,7 +53,7 @@ const DEFAULT_SETTINGS: AppSettings = {
 export default function CheckoutPage() {
   const router = useRouter()
   const { items, getTotalPrice, clearCart, giftOptions, setGiftOptions } = useCartStore()
-  const { deliveryAddress } = useLocationStore()
+  const { deliveryAddress, setDeliveryAddress } = useLocationStore()
   const { user, _hasHydrated } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
   const [orderPlaced, setOrderPlaced] = useState(false)
@@ -66,6 +67,7 @@ export default function CheckoutPage() {
   const [addresses, setAddresses] = useState<any[]>([])
   const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null)
   const [showAddressForm, setShowAddressForm] = useState(false)
+  const [isLocationModalOpen, setIsLocationModalOpen] = useState(false)
   const [appSettings, setAppSettings] = useState<AppSettings>(DEFAULT_SETTINGS)
   const [newAddress, setNewAddress] = useState({
     label: 'Home',
@@ -181,6 +183,11 @@ export default function CheckoutPage() {
       return
     }
 
+    if (!newAddress.latitude || !newAddress.longitude) {
+      alert('Please pick your exact location on the map for accurate delivery.')
+      return
+    }
+
     try {
       const res = await fetch('/api/addresses', {
         method: 'POST',
@@ -240,6 +247,9 @@ export default function CheckoutPage() {
     setIsLoading(true)
 
     try {
+      const selectedAddress = addresses.find((address) => address.id === selectedAddressId)
+      const addressLatitude = selectedAddress?.latitude ?? deliveryAddress?.latitude ?? null
+      const addressLongitude = selectedAddress?.longitude ?? deliveryAddress?.longitude ?? null
       const response = await fetch('/api/orders', {
         method: 'POST',
         headers: {
@@ -248,6 +258,8 @@ export default function CheckoutPage() {
         body: JSON.stringify({
           items,
           addressId: selectedAddressId,
+          addressLatitude,
+          addressLongitude,
           paymentMethod,
           subtotal,
           deliveryFee,
@@ -400,6 +412,18 @@ export default function CheckoutPage() {
                 <div className="mt-3 lg:mt-4 p-3 lg:p-4 bg-white border-2 border-pink-200 rounded-xl">
                   <h3 className="font-semibold mb-2 lg:mb-3 text-sm lg:text-base">New Address</h3>
                   <div className="space-y-2 lg:space-y-3">
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-pink-200 bg-pink-50 px-3 py-2 text-xs text-pink-700">
+                      <span>
+                        📍 Pick the exact pin on map for accurate delivery.
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setIsLocationModalOpen(true)}
+                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-pink-600 shadow-sm hover:bg-pink-100"
+                      >
+                        Choose on Map
+                      </button>
+                    </div>
                     <select
                       value={newAddress.label}
                       onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
@@ -473,6 +497,34 @@ export default function CheckoutPage() {
                 </div>
               )}
             </motion.div>
+
+            <LocationModal
+              isOpen={isLocationModalOpen}
+              onClose={() => setIsLocationModalOpen(false)}
+              onSaved={(location) => {
+                if (location?.latitude && location?.longitude) {
+                  setNewAddress((prev) => ({
+                    ...prev,
+                    label: location.label || prev.label,
+                    street: location.street || prev.street,
+                    apartment: location.apartment || prev.apartment,
+                    landmark: location.landmark || prev.landmark,
+                    city: location.city || prev.city,
+                    state: location.state || prev.state,
+                    pincode: location.pincode || prev.pincode,
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                  }))
+                  setDeliveryAddress({
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    address: location.address || '',
+                    label: location.label || 'Selected Location',
+                  })
+                }
+                setIsLocationModalOpen(false)
+              }}
+            />
 
             {/* Gift Options - Open Design */}
             <motion.div
