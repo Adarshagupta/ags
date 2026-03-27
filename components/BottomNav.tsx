@@ -86,22 +86,46 @@ export default function BottomNav() {
   ]
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-neutral-100 z-50 lg:hidden safe-area-bottom">
-      <div className="grid grid-cols-5 h-14">
-        {navItems.map((item) => (
-          <motion.button
-            key={item.path}
-            onClick={() => router.push(item.path)}
-            whileTap={{ scale: 0.9 }}
-            className={`flex flex-col items-center justify-center gap-0.5 ${
-              item.active ? 'text-pink-600' : 'text-neutral-400'
-            }`}
-          >
-            {item.icon(item.active)}
-            <span className="text-[10px]">{item.label}</span>
-          </motion.button>
-        ))}
+    <>
+      {/* Mobile */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-sm border-t border-neutral-100 z-50 lg:hidden safe-area-bottom">
+        <div className="grid grid-cols-5 h-14">
+          {navItems.map((item) => (
+            <motion.button
+              key={item.path}
+              onClick={() => router.push(item.path)}
+              whileTap={{ scale: 0.9 }}
+              className={`flex flex-col items-center justify-center gap-0.5 ${
+                item.active ? 'text-pink-600' : 'text-neutral-400'
+              }`}
+            >
+              {item.icon(item.active)}
+              <span className="text-[10px]">{item.label}</span>
+            </motion.button>
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Desktop */}
+      <div className="fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 lg:block">
+        <div className="rounded-full border border-neutral-200 bg-white/90 px-4 py-2 shadow-lg backdrop-blur">
+          <div className="flex items-center gap-4">
+            {navItems.map((item) => (
+              <motion.button
+                key={`${item.path}-desktop`}
+                onClick={() => router.push(item.path)}
+                whileTap={{ scale: 0.9 }}
+                className={`flex items-center gap-2 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
+                  item.active ? 'text-pink-600 bg-pink-50' : 'text-neutral-500 hover:text-neutral-700'
+                }`}
+              >
+                {item.icon(item.active)}
+                <span className="hidden xl:block">{item.label}</span>
+              </motion.button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
   )
 }
