@@ -94,6 +94,8 @@ export async function POST(request: NextRequest) {
               city: true,
               state: true,
               pincode: true,
+              latitude: true,
+              longitude: true,
             },
           })
         : Promise.resolve(null),
