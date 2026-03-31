@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         tax: resolvedTax,
         total: resolvedTotal,
         paymentMethod,
-        estimatedTime: 30,
+        estimatedTime: 0,
         isGift: isGift || false,
         recipientId: isGift ? recipientId : null,
         occasionId: isGift ? occasionId : null,
@@ -259,10 +259,15 @@ export async function GET(request: NextRequest) {
       include: {
         items: {
           include: {
-            product: true,
+            product: {
+              select: LEGACY_PRODUCT_SELECT,
+            },
           },
         },
         address: true,
+        recipient: true,
+        giftWrap: true,
+        occasion: true,
       },
       orderBy: { createdAt: 'desc' },
     })

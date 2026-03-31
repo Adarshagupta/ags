@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { formatPriceNoDecimals } from '@/lib/utils'
+import { formatPriceNoDecimals, formatTime } from '@/lib/utils'
 
 interface Address {
   label: string
@@ -20,6 +20,14 @@ interface Order {
   orderNumber: string
   userId: string
   total: number
+  estimatedTime?: number
+  subtotal?: number
+  deliveryFee?: number
+  tax?: number
+  isGift?: boolean
+  greetingMessage?: string | null
+  senderName?: string | null
+  showSenderName?: boolean
   status: 'PENDING' | 'ACCEPTED' | 'PREPARING' | 'READY' | 'OUT_FOR_DELIVERY' | 'DELIVERED' | 'CANCELLED'
   paymentStatus: 'PENDING' | 'COMPLETED' | 'FAILED' | 'REFUNDED'
   deliveryDate: string
@@ -30,6 +38,21 @@ interface Order {
     phone: string | null
   }
   address: Address | null
+  recipient?: {
+    name: string
+    phone: string
+    relationship: string
+  } | null
+  occasion?: {
+    name: string
+    emoji: string
+  } | null
+  giftWrap?: {
+    name: string
+    type: string
+    price: number
+    image: string
+  } | null
   items: {
     id: string
     quantity: number
@@ -43,12 +66,37 @@ interface Order {
 
 const STATUS_OPTIONS = ['PENDING', 'ACCEPTED', 'PREPARING', 'READY', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED']
 const PAYMENT_STATUS_OPTIONS = ['PENDING', 'COMPLETED', 'FAILED', 'REFUNDED']
+const MINUTES_PER_DAY = 24 * 60
+
+type EstimatedTimeUnit = 'minutes' | 'days'
+
+const toEstimatedTimeDraft = (minutes: number, unit: EstimatedTimeUnit): string => {
+  const safeMinutes = Math.max(0, Math.round(Number(minutes) || 0))
+  if (unit === 'days') {
+    return String(Number((safeMinutes / MINUTES_PER_DAY).toFixed(2)))
+  }
+  return String(safeMinutes)
+}
+
+const toEstimatedTimeMinutes = (rawValue: string, unit: EstimatedTimeUnit): number => {
+  const parsed = Number(rawValue)
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    return NaN
+  }
+  if (unit === 'days') {
+    return Math.round(parsed * MINUTES_PER_DAY)
+  }
+  return Math.round(parsed)
+}
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState<Order[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null)
   const [searchTerm, setSearchTerm] = useState('')
+  const [estimatedTimeDraft, setEstimatedTimeDraft] = useState('')
+  const [estimatedTimeUnit, setEstimatedTimeUnit] = useState<EstimatedTimeUnit>('minutes')
+  const [savingEstimatedTime, setSavingEstimatedTime] = useState(false)
   const hasSelectedOrderCoords =
     !!selectedOrder?.address &&
     Number.isFinite(selectedOrder.address.latitude) &&
@@ -58,6 +106,25 @@ export default function AdminOrders() {
   useEffect(() => {
     fetchOrders()
   }, [])
+
+  const handleEstimatedTimeUnitChange = (nextUnit: EstimatedTimeUnit) => {
+    if (nextUnit === estimatedTimeUnit) return
+    const currentMinutes = toEstimatedTimeMinutes(estimatedTimeDraft, estimatedTimeUnit)
+    setEstimatedTimeUnit(nextUnit)
+    if (Number.isFinite(currentMinutes)) {
+      setEstimatedTimeDraft(toEstimatedTimeDraft(currentMinutes, nextUnit))
+    }
+  }
+
+  useEffect(() => {
+    if (selectedOrder) {
+      const safeMinutes = Math.max(0, Number(selectedOrder.estimatedTime) || 0)
+      const defaultUnit: EstimatedTimeUnit =
+        safeMinutes >= MINUTES_PER_DAY && safeMinutes % MINUTES_PER_DAY === 0 ? 'days' : 'minutes'
+      setEstimatedTimeUnit(defaultUnit)
+      setEstimatedTimeDraft(toEstimatedTimeDraft(safeMinutes, defaultUnit))
+    }
+  }, [selectedOrder])
 
   const fetchOrders = async () => {
     try {
@@ -108,6 +175,37 @@ export default function AdminOrders() {
       }
     } catch (error) {
       console.error('Error updating payment status:', error)
+    }
+  }
+
+  const updateEstimatedTime = async (orderId: string) => {
+    const etaMinutes = toEstimatedTimeMinutes(estimatedTimeDraft, estimatedTimeUnit)
+    if (!Number.isFinite(etaMinutes) || etaMinutes < 0) {
+      alert('Estimated time must be a non-negative number')
+      return
+    }
+
+    try {
+      setSavingEstimatedTime(true)
+      const res = await fetch(`/api/admin/orders/${orderId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estimatedTime: etaMinutes }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        throw new Error(data?.error || 'Failed to update estimated time')
+      }
+
+      const updated = await res.json()
+      setSelectedOrder(updated)
+      setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, estimatedTime: updated.estimatedTime } : order)))
+    } catch (error: any) {
+      console.error('Error updating estimated time:', error)
+      alert(error?.message || 'Failed to update estimated time')
+    } finally {
+      setSavingEstimatedTime(false)
     }
   }
 
@@ -353,6 +451,64 @@ export default function AdminOrders() {
                 </div>
               )}
 
+              {/* Gift Details */}
+              <div>
+                <h3 className="font-bold text-gray-900 mb-2">Gift Details</h3>
+                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
+                  <p className="text-gray-900">
+                    <span className="font-medium">Order Type:</span> {selectedOrder.isGift ? 'Gift' : 'Direct'}
+                  </p>
+
+                  {selectedOrder.isGift ? (
+                    <>
+                      {selectedOrder.recipient ? (
+                        <p className="text-gray-900">
+                          <span className="font-medium">Recipient:</span> {selectedOrder.recipient.name}
+                          {selectedOrder.recipient.relationship ? ` (${selectedOrder.recipient.relationship})` : ''}
+                          {selectedOrder.recipient.phone ? ` - ${selectedOrder.recipient.phone}` : ''}
+                        </p>
+                      ) : (
+                        <p className="text-gray-600 text-sm">Recipient not selected</p>
+                      )}
+
+                      {selectedOrder.occasion ? (
+                        <p className="text-gray-900">
+                          <span className="font-medium">Occasion:</span> {selectedOrder.occasion.emoji}{' '}
+                          {selectedOrder.occasion.name}
+                        </p>
+                      ) : null}
+
+                      {selectedOrder.giftWrap ? (
+                        <p className="text-gray-900">
+                          <span className="font-medium">Gift Wrap:</span> {selectedOrder.giftWrap.image}{' '}
+                          {selectedOrder.giftWrap.name}
+                          {selectedOrder.giftWrap.type ? ` (${selectedOrder.giftWrap.type})` : ''} -{' '}
+                          {formatPriceNoDecimals(selectedOrder.giftWrap.price || 0)}
+                        </p>
+                      ) : (
+                        <p className="text-gray-600 text-sm">Gift wrap not selected</p>
+                      )}
+
+                      {selectedOrder.greetingMessage ? (
+                        <p className="text-gray-900">
+                          <span className="font-medium">Message:</span> {selectedOrder.greetingMessage}
+                        </p>
+                      ) : null}
+
+                      {selectedOrder.showSenderName !== false && selectedOrder.senderName ? (
+                        <p className="text-gray-900">
+                          <span className="font-medium">Sender Name:</span> {selectedOrder.senderName}
+                        </p>
+                      ) : (
+                        <p className="text-gray-600 text-sm">Sender name hidden</p>
+                      )}
+                    </>
+                  ) : (
+                    <p className="text-gray-600 text-sm">Customer placed a normal (non-gift) order.</p>
+                  )}
+                </div>
+              </div>
+
               {/* Order Items */}
               <div>
                 <h3 className="font-bold text-gray-900 mb-2">Order Items</h3>
@@ -372,6 +528,41 @@ export default function AdminOrders() {
 
               {/* Order Summary */}
               <div className="border-t border-gray-200 pt-4">
+                <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 p-3">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-orange-700">
+                    Estimated Delivery Time
+                  </p>
+                  <div className="flex gap-2">
+                    <input
+                      type="number"
+                      min="0"
+                      step={estimatedTimeUnit === 'days' ? '0.5' : '1'}
+                      value={estimatedTimeDraft}
+                      onChange={(event) => setEstimatedTimeDraft(event.target.value)}
+                      className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    />
+                    <select
+                      value={estimatedTimeUnit}
+                      onChange={(event) => handleEstimatedTimeUnitChange(event.target.value as EstimatedTimeUnit)}
+                      className="rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    >
+                      <option value="minutes">Minutes</option>
+                      <option value="days">Days</option>
+                    </select>
+                    <button
+                      type="button"
+                      onClick={() => updateEstimatedTime(selectedOrder.id)}
+                      disabled={savingEstimatedTime}
+                      className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
+                    >
+                      {savingEstimatedTime ? 'Saving...' : 'Save'}
+                    </button>
+                  </div>
+                  <p className="mt-2 text-xs text-gray-600">
+                    Customer view: {Number(selectedOrder.estimatedTime) > 0 ? formatTime(Number(selectedOrder.estimatedTime) || 0) : 'Not set yet'}
+                  </p>
+                </div>
+
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-medium text-gray-600">Delivery Date:</span>
                   <span className="text-gray-900">{new Date(selectedOrder.deliveryDate).toLocaleDateString()}</span>
@@ -388,6 +579,12 @@ export default function AdminOrders() {
                     {selectedOrder.paymentStatus}
                   </span>
                 </div>
+                {selectedOrder.giftWrap ? (
+                  <div className="flex justify-between items-center mb-2">
+                    <span className="font-medium text-gray-600">Gift Wrap:</span>
+                    <span className="text-gray-900">{formatPriceNoDecimals(selectedOrder.giftWrap.price || 0)}</span>
+                  </div>
+                ) : null}
                 <div className="flex justify-between items-center text-lg font-bold border-t border-gray-200 pt-4">
                   <span>Total Amount:</span>
                   <span className="text-orange-600">{formatPriceNoDecimals(selectedOrder.total || 0)}</span>

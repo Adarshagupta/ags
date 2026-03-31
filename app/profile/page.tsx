@@ -11,11 +11,34 @@ import BottomNav from '@/components/BottomNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { formatPriceNoDecimals } from '@/lib/utils'
 
+interface GiftRecipient {
+  id: string
+  name: string
+  relationship: string
+}
+
+interface GiftOccasion {
+  id: string
+  name: string
+  emoji: string
+}
+
+interface OrderGiftWrap {
+  id: string
+  name: string
+  price: number
+}
+
 interface Order {
   id: string
   createdAt: string
   status: string
   total: number
+  isGift: boolean
+  greetingMessage?: string | null
+  recipient?: GiftRecipient | null
+  occasion?: GiftOccasion | null
+  giftWrap?: OrderGiftWrap | null
   items: any[]
 }
 
@@ -383,7 +406,15 @@ export default function ProfilePage() {
                       </Link>
                     </div>
                   ) : (
-                    orders.map((order, index) => (
+                    orders.map((order, index) => {
+                      const detailChips = [
+                        order.isGift ? 'Gift Order' : 'Direct Order',
+                        order.occasion ? `${order.occasion.emoji} ${order.occasion.name}` : null,
+                        order.giftWrap ? `Wrap: ${order.giftWrap.name}` : null,
+                        order.recipient ? `To: ${order.recipient.name}` : null,
+                      ].filter(Boolean) as string[]
+
+                      return (
                       <Link key={order.id} href={`/orders/${order.id}`}>
                         <motion.div
                           initial={{ opacity: 0, y: 20 }}
@@ -401,6 +432,23 @@ export default function ProfilePage() {
                               {order.status.replace('_', ' ')}
                             </span>
                           </div>
+                          {detailChips.length > 0 ? (
+                            <div className="mb-3 flex gap-1.5 overflow-x-auto">
+                              {detailChips.map((chip) => (
+                                <span
+                                  key={`${order.id}-${chip}`}
+                                  className="shrink-0 rounded-full bg-pink-50 px-2.5 py-1 text-[11px] font-semibold text-pink-700 border border-pink-100"
+                                >
+                                  {chip}
+                                </span>
+                              ))}
+                            </div>
+                          ) : null}
+                          {order.greetingMessage ? (
+                            <p className="mb-3 text-xs text-gray-600 line-clamp-1">
+                              Message: <span className="font-medium text-gray-700">{order.greetingMessage}</span>
+                            </p>
+                          ) : null}
                           
                           <div className="flex items-center justify-between pt-3 border-t border-gray-100">
                             <div className="flex items-center gap-2">
@@ -417,7 +465,7 @@ export default function ProfilePage() {
                           </div>
                         </motion.div>
                       </Link>
-                    ))
+                    )})
                   )}
                 </motion.div>
               )}

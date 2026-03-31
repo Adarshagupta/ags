@@ -1,23 +1,80 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
 import { useParams, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import Header from '@/components/Header'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import FoodTypeBadge from '@/components/FoodTypeBadge'
 import { useUserStore } from '@/lib/store/user'
-import { formatPrice, formatPriceNoDecimals } from '@/lib/utils'
+import { resolveImageUrl } from '@/lib/image-url'
+import { formatPrice, formatPriceNoDecimals, formatTime } from '@/lib/utils'
 
-const orderStatuses = [
-  { key: 'PENDING', label: 'Order Placed', icon: '📝' },
-  { key: 'ACCEPTED', label: 'Accepted', icon: '✅' },
-  { key: 'PREPARING', label: 'Preparing', icon: '👨‍🍳' },
-  { key: 'READY', label: 'Ready', icon: '📦' },
-  { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery', icon: '🚀' },
-  { key: 'DELIVERED', label: 'Delivered', icon: '🎉' },
+const trackingSteps = [
+  { key: 'PENDING', label: 'Order Placed' },
+  { key: 'ACCEPTED', label: 'Accepted' },
+  { key: 'PREPARING', label: 'Preparing' },
+  { key: 'READY', label: 'Ready for Pickup' },
+  { key: 'OUT_FOR_DELIVERY', label: 'Out for Delivery' },
+  { key: 'DELIVERED', label: 'Delivered' },
 ]
+
+const statusTheme: Record<
+  string,
+  {
+    badge: string
+    title: string
+    hint: string
+    panelClass: string
+  }
+> = {
+  PENDING: {
+    badge: 'bg-amber-100 text-amber-700',
+    title: 'Order received',
+    hint: 'We are confirming your order now.',
+    panelClass: 'bg-amber-50 border-amber-200 text-amber-800',
+  },
+  ACCEPTED: {
+    badge: 'bg-blue-100 text-blue-700',
+    title: 'Order accepted',
+    hint: 'Your order is in queue for preparation.',
+    panelClass: 'bg-blue-50 border-blue-200 text-blue-800',
+  },
+  PREPARING: {
+    badge: 'bg-violet-100 text-violet-700',
+    title: 'Preparing your order',
+    hint: 'Our team is preparing your items.',
+    panelClass: 'bg-violet-50 border-violet-200 text-violet-800',
+  },
+  READY: {
+    badge: 'bg-sky-100 text-sky-700',
+    title: 'Ready for dispatch',
+    hint: 'Packaging is complete and rider assignment is next.',
+    panelClass: 'bg-sky-50 border-sky-200 text-sky-800',
+  },
+  OUT_FOR_DELIVERY: {
+    badge: 'bg-orange-100 text-orange-700',
+    title: 'On the way',
+    hint: 'Rider is heading to your delivery location.',
+    panelClass: 'bg-orange-50 border-orange-200 text-orange-800',
+  },
+  DELIVERED: {
+    badge: 'bg-emerald-100 text-emerald-700',
+    title: 'Delivered',
+    hint: 'Order has been delivered successfully.',
+    panelClass: 'bg-emerald-50 border-emerald-200 text-emerald-800',
+  },
+  CANCELLED: {
+    badge: 'bg-rose-100 text-rose-700',
+    title: 'Cancelled',
+    hint: 'This order was cancelled.',
+    panelClass: 'bg-rose-50 border-rose-200 text-rose-800',
+  },
+}
+
+function formatStatusLabel(status: string) {
+  return status.replace(/_/g, ' ').replace(/\b\w/g, (char) => char.toUpperCase())
+}
 
 export default function OrderTrackingPage() {
   const params = useParams()
@@ -27,28 +84,35 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState<any>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const orderId = Array.isArray(params.id) ? params.id[0] : params.id
+  const sessionUser = (session as any)?.user
+
   useEffect(() => {
-    // Wait for session to load
+    if (!orderId) return
     if (status === 'loading' || !_hasHydrated) return
 
-    // Redirect to login if not authenticated
-    if (status === 'unauthenticated' || !user) {
+    if (status === 'unauthenticated' && !user && !sessionUser) {
       router.push('/login')
       return
     }
 
-    fetchOrder()
-    
-    // Poll for updates every 5 seconds
-    const interval = setInterval(fetchOrder, 5000)
+    if (!user && !sessionUser) return
+
+    void fetchOrder()
+    const interval = setInterval(() => {
+      void fetchOrder()
+    }, 5000)
+
     return () => clearInterval(interval)
-  }, [params.id, status, user, _hasHydrated])
+  }, [orderId, status, user, sessionUser, _hasHydrated, router])
 
   const fetchOrder = async () => {
+    if (!orderId) return
+
     try {
-      const token = localStorage.getItem('token') || (session?.user as any)?.token
-      const response = await fetch(`/api/orders/${params.id}`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+      const token = localStorage.getItem('token') || sessionUser?.token
+      const response = await fetch(`/api/orders/${orderId}`, {
+        headers: token ? { Authorization: `Bearer ${token}` } : {},
       })
       const data = await response.json()
       if (response.ok) {
@@ -63,11 +127,10 @@ export default function OrderTrackingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="max-w-4xl mx-auto px-4 py-6 space-y-4">
+      <div className="min-h-screen bg-slate-50">
+        <div className="mx-auto max-w-5xl px-4 py-6 space-y-4">
           <SkeletonLoader variant="order" />
-          <SkeletonLoader variant="text" count={3} />
+          <SkeletonLoader variant="text" count={4} />
         </div>
       </div>
     )
@@ -75,180 +138,214 @@ export default function OrderTrackingPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-gray-50">
-        <Header />
-        <div className="max-w-2xl mx-auto px-4 py-20 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Order not found</h1>
-          <p className="text-gray-600">The order you're looking for doesn't exist.</p>
-        </div>
+      <div className="min-h-screen bg-slate-50 px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold text-slate-900 mb-2">Order not found</h1>
+        <p className="text-slate-600 mb-6">The order you are looking for is not available.</p>
+        <button
+          type="button"
+          onClick={() => router.push('/orders')}
+          className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white"
+        >
+          Back to Orders
+        </button>
       </div>
     )
   }
 
-  const currentStatusIndex = orderStatuses.findIndex((s) => s.key === order.status)
+  const currentStatus = String(order.status || 'PENDING')
+  const currentStatusIndex = trackingSteps.findIndex((step) => step.key === currentStatus)
+  const completedIndex = currentStatus === 'CANCELLED' ? 0 : Math.max(0, currentStatusIndex)
+  const activeTheme = statusTheme[currentStatus] || statusTheme.PENDING
+  const hasAddress = Boolean(order.address)
+  const hasEstimatedTime = Number.isFinite(Number(order.estimatedTime)) && Number(order.estimatedTime) > 0
+  const hasCoordinates =
+    Number.isFinite(Number(order.address?.latitude)) && Number.isFinite(Number(order.address?.longitude))
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Order Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-6"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Order #{order.orderNumber}</h1>
-              <p className="text-gray-600">{new Date(order.placedAt).toLocaleString()}</p>
-            </div>
-            <div className="text-right">
-              <p className="text-sm text-gray-600">Total</p>
-              <p className="text-2xl font-bold text-primary">{formatPriceNoDecimals(order.total)}</p>
+    <div className="min-h-screen bg-slate-50 pb-8">
+      <div className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => router.push('/orders')}
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50"
+            >
+              <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
+              </svg>
+            </button>
+            <div className="min-w-0">
+              <p className="truncate text-sm font-semibold text-slate-900">Order #{order.orderNumber}</p>
+              <p className="truncate text-xs text-slate-500">{new Date(order.placedAt).toLocaleString()}</p>
             </div>
           </div>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${activeTheme.badge}`}>
+            {formatStatusLabel(currentStatus)}
+          </span>
+        </div>
+      </div>
 
-          {order.status !== 'DELIVERED' && order.status !== 'CANCELLED' && (
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 flex items-center space-x-3">
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ repeat: Infinity, duration: 2 }}
-                className="text-3xl"
-              >
-                🚀
-              </motion.div>
-              <div className="flex-1">
-                <p className="font-semibold text-green-900">On the way!</p>
-                <p className="text-sm text-green-700">Estimated arrival in {order.estimatedTime} minutes</p>
-              </div>
-            </div>
-          )}
-        </motion.div>
-
-        {/* Order Status Timeline */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+      <div className="mx-auto max-w-5xl space-y-4 px-4 py-4">
+        <motion.section
+          initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-6"
+          className="overflow-hidden rounded-2xl bg-gradient-to-br from-pink-600 to-rose-600 p-5 text-white shadow-lg"
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Order Status</h2>
-          
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p className="text-xs uppercase tracking-[0.16em] text-pink-100">Current Status</p>
+              <h1 className="mt-1 text-2xl font-bold">{activeTheme.title}</h1>
+              <p className="mt-1 text-sm text-pink-50">{activeTheme.hint}</p>
+            </div>
+            <div className="text-left sm:text-right">
+              <p className="text-xs uppercase tracking-[0.16em] text-pink-100">Order Total</p>
+              <p className="mt-1 text-2xl font-bold">{formatPriceNoDecimals(order.total)}</p>
+            </div>
+          </div>
+          {currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' ? (
+            <div className="mt-4 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-sm">
+              {hasEstimatedTime ? (
+                <>
+                  Estimated arrival: <span className="font-semibold">{formatTime(order.estimatedTime)}</span>
+                </>
+              ) : (
+                <>
+                  Estimated arrival: <span className="font-semibold">Will be updated by admin soon</span>
+                </>
+              )}
+            </div>
+          ) : null}
+        </motion.section>
+
+        <motion.section
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+        >
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Tracking Timeline</h2>
           <div className="space-y-4">
-            {orderStatuses.map((status, index) => {
-              const isCompleted = index <= currentStatusIndex
-              const isCurrent = index === currentStatusIndex
-              
+            {trackingSteps.map((step, index) => {
+              const isCompleted = index <= completedIndex
+              const isCurrent = index === completedIndex && currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED'
+
               return (
-                <motion.div
-                  key={status.key}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex items-center space-x-4"
-                >
-                  <div className="relative">
-                    <motion.div
-                      animate={isCurrent ? { scale: [1, 1.2, 1] } : {}}
-                      transition={{ repeat: Infinity, duration: 2 }}
-                      className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl ${
-                        isCompleted
-                          ? 'bg-primary text-white'
-                          : 'bg-gray-200 text-gray-400'
+                <div key={step.key} className="flex items-start gap-3">
+                  <div className="relative flex flex-col items-center">
+                    <div
+                      className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-[11px] font-bold ${
+                        isCompleted ? 'border-pink-600 bg-pink-600 text-white' : 'border-slate-300 bg-white text-slate-500'
                       }`}
                     >
-                      {status.icon}
-                    </motion.div>
-                    {index < orderStatuses.length - 1 && (
-                      <div
-                        className={`absolute top-12 left-6 w-0.5 h-12 ${
-                          isCompleted ? 'bg-primary' : 'bg-gray-200'
-                        }`}
-                      />
-                    )}
+                      {index + 1}
+                    </div>
+                    {index < trackingSteps.length - 1 ? (
+                      <div className={`mt-1 h-7 w-0.5 ${isCompleted ? 'bg-pink-500' : 'bg-slate-200'}`} />
+                    ) : null}
                   </div>
-                  <div className="flex-1">
-                    <p className={`font-semibold ${isCompleted ? 'text-gray-900' : 'text-gray-400'}`}>
-                      {status.label}
+                  <div className="pt-0.5">
+                    <p className={`text-sm font-semibold ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>
+                      {step.label}
                     </p>
-                    {isCurrent && (
-                      <p className="text-sm text-primary font-semibold">In Progress</p>
-                    )}
+                    {isCurrent ? <p className="text-xs text-pink-600">In progress</p> : null}
                   </div>
-                </motion.div>
+                </div>
               )
             })}
           </div>
-        </motion.div>
-
-        {/* Delivery Address */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="bg-white rounded-lg shadow-md p-6 mb-6"
-        >
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Delivery Address</h2>
-          <div className="flex items-start space-x-3">
-            <svg className="w-6 h-6 text-primary flex-shrink-0 mt-1" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clipRule="evenodd" />
-            </svg>
-            <div>
-              <p className="font-semibold text-gray-900">{order.address.label}</p>
-              <p className="text-gray-600">{order.address.street}</p>
-              {order.address.apartment && (
-                <p className="text-gray-600">{order.address.apartment}</p>
-              )}
-              <p className="text-gray-600">
-                {order.address.city}, {order.address.state} - {order.address.pincode}
-              </p>
+          {currentStatus === 'CANCELLED' ? (
+            <div className={`mt-4 rounded-xl border px-3 py-2 text-sm ${activeTheme.panelClass}`}>
+              This order was cancelled. Contact support if this was unexpected.
             </div>
-          </div>
-        </motion.div>
+          ) : null}
+        </motion.section>
 
-        {/* Order Items */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
+        <div className="grid gap-4 lg:grid-cols-2">
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          >
+            <h2 className="mb-3 text-lg font-semibold text-slate-900">Delivery Address</h2>
+            {hasAddress ? (
+              <div className="space-y-1 text-sm text-slate-700">
+                <p className="font-semibold text-slate-900">{order.address.label || 'Address'}</p>
+                <p>{order.address.street}</p>
+                {order.address.apartment ? <p>{order.address.apartment}</p> : null}
+                {order.address.landmark ? <p>{order.address.landmark}</p> : null}
+                <p>
+                  {order.address.city}, {order.address.state} - {order.address.pincode}
+                </p>
+                {hasCoordinates ? (
+                  <p className="pt-1 text-xs text-slate-500">
+                    Coordinates: {Number(order.address.latitude).toFixed(5)}, {Number(order.address.longitude).toFixed(5)}
+                  </p>
+                ) : null}
+              </div>
+            ) : (
+              <p className="text-sm text-slate-500">No address found for this order.</p>
+            )}
+          </motion.section>
+
+          <motion.section
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.12 }}
+            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          >
+            <h2 className="mb-3 text-lg font-semibold text-slate-900">Bill Summary</h2>
+            <div className="space-y-2 text-sm">
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Subtotal</span>
+                <span>{formatPriceNoDecimals(order.subtotal)}</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Delivery Fee</span>
+                <span>{formatPriceNoDecimals(order.deliveryFee)}</span>
+              </div>
+              <div className="flex items-center justify-between text-slate-600">
+                <span>Tax</span>
+                <span>{formatPriceNoDecimals(order.tax)}</span>
+              </div>
+              <div className="border-t border-slate-200 pt-2 flex items-center justify-between text-base font-bold text-slate-900">
+                <span>Total</span>
+                <span>{formatPriceNoDecimals(order.total)}</span>
+              </div>
+            </div>
+          </motion.section>
+        </div>
+
+        <motion.section
+          initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="bg-white rounded-lg shadow-md p-6"
+          transition={{ delay: 0.16 }}
+          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
         >
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Order Items</h2>
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Items in This Order</h2>
           <div className="space-y-3">
             {order.items.map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  {item.product.showFoodTypeLabel ? (
-                    <FoodTypeBadge isVeg={item.product.isVeg} className="h-5 w-5" />
-                  ) : null}
-                  <div>
-                    <p className="font-semibold text-gray-900">{item.product.name}</p>
-                    <p className="text-sm text-gray-600">Qty: {item.quantity}</p>
+              <div key={item.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
+                <div className="flex min-w-0 items-center gap-3">
+                  <img
+                    src={resolveImageUrl(item.product.image)}
+                    alt={item.product.name}
+                    className="h-14 w-14 flex-shrink-0 rounded-lg object-cover border border-slate-200"
+                  />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-2">
+                      {item.product.showFoodTypeLabel ? <FoodTypeBadge isVeg={item.product.isVeg} className="h-4 w-4" /> : null}
+                      <p className="truncate text-sm font-semibold text-slate-900">{item.product.name}</p>
+                    </div>
+                    <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
                   </div>
                 </div>
-                <p className="font-semibold text-gray-900">
-                  {formatPrice(item.price * item.quantity)}
-                </p>
+                <p className="text-sm font-semibold text-slate-900">{formatPrice(item.price * item.quantity)}</p>
               </div>
             ))}
           </div>
-
-          <div className="border-t mt-4 pt-4 space-y-2">
-            <div className="flex justify-between text-gray-600">
-              <span>Subtotal</span>
-              <span>{formatPriceNoDecimals(order.subtotal)}</span>
-            </div>
-            <div className="flex justify-between text-gray-600">
-              <span>Delivery Fee</span>
-              <span>{formatPriceNoDecimals(order.deliveryFee)}</span>
-            </div>
-            <div className="flex justify-between text-xl font-bold text-gray-900">
-              <span>Total</span>
-              <span>{formatPriceNoDecimals(order.total)}</span>
-            </div>
-          </div>
-        </motion.div>
+        </motion.section>
       </div>
     </div>
   )

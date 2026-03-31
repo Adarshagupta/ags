@@ -25,6 +25,27 @@ export async function GET() {
             longitude: true
           }
         },
+        recipient: {
+          select: {
+            name: true,
+            phone: true,
+            relationship: true,
+          },
+        },
+        occasion: {
+          select: {
+            name: true,
+            emoji: true,
+          },
+        },
+        giftWrap: {
+          select: {
+            name: true,
+            type: true,
+            price: true,
+            image: true,
+          },
+        },
         items: {
           include: {
             product: {
