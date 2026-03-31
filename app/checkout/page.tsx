@@ -625,24 +625,63 @@ export default function CheckoutPage() {
                       </div>
                     ) : (
                     <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                      {giftWraps.map((wrap) => (
-                        <button
-                          key={wrap.id}
-                          onClick={() => setGiftOptions({ ...giftOptions, giftWrapId: wrap.id })}
-                          className={`flex-shrink-0 p-4 rounded-lg border-2 transition-all min-w-[140px] ${
-                            giftOptions.giftWrapId === wrap.id
-                              ? 'border-primary bg-primary/10 shadow-md'
-                              : 'border-gray-200 hover:border-primary'
-                          }`}
-                        >
-                          <div className="text-center">
-                            <span className="text-3xl block mb-2">{wrap.image}</span>
-                            <p className="font-semibold text-gray-900 text-sm">{wrap.name}</p>
-                            <p className="text-xs text-gray-600 mb-1">{wrap.type}</p>
-                            <p className="text-pink-600 font-bold">+{formatPrice(wrap.price)}</p>
+                      <button
+                        type="button"
+                        onClick={() => setGiftOptions({ ...giftOptions, giftWrapId: undefined })}
+                        className={`flex-shrink-0 p-4 rounded-lg border-2 transition-all min-w-[140px] ${
+                          !giftOptions.giftWrapId
+                            ? 'border-primary bg-primary/10 shadow-md'
+                            : 'border-gray-200 hover:border-primary'
+                        }`}
+                      >
+                        <div className="text-center">
+                          <span className="text-3xl block mb-2">🚫</span>
+                          <p className="font-semibold text-gray-900 text-sm">No Wrap</p>
+                          <p className="text-xs text-gray-600 mb-1">Use default packaging</p>
+                          <p className="text-pink-600 font-bold">+{formatPrice(0)}</p>
+                        </div>
+                      </button>
+                      {giftWraps.map((wrap) => {
+                        const isSelected = giftOptions.giftWrapId === wrap.id
+                        return (
+                          <div key={wrap.id} className="relative flex-shrink-0 min-w-[140px]">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setGiftOptions({
+                                  ...giftOptions,
+                                  giftWrapId: isSelected ? undefined : wrap.id,
+                                })
+                              }
+                              className={`w-full p-4 rounded-lg border-2 transition-all ${
+                                isSelected
+                                  ? 'border-primary bg-primary/10 shadow-md'
+                                  : 'border-gray-200 hover:border-primary'
+                              }`}
+                            >
+                              <div className="text-center">
+                                <span className="text-3xl block mb-2">{wrap.image}</span>
+                                <p className="font-semibold text-gray-900 text-sm">{wrap.name}</p>
+                                <p className="text-xs text-gray-600 mb-1">{wrap.type}</p>
+                                <p className="text-pink-600 font-bold">+{formatPrice(wrap.price)}</p>
+                              </div>
+                            </button>
+                            {isSelected ? (
+                              <button
+                                type="button"
+                                onClick={(event) => {
+                                  event.stopPropagation()
+                                  setGiftOptions({ ...giftOptions, giftWrapId: undefined })
+                                }}
+                                className="absolute right-1.5 top-1.5 h-6 w-6 rounded-full bg-white text-gray-600 shadow-sm border border-gray-200 hover:bg-gray-50"
+                                aria-label={`Remove ${wrap.name}`}
+                              >
+                                ×
+                              </button>
+                            ) : null}
                           </div>
-                        </button>
-                      ))}
+                        )
+                      })}
                     </div>
                     )}
                   </div>
