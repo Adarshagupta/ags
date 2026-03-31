@@ -15,7 +15,7 @@ import {
 } from '@/lib/product-categories'
 import { mergeSubProductTags } from '@/lib/product-subproducts'
 import { renderProductDescriptionMarkdown } from '@/lib/markdown-description'
-import { formatPriceNoDecimals } from '@/lib/utils'
+import { formatPriceNoDecimals, formatTime } from '@/lib/utils'
 
 type ProductVariant = {
   color: string
@@ -23,6 +23,8 @@ type ProductVariant = {
   image: string
   price?: number | ''
 }
+
+type PrepTimeUnit = 'minutes' | 'days'
 
 export default function NewProduct() {
   const router = useRouter()
@@ -39,6 +41,7 @@ export default function NewProduct() {
   const [recipientSelections, setRecipientSelections] = useState<string[]>([])
   const [occasionSelections, setOccasionSelections] = useState<string[]>([])
   const [subProductIds, setSubProductIds] = useState<string[]>([])
+  const [prepTimeUnit, setPrepTimeUnit] = useState<PrepTimeUnit>('minutes')
   const [formData, setFormData] = useState({
     name: '',
     miniDescription: '',
@@ -72,6 +75,23 @@ export default function NewProduct() {
     } finally {
       setCategoryGroupsLoading(false)
     }
+  }
+
+  const minutesPerDay = 24 * 60
+  const prepTimeInputValue =
+    prepTimeUnit === 'days'
+      ? Number((Math.max(0, formData.prepTime) / minutesPerDay).toFixed(2))
+      : Math.max(0, formData.prepTime)
+
+  const handlePrepTimeValueChange = (rawValue: string) => {
+    const parsed = Number(rawValue)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      setFormData((prev) => ({ ...prev, prepTime: 0 }))
+      return
+    }
+
+    const nextMinutes = prepTimeUnit === 'days' ? Math.round(parsed * minutesPerDay) : Math.round(parsed)
+    setFormData((prev) => ({ ...prev, prepTime: Math.max(0, nextMinutes) }))
   }
 
   const setAdditionalImageUrl = (url: string) => {
@@ -171,6 +191,7 @@ export default function NewProduct() {
   }
 
   const applyCakeQuickSetup = () => {
+    setPrepTimeUnit('minutes')
     setFormData((prev) => ({
       ...prev,
       category: prev.category || 'Cakes',
@@ -501,14 +522,27 @@ export default function NewProduct() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Prep Time (minutes)*</label>
-            <input
-              type="number"
-              required
-              value={formData.prepTime}
-              onChange={(e) => setFormData({ ...formData, prepTime: parseInt(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-            />
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preparation Time*</label>
+            <div className="flex gap-2">
+              <input
+                type="number"
+                required
+                min="0"
+                step={prepTimeUnit === 'days' ? '0.25' : '1'}
+                value={prepTimeInputValue}
+                onChange={(e) => handlePrepTimeValueChange(e.target.value)}
+                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              />
+              <select
+                value={prepTimeUnit}
+                onChange={(e) => setPrepTimeUnit(e.target.value as PrepTimeUnit)}
+                className="px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+              >
+                <option value="minutes">Minutes</option>
+                <option value="days">Days</option>
+              </select>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">Shown on product page as: {formatTime(formData.prepTime)}</p>
           </div>
 
           <div>

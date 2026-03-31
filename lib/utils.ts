@@ -36,12 +36,31 @@ export function formatDistance(meters: number): string {
 }
 
 export function formatTime(minutes: number): string {
-  if (minutes < 60) {
-    return `${minutes} min`
+  const safeMinutes = Math.max(0, Math.round(Number(minutes) || 0))
+  const minutesInDay = 24 * 60
+
+  if (safeMinutes < 60) {
+    return `${safeMinutes} min`
   }
-  const hours = Math.floor(minutes / 60)
-  const mins = minutes % 60
-  return `${hours}h ${mins}m`
+
+  if (safeMinutes < minutesInDay) {
+    const hours = Math.floor(safeMinutes / 60)
+    const mins = safeMinutes % 60
+    return mins === 0 ? `${hours}h` : `${hours}h ${mins}m`
+  }
+
+  const days = Math.floor(safeMinutes / minutesInDay)
+  const remainingMinutes = safeMinutes % minutesInDay
+  if (remainingMinutes === 0) {
+    return `${days} ${days === 1 ? 'day' : 'days'}`
+  }
+
+  const hours = Math.floor(remainingMinutes / 60)
+  if (hours === 0) {
+    return `${days} ${days === 1 ? 'day' : 'days'}`
+  }
+
+  return `${days} ${days === 1 ? 'day' : 'days'} ${hours}h`
 }
 
 export function generateOrderNumber(): string {

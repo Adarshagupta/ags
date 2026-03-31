@@ -11,12 +11,15 @@ import {
   fetchProductCategoryGroups,
   splitProductTags,
 } from '@/lib/product-categories'
+import { formatTime } from '@/lib/utils'
 
 type ProductVariant = {
   color: string
   size: string
   image: string
 }
+
+type PrepTimeUnit = 'minutes' | 'days'
 
 export default function EditSellerProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -34,6 +37,7 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
   const [categoryError, setCategoryError] = useState<string | null>(null)
   const [recipientSelections, setRecipientSelections] = useState<string[]>([])
   const [occasionSelections, setOccasionSelections] = useState<string[]>([])
+  const [prepTimeUnit, setPrepTimeUnit] = useState<PrepTimeUnit>('minutes')
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -50,6 +54,23 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
     tags: '',
     discount: 0,
   })
+
+  const minutesPerDay = 24 * 60
+  const prepTimeInputValue =
+    prepTimeUnit === 'days'
+      ? Number((Math.max(0, formData.prepTime) / minutesPerDay).toFixed(2))
+      : Math.max(0, formData.prepTime)
+
+  const handlePrepTimeValueChange = (rawValue: string) => {
+    const parsed = Number(rawValue)
+    if (!Number.isFinite(parsed) || parsed < 0) {
+      setFormData((prev) => ({ ...prev, prepTime: 0 }))
+      return
+    }
+
+    const nextMinutes = prepTimeUnit === 'days' ? Math.round(parsed * minutesPerDay) : Math.round(parsed)
+    setFormData((prev) => ({ ...prev, prepTime: Math.max(0, nextMinutes) }))
+  }
 
   useEffect(() => {
     void fetchProduct()
@@ -113,6 +134,11 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
         tags: tagState.customTags,
         discount: product.discount || 0,
       })
+      setPrepTimeUnit(
+        Number(product.prepTime) >= minutesPerDay && Number(product.prepTime) % minutesPerDay === 0
+          ? 'days'
+          : 'minutes'
+      )
       setRecipientSelections(tagState.recipientSelections)
       setOccasionSelections(tagState.occasionSelections)
       setVariantFiles(new Array(variants.length).fill(null))
@@ -350,14 +376,26 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Preparation Time (minutes)</label>
-              <input
-                type="number"
-                min="0"
-                value={formData.prepTime}
-                onChange={(e) => setFormData({ ...formData, prepTime: parseInt(e.target.value, 10) || 0 })}
-                className="w-full rounded-lg border px-4 py-2"
-              />
+              <label className="mb-2 block text-sm font-medium text-gray-700">Preparation Time</label>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  min="0"
+                  step={prepTimeUnit === 'days' ? '0.25' : '1'}
+                  value={prepTimeInputValue}
+                  onChange={(e) => handlePrepTimeValueChange(e.target.value)}
+                  className="w-full rounded-lg border px-4 py-2"
+                />
+                <select
+                  value={prepTimeUnit}
+                  onChange={(e) => setPrepTimeUnit(e.target.value as PrepTimeUnit)}
+                  className="rounded-lg border px-3 py-2 bg-white"
+                >
+                  <option value="minutes">Minutes</option>
+                  <option value="days">Days</option>
+                </select>
+              </div>
+              <p className="mt-1 text-xs text-gray-500">Shown on product page as: {formatTime(formData.prepTime)}</p>
             </div>
           </div>
 

@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useEffect, useState } from 'react'
+import { use, useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { motion } from 'framer-motion'
@@ -13,7 +13,7 @@ import RecommendationShelf from '@/components/recommendations/RecommendationShel
 import { getOrCreateRecommendationSessionId, rememberViewedProduct } from '@/lib/recommendation-session'
 import { renderProductDescriptionMarkdown } from '@/lib/markdown-description'
 import { extractSubProductIdsFromTags, stripSubProductTags } from '@/lib/product-subproducts'
-import { formatPriceNoDecimals } from '@/lib/utils'
+import { formatPriceNoDecimals, formatTime } from '@/lib/utils'
 
 interface ProductVariant {
   color: string
@@ -87,12 +87,23 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [relatedProducts, setRelatedProducts] = useState<RecommendationProduct[]>([])
   const [subProducts, setSubProducts] = useState<RecommendationProduct[]>([])
   const addItem = useCartStore((state) => state.addItem)
+  const totalCartItems = useCartStore((state) => state.getTotalItems())
+  const [cartToastMessage, setCartToastMessage] = useState('')
+  const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     void fetchProductData()
     setSelectedImage(0)
     setSelectedVariantIndex(null)
   }, [id])
+
+  useEffect(() => {
+    return () => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current)
+      }
+    }
+  }, [])
 
   const fetchProductData = async () => {
     try {
@@ -146,6 +157,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   }
 
+  const showAddedToCartToast = (message: string) => {
+    setCartToastMessage(message)
+    if (toastTimeoutRef.current) {
+      clearTimeout(toastTimeoutRef.current)
+    }
+    toastTimeoutRef.current = setTimeout(() => setCartToastMessage(''), 1500)
+  }
+
   const handleAddToCart = () => {
     if (!product) return
     const selectedVariantPrice =
@@ -161,7 +180,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       isVeg: product.isVeg,
       quantity
     })
-    router.push('/cart')
+    showAddedToCartToast('Added to cart')
   }
 
   const handleQuickAddRecommendation = (item: RecommendationProduct) => {
@@ -172,6 +191,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       image: resolveImageUrl(item.image),
       isVeg: item.isVeg,
     })
+    showAddedToCartToast('Added to cart')
   }
 
   if (loading) {
@@ -280,7 +300,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
               </svg>
-              <span className="text-xs font-medium">{product.prepTime} mins</span>
+              <span className="text-xs font-medium">{formatTime(product.prepTime)}</span>
             </div>
           </div>
 
@@ -289,23 +309,34 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
           {miniDescription ? <p className="text-sm text-gray-600">{miniDescription}</p> : null}
 
-          {/* Price */}
-          <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-pink-600">Rs. {finalPrice.toFixed(2)}</span>
-            {product.discount > 0 && (
-              <>
-                <span className="text-lg text-gray-400 line-through">Rs. {product.price.toFixed(2)}</span>
-                <span className="text-sm font-semibold text-green-600 bg-green-50 px-2 py-0.5 rounded">
-                  Save Rs. {(product.price - finalPrice).toFixed(2)}
-                </span>
-              </>
-            )}
-          </div>
-
           {variants.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Variants</p>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="flex gap-2 overflow-x-auto pb-1 pr-1 scrollbar-hide">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedVariantIndex(null)
+                    setSelectedImage(0)
+                  }}
+                  className={`w-40 flex-shrink-0 rounded-xl border p-2 text-left transition-colors ${
+                    selectedVariantIndex === null
+                      ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
+                      : 'border-gray-300 bg-white hover:border-pink-400'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <img
+                      src={resolveImageUrl(product.image)}
+                      alt={product.name}
+                      className="h-11 w-11 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                    />
+                    <div className="min-w-0">
+                      <p className="truncate text-xs font-semibold text-gray-900">{product.name}</p>
+                      <p className="text-[11px] text-pink-600">{formatPriceNoDecimals(basePrice)}</p>
+                    </div>
+                  </div>
+                </button>
                 {variants.map((variant, index) => {
                   const label = [variant.color, variant.size].filter(Boolean).join(' / ') || `Variant ${index + 1}`
                   return (
@@ -313,10 +344,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       key={`${label}-${index}`}
                       type="button"
                       onClick={() => {
-                        setSelectedVariantIndex(index)
+                        setSelectedVariantIndex((prev) => (prev === index ? null : index))
                         setSelectedImage(0)
                       }}
-                      className={`rounded-xl border p-2 text-left transition-colors ${
+                      className={`w-40 flex-shrink-0 rounded-xl border p-2 text-left transition-colors ${
                         selectedVariantIndex === index
                           ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
                           : 'border-gray-300 bg-white hover:border-pink-400'
@@ -344,9 +375,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
           {/* Tags */}
           {visibleTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex gap-1.5 overflow-x-auto whitespace-nowrap pb-1 pr-1 scrollbar-hide">
               {visibleTags.map((tag, idx) => (
-                <span key={idx} className="px-3 py-1 bg-pink-50 text-pink-700 rounded-full text-xs font-medium border border-pink-100">
+                <span
+                  key={idx}
+                  className="flex-shrink-0 px-2.5 py-0.5 bg-pink-50 text-pink-700 rounded-full text-[11px] font-medium border border-pink-100"
+                >
                   {tag}
                 </span>
               ))}
@@ -499,15 +533,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 description="Quick combo suggestions."
                 products={buyTogether}
                 actionLabel="Add"
-                onAdd={(item) =>
-                  useCartStore.getState().addItem({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price - item.price * ((item.discount || 0) / 100),
-                    image: resolveImageUrl(item.image),
-                    isVeg: item.isVeg,
-                  })
-                }
+                onAdd={(item) => handleQuickAddRecommendation(item)}
               />
             ) : null}
 
@@ -517,15 +543,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 description="Optional add-on products for this item."
                 products={subProducts}
                 actionLabel="Add"
-                onAdd={(item) =>
-                  useCartStore.getState().addItem({
-                    id: item.id,
-                    name: item.name,
-                    price: item.price - item.price * ((item.discount || 0) / 100),
-                    image: resolveImageUrl(item.image),
-                    isVeg: item.isVeg,
-                  })
-                }
+                onAdd={(item) => handleQuickAddRecommendation(item)}
               />
             ) : null}
           </div>
@@ -610,14 +628,17 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
               </svg>
-              <span className="text-sm font-medium">Prep time: {product.prepTime} mins</span>
+              <span className="text-sm font-medium">Prep time: {formatTime(product.prepTime)}</span>
             </div>
 
             {/* Tags */}
             {visibleTags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
+              <div className="flex gap-2 overflow-x-auto whitespace-nowrap pb-1 pr-1 scrollbar-hide">
                 {visibleTags.map((tag, idx) => (
-                  <span key={idx} className="px-4 py-2 bg-pink-50 text-pink-700 rounded-full text-sm font-medium border border-pink-100">
+                  <span
+                    key={idx}
+                    className="flex-shrink-0 px-3 py-1 bg-pink-50 text-pink-700 rounded-full text-xs font-medium border border-pink-100"
+                  >
                     {tag}
                   </span>
                 ))}
@@ -627,7 +648,31 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {variants.length > 0 && (
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-2">Variants</p>
-                <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
+                <div className="flex gap-3 overflow-x-auto pb-1 pr-1 scrollbar-hide">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedVariantIndex(null)
+                      setSelectedImage(0)
+                    }}
+                    className={`w-56 flex-shrink-0 rounded-xl border p-3 text-left transition-colors ${
+                      selectedVariantIndex === null
+                        ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
+                        : 'border-gray-300 bg-white hover:border-pink-400'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={resolveImageUrl(product.image)}
+                        alt={product.name}
+                        className="h-14 w-14 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                      />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-gray-900">{product.name}</p>
+                        <p className="text-sm text-pink-600">{formatPriceNoDecimals(basePrice)}</p>
+                      </div>
+                    </div>
+                  </button>
                   {variants.map((variant, index) => {
                     const label = [variant.color, variant.size].filter(Boolean).join(' / ') || `Variant ${index + 1}`
                     return (
@@ -635,10 +680,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         key={`${label}-${index}`}
                         type="button"
                         onClick={() => {
-                          setSelectedVariantIndex(index)
+                          setSelectedVariantIndex((prev) => (prev === index ? null : index))
                           setSelectedImage(0)
                         }}
-                        className={`rounded-xl border p-3 text-left transition-colors ${
+                        className={`w-56 flex-shrink-0 rounded-xl border p-3 text-left transition-colors ${
                           selectedVariantIndex === index
                             ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
                             : 'border-gray-300 bg-white hover:border-pink-400'
@@ -819,15 +864,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               description="Complete your combo in one tap."
               products={buyTogether}
               actionLabel="Add"
-              onAdd={(item) =>
-                useCartStore.getState().addItem({
-                  id: item.id,
-                  name: item.name,
-                  price: item.price - item.price * ((item.discount || 0) / 100),
-                  image: resolveImageUrl(item.image),
-                  isVeg: item.isVeg,
-                })
-              }
+              onAdd={(item) => handleQuickAddRecommendation(item)}
             />
           </div>
         ) : null}
@@ -839,15 +876,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               description="Optional add-on products configured by admin for this item."
               products={subProducts}
               actionLabel="Add"
-              onAdd={(item) =>
-                useCartStore.getState().addItem({
-                  id: item.id,
-                  name: item.name,
-                  price: item.price - item.price * ((item.discount || 0) / 100),
-                  image: resolveImageUrl(item.image),
-                  isVeg: item.isVeg,
-                })
-              }
+              onAdd={(item) => handleQuickAddRecommendation(item)}
             />
           </div>
         ) : null}
@@ -862,6 +891,34 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           />
         </section>
       </div>
+
+      {cartToastMessage ? (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 12 }}
+          className="fixed bottom-28 left-1/2 z-[70] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-xl lg:bottom-24"
+        >
+          {cartToastMessage}
+        </motion.div>
+      ) : null}
+
+      <button
+        type="button"
+        onClick={() => router.push('/cart')}
+        className="fixed bottom-24 right-4 z-[65] flex h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-pink-600 px-4 text-white shadow-xl transition hover:bg-pink-700 lg:bottom-6 lg:right-6"
+        aria-label="Open cart"
+      >
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M3 3h2l.4 2m0 0L7 13h10l2-8H5.4zm1.6 13a1 1 0 100 2 1 1 0 000-2zm10 0a1 1 0 100 2 1 1 0 000-2z"
+          />
+        </svg>
+        <span className="text-sm font-semibold">{totalCartItems}</span>
+      </button>
     </div>
   )
 }
