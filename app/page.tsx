@@ -65,7 +65,14 @@ async function getHomeData() {
       }))
       .filter((section) => section.products.length > 0)
 
+    const bestOfferProducts = [...products]
+      .sort((left, right) => Number(right.discount || 0) - Number(left.discount || 0))
+      .slice(0, 6)
     const latestProducts = products.slice(0, 6)
+    const homepageRecommendationProducts =
+      String(settings.homepageRecommendationMode || 'LATEST').toUpperCase() === 'BEST_OFFER'
+        ? bestOfferProducts
+        : latestProducts
 
     const homepageBanners =
       banners.length > 0
@@ -87,6 +94,7 @@ async function getHomeData() {
       occasionCategories,
       groupedCategories,
       latestProducts,
+      homepageRecommendationProducts,
       homepageBanners,
     }
   } catch (error) {
@@ -97,31 +105,40 @@ async function getHomeData() {
       occasionCategories: [],
       groupedCategories: [],
       latestProducts: [],
+      homepageRecommendationProducts: [],
       homepageBanners: [],
     }
   }
 }
 
 export default async function Home() {
-  const { categories, occasionCategories, groupedCategories, latestProducts, homepageBanners } = await getHomeData()
+  const { settings, categories, occasionCategories, groupedCategories, homepageRecommendationProducts, homepageBanners } =
+    await getHomeData()
 
   return (
     <main className="min-h-screen bg-[#f4f7fb]">
       <div className="px-4 pt-3">
         <div className="mx-auto max-w-7xl">
-          <HomepageTopLayout categories={categories} occasionCategories={occasionCategories} />
+          <HomepageTopLayout
+            categories={categories}
+            occasionCategories={occasionCategories}
+            showTopCategories={settings.homepageShowTopCategories}
+            showOccasionTabs={settings.homepageShowOccasionTabs}
+          />
         </div>
       </div>
 
-      <div className="px-4 pt-2">
-        <div className="mx-auto max-w-7xl">
-          <HomepageBannerCarousel banners={homepageBanners} />
+      {settings.homepageShowBanner ? (
+        <div className="px-4 pt-2">
+          <div className="mx-auto max-w-7xl">
+            <HomepageBannerCarousel banners={homepageBanners} />
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div id="featured" className="space-y-6 px-4 py-2 pb-24 lg:pb-8">
         <div className="mx-auto max-w-7xl space-y-6">
-          {groupedCategories.length === 0 && latestProducts.length === 0 ? (
+          {groupedCategories.length === 0 && homepageRecommendationProducts.length === 0 ? (
             <div className="rounded-2xl border border-neutral-200 bg-white py-12 text-center">
               <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
                 <svg className="h-8 w-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -132,35 +149,46 @@ export default async function Home() {
             </div>
           ) : (
             <>
-              {groupedCategories.map(({ category, products }) => (
-                <section key={category.id} className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm">
-                  <div className="mb-4 flex items-center justify-between">
-                    <div>
-                      <h2 className="text-lg font-semibold text-gray-900">{category.name}</h2>
-                      <p className="text-sm text-gray-500">Fresh picks from this category</p>
-                    </div>
-                    <Link href={`/categories/${category.id}`} className="text-sm font-semibold text-pink-600 hover:text-pink-700">
-                      View All
-                    </Link>
-                  </div>
-                  <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
-                    {products.map((product) => (
-                      <ProductCard key={product.id} product={product} />
-                    ))}
-                  </div>
-                </section>
-              ))}
+              {settings.homepageShowCategorySections
+                ? groupedCategories.map(({ category, products }) => (
+                    <section key={category.id} className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm">
+                      <div className="mb-4 flex items-center justify-between">
+                        <div>
+                          <h2 className="text-lg font-semibold text-gray-900">{category.name}</h2>
+                          <p className="text-sm text-gray-500">Fresh picks from this category</p>
+                        </div>
+                        <Link
+                          href={`/categories/${category.id}`}
+                          className="text-sm font-semibold text-pink-600 hover:text-pink-700"
+                        >
+                          View All
+                        </Link>
+                      </div>
+                      <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+                        {products.map((product) => (
+                          <ProductCard key={product.id} product={product} />
+                        ))}
+                      </div>
+                    </section>
+                  ))
+                : null}
 
-              {latestProducts.length > 0 ? (
+              {settings.homepageShowRecommendations && homepageRecommendationProducts.length > 0 ? (
                 <section id="latest" className="rounded-3xl border border-neutral-200 bg-white p-4 shadow-sm">
                   <div className="mb-4 flex items-center justify-between">
                     <div>
-                      <h2 className="text-lg font-semibold text-gray-900">Latest Arrivals</h2>
-                      <p className="text-sm text-gray-500">Recently added products</p>
+                      <h2 className="text-lg font-semibold text-gray-900">
+                        {settings.homepageRecommendationTitle || 'Recommended Products'}
+                      </h2>
+                      <p className="text-sm text-gray-500">
+                        {String(settings.homepageRecommendationMode || 'LATEST').toUpperCase() === 'BEST_OFFER'
+                          ? 'Best discount picks curated for quick checkout.'
+                          : 'Recently added products from the catalog.'}
+                      </p>
                     </div>
                   </div>
                   <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-6">
-                    {latestProducts.map((product) => (
+                    {homepageRecommendationProducts.map((product) => (
                       <ProductCard key={product.id} product={product} />
                     ))}
                   </div>

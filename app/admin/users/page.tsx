@@ -10,6 +10,8 @@ interface User {
   phone: string | null
   role: 'CUSTOMER' | 'ADMIN'
   createdAt: string
+  totalSpent: number
+  lastOrderAt: string | null
   _count: {
     orders: number
     addresses: number
@@ -33,11 +35,28 @@ interface Order {
   orderNumber: string
   total: number
   status: string
+  paymentMethod: string
+  paymentStatus: string
+  deliveryFee: number
+  discount: number
   createdAt: string
+  items: Array<{
+    id: string
+    quantity: number
+    price: number
+    product: {
+      id: string
+      name: string
+      image: string
+      category: string
+    }
+  }>
   address: Address | null
 }
 
 interface UserDetails extends User {
+  emailVerified?: string | null
+  completedOrders: number
   addresses: Address[]
   orders: Order[]
 }
@@ -101,6 +120,8 @@ export default function AdminUsers() {
     if (baseUser) {
       setSelectedUser({
         ...baseUser,
+        completedOrders: 0,
+        emailVerified: null,
         addresses: [],
         orders: [],
       })
@@ -159,6 +180,7 @@ export default function AdminUsers() {
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Contact</th>
                     <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Role</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Orders</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Spend</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Joined</th>
                   <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
                 </tr>
@@ -197,6 +219,12 @@ export default function AdminUsers() {
                     <td className="px-4 py-4">
                       <div className="text-sm text-gray-900">{user._count.orders} orders</div>
                       <div className="text-xs text-gray-500">{user._count.addresses} addresses</div>
+                    </td>
+                    <td className="px-4 py-4">
+                      <div className="text-sm font-semibold text-gray-900">{formatPriceNoDecimals(user.totalSpent || 0)}</div>
+                      <div className="text-xs text-gray-500">
+                        {user.lastOrderAt ? `Last: ${new Date(user.lastOrderAt).toLocaleDateString()}` : 'No orders yet'}
+                      </div>
                     </td>
                     <td className="px-4 py-4">
                       <div className="text-sm text-gray-900">{new Date(user.createdAt).toLocaleDateString()}</div>
@@ -242,6 +270,9 @@ export default function AdminUsers() {
                   <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
                     <span>{user.phone || 'No phone'}</span>
                     <span>{user._count.orders} orders</span>
+                  </div>
+                  <div className="mt-1 text-xs font-semibold text-gray-900">
+                    {formatPriceNoDecimals(user.totalSpent || 0)}
                   </div>
                   <div className="mt-3 flex gap-2">
                     <button
@@ -323,10 +354,24 @@ export default function AdminUsers() {
                         <div className="font-medium text-gray-900">{selectedUser.role}</div>
                       </div>
                       <div>
+                        <div className="text-gray-500">Email Verified</div>
+                        <div className="font-medium text-gray-900">
+                          {selectedUser.emailVerified ? new Date(selectedUser.emailVerified).toLocaleDateString() : 'Not verified'}
+                        </div>
+                      </div>
+                      <div>
                         <div className="text-gray-500">Joined</div>
                         <div className="font-medium text-gray-900">
                           {new Date(selectedUser.createdAt).toLocaleDateString()}
                         </div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Total Spend</div>
+                        <div className="font-medium text-gray-900">{formatPriceNoDecimals(selectedUser.totalSpent || 0)}</div>
+                      </div>
+                      <div>
+                        <div className="text-gray-500">Delivered Orders</div>
+                        <div className="font-medium text-gray-900">{selectedUser.completedOrders || 0}</div>
                       </div>
                     </div>
                   </section>
@@ -371,12 +416,26 @@ export default function AdminUsers() {
                               </div>
                               <div className="text-right">
                                 <div className="font-semibold text-gray-900">{formatPriceNoDecimals(order.total)}</div>
-                                <div className="text-xs text-gray-500">{order.status}</div>
+                                <div className="text-xs text-gray-500">{order.status} • {order.paymentStatus}</div>
                               </div>
                             </div>
-                            {order.address ? (
-                              <div className="mt-2 text-xs text-gray-500">
-                                {order.address.city}, {order.address.state}
+                            <div className="mt-2 grid gap-1 text-xs text-gray-500 md:grid-cols-2">
+                              <div>Payment: {order.paymentMethod}</div>
+                              <div>Delivery fee: {formatPriceNoDecimals(order.deliveryFee || 0)}</div>
+                              <div>Discount: {formatPriceNoDecimals(order.discount || 0)}</div>
+                              {order.address ? <div>{order.address.city}, {order.address.state}</div> : null}
+                            </div>
+                            {order.items.length > 0 ? (
+                              <div className="mt-3 space-y-2 rounded-md border border-gray-100 bg-gray-50 p-3">
+                                {order.items.map((item) => (
+                                  <div key={item.id} className="flex items-center justify-between gap-2 text-xs">
+                                    <div className="min-w-0">
+                                      <div className="truncate font-medium text-gray-700">{item.product?.name || 'Product removed'}</div>
+                                      <div className="text-gray-500">Qty: {item.quantity}</div>
+                                    </div>
+                                    <div className="font-medium text-gray-700">{formatPriceNoDecimals(item.price * item.quantity)}</div>
+                                  </div>
+                                ))}
                               </div>
                             ) : null}
                           </div>

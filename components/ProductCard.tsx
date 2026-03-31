@@ -12,6 +12,7 @@ interface ProductCardProps {
   product: {
     id: string
     name: string
+    miniDescription?: string | null
     description: string
     price: number
     image: string
@@ -54,6 +55,7 @@ export default function ProductCard({ product }: ProductCardProps) {
   const discountedPrice = product.discount
     ? product.price - (product.price * product.discount) / 100
     : product.price
+  const cardDescription = String(product.miniDescription || product.description || '').trim()
   const imageUrl = resolveImageUrl(product.image)
 
   return (
@@ -92,7 +94,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           {product.name}
         </h3>
         <p className="text-xs text-neutral-400 mb-2 line-clamp-1">
-          {product.description}
+          {cardDescription}
         </p>
 
         <div className="flex items-center justify-between">

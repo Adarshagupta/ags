@@ -5,17 +5,23 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ProductCategoryFields from '@/components/ProductCategoryFields'
 import ProductFoodTypeFields from '@/components/ProductFoodTypeFields'
+import ImageDropUpload from '@/components/admin/ImageDropUpload'
+import SubProductSelector from '@/components/admin/SubProductSelector'
 import { uploadProductImage } from '@/lib/upload-image'
 import {
   EMPTY_PRODUCT_CATEGORY_GROUPS,
   buildProductTags,
   fetchProductCategoryGroups,
 } from '@/lib/product-categories'
+import { mergeSubProductTags } from '@/lib/product-subproducts'
+import { renderProductDescriptionMarkdown } from '@/lib/markdown-description'
+import { formatPriceNoDecimals } from '@/lib/utils'
 
 type ProductVariant = {
   color: string
   size: string
   image: string
+  price?: number | ''
 }
 
 export default function NewProduct() {
@@ -32,8 +38,10 @@ export default function NewProduct() {
   const [categoryError, setCategoryError] = useState<string | null>(null)
   const [recipientSelections, setRecipientSelections] = useState<string[]>([])
   const [occasionSelections, setOccasionSelections] = useState<string[]>([])
+  const [subProductIds, setSubProductIds] = useState<string[]>([])
   const [formData, setFormData] = useState({
     name: '',
+    miniDescription: '',
     description: '',
     category: '',
     price: 0,
@@ -131,7 +139,7 @@ export default function NewProduct() {
     setVariantFiles((prev) => prev.filter((_, i) => i !== index))
   }
 
-  const updateVariant = (index: number, field: keyof ProductVariant, value: string) => {
+  const updateVariant = (index: number, field: keyof ProductVariant, value: string | number) => {
     setFormData((prev) => {
       const nextVariants = [...prev.variants]
       nextVariants[index] = { ...nextVariants[index], [field]: value }
@@ -162,6 +170,25 @@ export default function NewProduct() {
     }
   }
 
+  const applyCakeQuickSetup = () => {
+    setFormData((prev) => ({
+      ...prev,
+      category: prev.category || 'Cakes',
+      prepTime: prev.prepTime <= 0 ? 60 : prev.prepTime,
+      tags: prev.tags ? `${prev.tags}, cake, birthday` : 'cake, birthday',
+      variants:
+        prev.variants.length > 0
+          ? prev.variants
+          : [
+              { color: 'Chocolate', size: '1 Kg', image: '', price: prev.price || 0 },
+              { color: 'Vanilla', size: '0.5 Kg', image: '', price: Math.max((prev.price || 0) * 0.65, 0) },
+            ],
+    }))
+    if (variantFiles.length === 0) {
+      setVariantFiles([null, null])
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
@@ -172,7 +199,10 @@ export default function NewProduct() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           ...formData,
-          tags: buildProductTags(formData.tags, recipientSelections, occasionSelections),
+          tags: mergeSubProductTags(
+            buildProductTags(formData.tags, recipientSelections, occasionSelections),
+            subProductIds
+          ),
           images: formData.images.filter(img => img.trim()),
           showFoodTypeLabel: formData.showFoodTypeLabel,
           variants: formData.variants
@@ -180,6 +210,9 @@ export default function NewProduct() {
               color: variant.color.trim(),
               size: variant.size.trim(),
               image: variant.image.trim(),
+              ...(Number.isFinite(Number(variant.price)) && Number(variant.price) >= 0
+                ? { price: Number(variant.price) }
+                : {}),
             }))
             .filter((variant) => variant.image && (variant.color || variant.size)),
         })
@@ -208,6 +241,16 @@ export default function NewProduct() {
       </div>
 
       <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3">
+          <p className="text-sm font-medium text-orange-700">Quick setup for cake products and combo-ready metadata.</p>
+          <button
+            type="button"
+            onClick={applyCakeQuickSetup}
+            className="rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-400"
+          >
+            Apply Cake Starter
+          </button>
+        </div>
         <div className="grid grid-cols-2 gap-6">
           <div className="col-span-2">
             <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
@@ -221,14 +264,33 @@ export default function NewProduct() {
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Mini Description</label>
+            <input
+              type="text"
+              value={formData.miniDescription}
+              onChange={(e) => setFormData({ ...formData, miniDescription: e.target.value })}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="Short one-line text shown above price"
+            />
+          </div>
+
+          <div className="col-span-2 space-y-3">
+            <label className="block text-sm font-medium text-gray-700 mb-1">Description (Markdown)*</label>
             <textarea
               required
-              rows={3}
+              rows={7}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              placeholder="# Product Highlights&#10;- Freshly baked&#10;- Same day delivery&#10;&#10;**Storage:** Keep refrigerated."
             />
+            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Preview</p>
+              <div
+                className="space-y-3 text-sm leading-7 text-gray-700 [&_a]:text-pink-600 [&_h1]:text-xl [&_h2]:text-lg"
+                dangerouslySetInnerHTML={{ __html: renderProductDescriptionMarkdown(formData.description) }}
+              />
+            </div>
           </div>
 
           <ProductCategoryFields
@@ -245,6 +307,8 @@ export default function NewProduct() {
             onOccasionSelectionsChange={setOccasionSelections}
             accent="orange"
           />
+
+          <SubProductSelector value={subProductIds} onChange={setSubProductIds} />
 
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-1">Price (NPR)*</label>
@@ -267,12 +331,11 @@ export default function NewProduct() {
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
-            <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-              <input
-                type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
-                onChange={(e) => setMainImageFile(e.target.files?.[0] || null)}
-                className="block w-full text-sm text-gray-700 sm:w-auto"
+            <div className="mt-2 space-y-2">
+              <ImageDropUpload
+                label="Main product image"
+                onFileSelect={setMainImageFile}
+                disabled={uploadingMainImage}
               />
               <button
                 type="button"
@@ -283,7 +346,6 @@ export default function NewProduct() {
                 {uploadingMainImage ? 'Uploading...' : 'Upload Main Image'}
               </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">JPG, PNG, WEBP or GIF. Max size 5MB.</p>
           </div>
 
           <div className="col-span-2">
@@ -321,23 +383,19 @@ export default function NewProduct() {
               + Add Another Image
             </button>
             <div className="mt-3 rounded-lg border border-dashed border-gray-300 p-3">
-              <p className="text-xs text-gray-600">Upload additional image</p>
-              <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
-                <input
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp,image/gif"
-                  onChange={(e) => setAdditionalImageFile(e.target.files?.[0] || null)}
-                  className="block w-full text-sm text-gray-700 sm:w-auto"
-                />
-                <button
-                  type="button"
-                  onClick={handleAdditionalImageUpload}
-                  disabled={!additionalImageFile || uploadingAdditionalImage}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
-                >
-                  {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
-                </button>
-              </div>
+              <ImageDropUpload
+                label="Additional gallery image"
+                onFileSelect={setAdditionalImageFile}
+                disabled={uploadingAdditionalImage}
+              />
+              <button
+                type="button"
+                onClick={handleAdditionalImageUpload}
+                disabled={!additionalImageFile || uploadingAdditionalImage}
+                className="mt-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+              >
+                {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
+              </button>
             </div>
           </div>
 
@@ -359,7 +417,7 @@ export default function NewProduct() {
             )}
             {formData.variants.map((variant, index) => (
               <div key={index} className="mb-3 rounded-lg border border-gray-200 p-3">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
                   <input
                     type="text"
                     value={variant.color}
@@ -381,21 +439,32 @@ export default function NewProduct() {
                     placeholder="Variant Image URL"
                     className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
                   />
+                  <input
+                    type="number"
+                    step="0.01"
+                    value={variant.price ?? ''}
+                    onChange={(e) =>
+                      updateVariant(
+                        index,
+                        'price',
+                        e.target.value === '' ? '' : String(Math.max(0, Number(e.target.value)))
+                      )
+                    }
+                    placeholder="Variant Price"
+                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  />
                 </div>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                    <input
-                      type="file"
-                      accept="image/jpeg,image/png,image/webp,image/gif"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0] || null
+                    <ImageDropUpload
+                      label={`Variant ${index + 1} image`}
+                      onFileSelect={(file) =>
                         setVariantFiles((prev) => {
                           const nextFiles = [...prev]
                           nextFiles[index] = file
                           return nextFiles
                         })
-                      }}
-                      className="block w-full text-xs text-gray-700 sm:w-auto"
+                      }
                     />
                     <button
                       type="button"
@@ -414,6 +483,9 @@ export default function NewProduct() {
                     Remove Variant
                   </button>
                 </div>
+                {typeof variant.price === 'number' ? (
+                  <p className="mt-2 text-xs font-semibold text-orange-600">Selling at {formatPriceNoDecimals(variant.price)}</p>
+                ) : null}
               </div>
             ))}
           </div>

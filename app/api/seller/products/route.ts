@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
-import { findManyProductsCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
+import { findManyProductsCompat, withProductWriteCompatibility } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
@@ -94,6 +94,7 @@ export async function POST(request: Request) {
 
     const data = {
       name: body.name,
+      miniDescription: String(body?.miniDescription || '').trim() || null,
       description: body.description,
       category: body.category,
       price: parseFloat(body.price),
@@ -110,19 +111,9 @@ export async function POST(request: Request) {
       sellerId: seller.id,
     }
 
-    let product
-
-    try {
-      product = await prisma.product.create({ data })
-    } catch (error) {
-      if (!isMissingProductFoodTypeColumnError(error)) {
-        throw error
-      }
-
-      product = await prisma.product.create({
-        data: stripFoodTypeLabelField(data),
-      })
-    }
+    const product = await withProductWriteCompatibility(data, (safeData) =>
+      prisma.product.create({ data: safeData })
+    )
 
     return NextResponse.json(product, { status: 201 })
   } catch (error) {

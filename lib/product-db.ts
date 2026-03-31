@@ -21,8 +21,13 @@ export const LEGACY_PRODUCT_SELECT = {
   updatedAt: true,
 } satisfies Prisma.ProductSelect
 
+export const LEGACY_PRODUCT_SELECT_WITH_MINI = {
+  ...LEGACY_PRODUCT_SELECT,
+  miniDescription: true,
+} satisfies Prisma.ProductSelect
+
 type LegacyProductShape = Prisma.ProductGetPayload<{ select: typeof LEGACY_PRODUCT_SELECT }>
-export type ProductCompatResult = LegacyProductShape & { showFoodTypeLabel: boolean }
+export type ProductCompatResult = LegacyProductShape & { showFoodTypeLabel: boolean; miniDescription: string | null }
 
 export function isMissingAppSettingsTableError(error: unknown) {
   const code = (error as { code?: string } | null)?.code
@@ -31,28 +36,76 @@ export function isMissingAppSettingsTableError(error: unknown) {
   return code === 'P2021' && message.includes('AppSettings')
 }
 
+export function isMissingTableError(error: unknown, tableName: string) {
+  const code = (error as { code?: string } | null)?.code
+  const message = String((error as { message?: string } | null)?.message || '')
+
+  return code === 'P2021' && message.toLowerCase().includes(tableName.toLowerCase())
+}
+
+export function isMissingRecommendationTablesError(error: unknown) {
+  return (
+    isMissingTableError(error, 'ProductViewEvent') ||
+    isMissingTableError(error, 'RecommendationRule')
+  )
+}
+
 export function isMissingProductFoodTypeColumnError(error: unknown) {
   const code = (error as { code?: string } | null)?.code
   const message = String((error as { message?: string } | null)?.message || '')
 
   return (
-    (code === 'P2022' && message.includes('showFoodTypeLabel')) ||
+    (code === 'P2022' && (message.includes('showFoodTypeLabel') || message.includes('miniDescription'))) ||
     message.includes('The column `(not available)` does not exist in the current database')
   )
 }
 
-export function withProductCompatibility<T extends Record<string, unknown>>(product: T): T & { showFoodTypeLabel: boolean } {
+export function withProductCompatibility<T extends Record<string, unknown>>(
+  product: T
+): T & { showFoodTypeLabel: boolean; miniDescription: string | null } {
   const value = (product as { showFoodTypeLabel?: boolean | null }).showFoodTypeLabel
+  const miniDescription = (product as { miniDescription?: string | null }).miniDescription
 
   return {
     ...product,
     showFoodTypeLabel: Boolean(value),
+    miniDescription: typeof miniDescription === 'string' && miniDescription.trim().length > 0 ? miniDescription : null,
   }
 }
 
 export function stripFoodTypeLabelField<T extends Record<string, unknown>>(data: T) {
   const { showFoodTypeLabel: _showFoodTypeLabel, ...rest } = data
   return rest
+}
+
+export function stripMiniDescriptionField<T extends Record<string, unknown>>(data: T) {
+  const { miniDescription: _miniDescription, ...rest } = data
+  return rest
+}
+
+export async function withProductWriteCompatibility<T>(
+  data: Record<string, unknown>,
+  run: (safeData: any) => Promise<T>
+) {
+  try {
+    return await run(data)
+  } catch (error) {
+    if (!isMissingProductFoodTypeColumnError(error)) {
+      throw error
+    }
+
+    const withoutFoodType = stripFoodTypeLabelField(data)
+
+    try {
+      return await run(withoutFoodType)
+    } catch (innerError) {
+      if (!isMissingProductFoodTypeColumnError(innerError)) {
+        throw innerError
+      }
+
+      return run(stripMiniDescriptionField(withoutFoodType))
+    }
+  }
 }
 
 export async function findManyProductsCompat(
@@ -66,12 +119,25 @@ export async function findManyProductsCompat(
       throw error
     }
 
-    const products = await prisma.product.findMany({
-      ...args,
-      select: LEGACY_PRODUCT_SELECT,
-    })
+    try {
+      const products = await prisma.product.findMany({
+        ...args,
+        select: LEGACY_PRODUCT_SELECT_WITH_MINI,
+      })
 
-    return products.map((product) => withProductCompatibility(product)) as ProductCompatResult[]
+      return products.map((product) => withProductCompatibility(product)) as ProductCompatResult[]
+    } catch (innerError) {
+      if (!isMissingProductFoodTypeColumnError(innerError)) {
+        throw innerError
+      }
+
+      const products = await prisma.product.findMany({
+        ...args,
+        select: LEGACY_PRODUCT_SELECT,
+      })
+
+      return products.map((product) => withProductCompatibility(product)) as ProductCompatResult[]
+    }
   }
 }
 
@@ -86,11 +152,24 @@ export async function findFirstProductCompat(
       throw error
     }
 
-    const product = await prisma.product.findFirst({
-      ...args,
-      select: LEGACY_PRODUCT_SELECT,
-    })
+    try {
+      const product = await prisma.product.findFirst({
+        ...args,
+        select: LEGACY_PRODUCT_SELECT_WITH_MINI,
+      })
 
-    return product ? (withProductCompatibility(product) as ProductCompatResult) : null
+      return product ? (withProductCompatibility(product) as ProductCompatResult) : null
+    } catch (innerError) {
+      if (!isMissingProductFoodTypeColumnError(innerError)) {
+        throw innerError
+      }
+
+      const product = await prisma.product.findFirst({
+        ...args,
+        select: LEGACY_PRODUCT_SELECT,
+      })
+
+      return product ? (withProductCompatibility(product) as ProductCompatResult) : null
+    }
   }
 }

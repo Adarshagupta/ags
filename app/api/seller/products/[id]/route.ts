@@ -3,7 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
-import { findFirstProductCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
+import { findFirstProductCompat, withProductWriteCompatibility } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
@@ -105,6 +105,9 @@ export async function PATCH(
       },
       data: {
         ...(body.name && { name: body.name }),
+        ...(body.miniDescription !== undefined && {
+          miniDescription: String(body.miniDescription || '').trim() || null,
+        }),
         ...(body.description && { description: body.description }),
         ...(body.category && { category: body.category }),
         ...(body.price !== undefined && { price: parseFloat(body.price) }),
@@ -121,20 +124,14 @@ export async function PATCH(
       },
     }
 
-    let product
-
-    try {
-      product = await prisma.product.updateMany(updateArgs)
-    } catch (error) {
-      if (!isMissingProductFoodTypeColumnError(error)) {
-        throw error
-      }
-
-      product = await prisma.product.updateMany({
-        ...updateArgs,
-        data: stripFoodTypeLabelField(updateArgs.data),
-      })
-    }
+    const product = await withProductWriteCompatibility(
+      updateArgs.data as Record<string, unknown>,
+      (safeData) =>
+        prisma.product.updateMany({
+          ...updateArgs,
+          data: safeData,
+        })
+    )
 
     if (product.count === 0) {
       return NextResponse.json({ error: 'Product not found' }, { status: 404 })

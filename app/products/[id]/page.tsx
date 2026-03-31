@@ -9,16 +9,23 @@ import SkeletonLoader from '@/components/SkeletonLoader'
 import { useCartStore } from '@/lib/store/cart'
 import { resolveImageUrl } from '@/lib/image-url'
 import FoodTypeBadge from '@/components/FoodTypeBadge'
+import RecommendationShelf from '@/components/recommendations/RecommendationShelf'
+import { getOrCreateRecommendationSessionId, rememberViewedProduct } from '@/lib/recommendation-session'
+import { renderProductDescriptionMarkdown } from '@/lib/markdown-description'
+import { extractSubProductIdsFromTags, stripSubProductTags } from '@/lib/product-subproducts'
+import { formatPriceNoDecimals } from '@/lib/utils'
 
 interface ProductVariant {
   color: string
   size: string
   image: string
+  price?: number
 }
 
 interface Product {
   id: string
   name: string
+  miniDescription?: string | null
   description: string
   category: string
   price: number
@@ -34,6 +41,17 @@ interface Product {
   isAvailable: boolean
 }
 
+interface RecommendationProduct {
+  id: string
+  name: string
+  category: string
+  price: number
+  image: string
+  discount: number
+  isVeg: boolean
+  isAvailable: boolean
+}
+
 function normalizeVariants(input: unknown): ProductVariant[] {
   if (!Array.isArray(input)) return []
 
@@ -43,9 +61,15 @@ function normalizeVariants(input: unknown): ProductVariant[] {
       const color = String(variant?.color || '').trim()
       const size = String(variant?.size || '').trim()
       const image = String(variant?.image || '').trim()
+      const price = Number(variant?.price)
 
       if (!image || (!color && !size)) return null
-      return { color, size, image }
+      return {
+        color,
+        size,
+        image,
+        ...(Number.isFinite(price) && price >= 0 ? { price } : {}),
+      }
     })
     .filter((variant): variant is ProductVariant => Boolean(variant))
 }
@@ -58,23 +82,59 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [selectedImage, setSelectedImage] = useState(0)
   const [selectedVariantIndex, setSelectedVariantIndex] = useState<number | null>(null)
   const [quantity, setQuantity] = useState(1)
-  const [addons, setAddons] = useState<Product[]>([])
-  const [relatedProducts, setRelatedProducts] = useState<Product[]>([])
+  const [addons, setAddons] = useState<RecommendationProduct[]>([])
+  const [buyTogether, setBuyTogether] = useState<RecommendationProduct[]>([])
+  const [relatedProducts, setRelatedProducts] = useState<RecommendationProduct[]>([])
+  const [subProducts, setSubProducts] = useState<RecommendationProduct[]>([])
   const addItem = useCartStore((state) => state.addItem)
 
   useEffect(() => {
-    fetchProduct()
-    fetchRelatedProducts()
+    void fetchProductData()
     setSelectedImage(0)
     setSelectedVariantIndex(null)
   }, [id])
 
-  const fetchProduct = async () => {
+  const fetchProductData = async () => {
     try {
       const res = await fetch(`/api/products/${id}`)
       if (res.ok) {
         const data = await res.json()
         setProduct(data)
+
+        const viewedProductIds = rememberViewedProduct(String(id))
+        const sessionId = getOrCreateRecommendationSessionId()
+
+        void fetch(`/api/products/${id}/view`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sessionId }),
+        }).catch(() => null)
+
+        const recommendationsRes = await fetch(
+          `/api/products/${id}/recommendations?viewedProductIds=${encodeURIComponent(viewedProductIds.join(','))}`
+        )
+        if (recommendationsRes.ok) {
+          const recommendations = await recommendationsRes.json()
+          setBuyTogether(Array.isArray(recommendations.buyTogether) ? recommendations.buyTogether : [])
+          setAddons(Array.isArray(recommendations.addons) ? recommendations.addons : [])
+          setRelatedProducts(Array.isArray(recommendations.related) ? recommendations.related : [])
+        } else {
+          setBuyTogether([])
+          setAddons([])
+          setRelatedProducts([])
+        }
+
+        const subProductIds = extractSubProductIdsFromTags(data.tags)
+        if (subProductIds.length > 0) {
+          const subProductsRes = await fetch(`/api/products?ids=${encodeURIComponent(subProductIds.join(','))}&limit=12`)
+          if (subProductsRes.ok) {
+            const subProductsData = await subProductsRes.json()
+            const list = Array.isArray(subProductsData.products) ? subProductsData.products : []
+            setSubProducts(list.filter((item: RecommendationProduct) => item.id !== String(id)))
+          }
+        } else {
+          setSubProducts([])
+        }
       } else {
         router.push('/')
       }
@@ -86,38 +146,32 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   }
 
-  const fetchRelatedProducts = async () => {
-    try {
-      // Fetch addons (greeting cards, gift wraps, etc.)
-      const addonsRes = await fetch('/api/products?category=Addons')
-      if (addonsRes.ok) {
-        const addonsData = await addonsRes.json()
-        setAddons(Array.isArray(addonsData.products) ? addonsData.products.slice(0, 4) : [])
-      }
-
-      // Fetch related products from same/similar category
-      const relatedRes = await fetch(`/api/products`)
-      if (relatedRes.ok) {
-        const relatedData = await relatedRes.json()
-        const products = Array.isArray(relatedData.products) ? relatedData.products : []
-        setRelatedProducts(products.filter((p: Product) => p.id !== id).slice(0, 6))
-      }
-    } catch (error) {
-      console.error('Error fetching related products:', error)
-    }
-  }
-
   const handleAddToCart = () => {
     if (!product) return
+    const selectedVariantPrice =
+      selectedVariant && typeof selectedVariant.price === 'number'
+        ? selectedVariant.price
+        : product.price - (product.price * (product.discount || 0) / 100)
+    const variantLabel = selectedVariant ? [selectedVariant.color, selectedVariant.size].filter(Boolean).join(' / ') : ''
     addItem({
       id: product.id,
-      name: product.name,
-      price: product.price - (product.price * (product.discount || 0) / 100),
+      name: variantLabel ? `${product.name} (${variantLabel})` : product.name,
+      price: selectedVariantPrice,
       image: resolveImageUrl(selectedVariant?.image || product.image),
       isVeg: product.isVeg,
       quantity
     })
     router.push('/cart')
+  }
+
+  const handleQuickAddRecommendation = (item: RecommendationProduct) => {
+    addItem({
+      id: item.id,
+      name: item.name,
+      price: item.price - item.price * ((item.discount || 0) / 100),
+      image: resolveImageUrl(item.image),
+      isVeg: item.isVeg,
+    })
   }
 
   if (loading) {
@@ -146,7 +200,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     new Set([...(selectedVariant?.image ? [selectedVariant.image] : []), ...resolvedAllImages])
   )
   const activeImage = galleryImages[Math.min(selectedImage, Math.max(0, galleryImages.length - 1))]
-  const finalPrice = product.price - (product.price * (product.discount || 0) / 100)
+  const basePrice = product.price - (product.price * (product.discount || 0) / 100)
+  const finalPrice = typeof selectedVariant?.price === 'number' ? selectedVariant.price : basePrice
+  const descriptionHtml = renderProductDescriptionMarkdown(product.description)
+  const miniDescription = String(product.miniDescription || '').trim()
+  const visibleTags = stripSubProductTags(product.tags)
 
   return (
     <div className="min-h-screen bg-white pb-20 lg:pb-0">
@@ -229,6 +287,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           {/* Product Name */}
           <h1 className="text-2xl font-bold text-gray-900 leading-tight">{product.name}</h1>
 
+          {miniDescription ? <p className="text-sm text-gray-600">{miniDescription}</p> : null}
+
           {/* Price */}
           <div className="flex items-baseline gap-2">
             <span className="text-3xl font-bold text-pink-600">Rs. {finalPrice.toFixed(2)}</span>
@@ -245,9 +305,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           {variants.length > 0 && (
             <div>
               <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Variants</p>
-              <div className="flex flex-wrap gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 {variants.map((variant, index) => {
-                  const label = [variant.color, variant.size].filter(Boolean).join(' / ')
+                  const label = [variant.color, variant.size].filter(Boolean).join(' / ') || `Variant ${index + 1}`
                   return (
                     <button
                       key={`${label}-${index}`}
@@ -256,13 +316,25 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                         setSelectedVariantIndex(index)
                         setSelectedImage(0)
                       }}
-                      className={`px-3 py-1.5 rounded-full text-xs border transition-colors ${
+                      className={`rounded-xl border p-2 text-left transition-colors ${
                         selectedVariantIndex === index
-                          ? 'bg-pink-600 text-white border-pink-600'
-                          : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400'
+                          ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
+                          : 'border-gray-300 bg-white hover:border-pink-400'
                       }`}
                     >
-                      {label}
+                      <div className="flex items-center gap-2">
+                        <img
+                          src={variant.image}
+                          alt={label}
+                          className="h-11 w-11 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                        />
+                        <div className="min-w-0">
+                          <p className="truncate text-xs font-semibold text-gray-900">{label}</p>
+                          {typeof variant.price === 'number' ? (
+                            <p className="text-[11px] text-pink-600">{formatPriceNoDecimals(variant.price)}</p>
+                          ) : null}
+                        </div>
+                      </div>
                     </button>
                   )
                 })}
@@ -270,15 +342,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
           )}
 
-          {/* Description */}
-          <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-            <p className="text-gray-600 leading-relaxed">{product.description}</p>
-          </div>
-
           {/* Tags */}
-          {product.tags.length > 0 && (
+          {visibleTags.length > 0 && (
             <div className="flex flex-wrap gap-2">
-              {product.tags.map((tag, idx) => (
+              {visibleTags.map((tag, idx) => (
                 <span key={idx} className="px-3 py-1 bg-pink-50 text-pink-700 rounded-full text-xs font-medium border border-pink-100">
                   {tag}
                 </span>
@@ -338,15 +405,29 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                 <motion.div
                   key={addon.id}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => router.push(`/products/${addon.id}`)}
-                  className="flex-shrink-0 w-32 bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer"
+                  className="flex-shrink-0 w-32 bg-white rounded-xl border border-gray-200 overflow-hidden"
                 >
                   <div className="relative h-32 bg-gray-100">
                     <Image unoptimized src={resolveImageUrl(addon.image)} alt={addon.name} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        handleQuickAddRecommendation(addon)
+                      }}
+                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-pink-600 text-white shadow-md transition hover:bg-pink-700"
+                      aria-label={`Add ${addon.name} to cart`}
+                    >
+                      <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+                      </svg>
+                    </button>
                   </div>
                   <div className="p-2">
                     <p className="text-xs font-semibold text-gray-900 truncate">{addon.name}</p>
-                    <p className="text-sm font-bold text-pink-600">Rs. {addon.price}</p>
+                    <p className="text-sm font-bold text-pink-600">
+                      {formatPriceNoDecimals(addon.price - addon.price * ((addon.discount || 0) / 100))}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -409,6 +490,54 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
         )}
+
+        {(buyTogether.length > 0 || subProducts.length > 0) && (
+          <div className="space-y-6 px-4 pb-24">
+            {buyTogether.length > 0 ? (
+              <RecommendationShelf
+                title="Buy Together"
+                description="Quick combo suggestions."
+                products={buyTogether}
+                actionLabel="Add"
+                onAdd={(item) =>
+                  useCartStore.getState().addItem({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price - item.price * ((item.discount || 0) / 100),
+                    image: resolveImageUrl(item.image),
+                    isVeg: item.isVeg,
+                  })
+                }
+              />
+            ) : null}
+
+            {subProducts.length > 0 ? (
+              <RecommendationShelf
+                title="Sub Products"
+                description="Optional add-on products for this item."
+                products={subProducts}
+                actionLabel="Add"
+                onAdd={(item) =>
+                  useCartStore.getState().addItem({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price - item.price * ((item.discount || 0) / 100),
+                    image: resolveImageUrl(item.image),
+                    isVeg: item.isVeg,
+                  })
+                }
+              />
+            ) : null}
+          </div>
+        )}
+
+        <section className="mx-4 mb-28 rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-pink-50 p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">Description</p>
+          <div
+            className="space-y-2 text-sm leading-6 text-gray-700 [&_a]:text-pink-600 [&_h1]:mt-3 [&_h2]:mt-3 [&_h3]:mt-2 [&_ul]:my-2"
+            dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+          />
+        </section>
       </div>
 
       {/* Desktop Layout */}
@@ -463,6 +592,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             <h1 className="text-4xl font-bold text-gray-900 leading-tight">{product.name}</h1>
 
+            {miniDescription ? <p className="text-base text-gray-600">{miniDescription}</p> : null}
+
             <div className="flex items-baseline gap-4">
               <span className="text-4xl font-bold text-pink-600">Rs. {finalPrice.toFixed(2)}</span>
               {product.discount > 0 && (
@@ -483,9 +614,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
 
             {/* Tags */}
-            {product.tags.length > 0 && (
+            {visibleTags.length > 0 && (
               <div className="flex flex-wrap gap-2">
-                {product.tags.map((tag, idx) => (
+                {visibleTags.map((tag, idx) => (
                   <span key={idx} className="px-4 py-2 bg-pink-50 text-pink-700 rounded-full text-sm font-medium border border-pink-100">
                     {tag}
                   </span>
@@ -496,9 +627,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             {variants.length > 0 && (
               <div>
                 <p className="text-sm font-semibold text-gray-700 mb-2">Variants</p>
-                <div className="flex flex-wrap gap-2">
+                <div className="grid grid-cols-2 gap-3 lg:grid-cols-3">
                   {variants.map((variant, index) => {
-                    const label = [variant.color, variant.size].filter(Boolean).join(' / ')
+                    const label = [variant.color, variant.size].filter(Boolean).join(' / ') || `Variant ${index + 1}`
                     return (
                       <button
                         key={`${label}-${index}`}
@@ -507,13 +638,25 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                           setSelectedVariantIndex(index)
                           setSelectedImage(0)
                         }}
-                        className={`px-4 py-2 rounded-full text-sm border transition-colors ${
+                        className={`rounded-xl border p-3 text-left transition-colors ${
                           selectedVariantIndex === index
-                            ? 'bg-pink-600 text-white border-pink-600'
-                            : 'bg-white text-gray-700 border-gray-300 hover:border-pink-400'
+                            ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
+                            : 'border-gray-300 bg-white hover:border-pink-400'
                         }`}
                       >
-                        {label}
+                        <div className="flex items-center gap-3">
+                          <img
+                            src={variant.image}
+                            alt={label}
+                            className="h-14 w-14 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                          />
+                          <div className="min-w-0">
+                            <p className="truncate text-sm font-semibold text-gray-900">{label}</p>
+                            {typeof variant.price === 'number' ? (
+                              <p className="text-sm text-pink-600">{formatPriceNoDecimals(variant.price)}</p>
+                            ) : null}
+                          </div>
+                        </div>
                       </button>
                     )
                   })}
@@ -551,10 +694,6 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               {product.isAvailable ? `Add to Cart • Rs. ${(finalPrice * quantity).toFixed(2)}` : 'Currently Unavailable'}
             </motion.button>
 
-            <div className="rounded-2xl border border-gray-200 bg-gray-50 p-4">
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-2">Description</p>
-              <p className="text-gray-600 text-base leading-relaxed">{product.description}</p>
-            </div>
           </div>
         </div>
 
@@ -568,15 +707,29 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                   key={addon.id}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  onClick={() => router.push(`/products/${addon.id}`)}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden cursor-pointer hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
                 >
                   <div className="relative h-48 bg-gray-100">
                     <Image unoptimized src={resolveImageUrl(addon.image)} alt={addon.name} fill className="object-cover" />
+                    <button
+                      type="button"
+                      onClick={(event) => {
+                        event.stopPropagation()
+                        handleQuickAddRecommendation(addon)
+                      }}
+                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-pink-600 text-white shadow-md transition hover:bg-pink-700"
+                      aria-label={`Add ${addon.name} to cart`}
+                    >
+                      <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M12 5v14m7-7H5" />
+                      </svg>
+                    </button>
                   </div>
                   <div className="p-4">
                     <p className="text-sm font-semibold text-gray-900 truncate">{addon.name}</p>
-                    <p className="text-lg font-bold text-pink-600 mt-1">Rs. {addon.price}</p>
+                    <p className="text-lg font-bold text-pink-600 mt-1">
+                      {formatPriceNoDecimals(addon.price - addon.price * ((addon.discount || 0) / 100))}
+                    </p>
                   </div>
                 </motion.div>
               ))}
@@ -658,6 +811,56 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             </div>
           </div>
         )}
+
+        {buyTogether.length > 0 ? (
+          <div className="mt-10">
+            <RecommendationShelf
+              title="Buy Together"
+              description="Complete your combo in one tap."
+              products={buyTogether}
+              actionLabel="Add"
+              onAdd={(item) =>
+                useCartStore.getState().addItem({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price - item.price * ((item.discount || 0) / 100),
+                  image: resolveImageUrl(item.image),
+                  isVeg: item.isVeg,
+                })
+              }
+            />
+          </div>
+        ) : null}
+
+        {subProducts.length > 0 ? (
+          <div className="mt-10">
+            <RecommendationShelf
+              title="Sub Products"
+              description="Optional add-on products configured by admin for this item."
+              products={subProducts}
+              actionLabel="Add"
+              onAdd={(item) =>
+                useCartStore.getState().addItem({
+                  id: item.id,
+                  name: item.name,
+                  price: item.price - item.price * ((item.discount || 0) / 100),
+                  image: resolveImageUrl(item.image),
+                  isVeg: item.isVeg,
+                })
+              }
+            />
+          </div>
+        ) : null}
+
+        <section className="mt-10 mb-8 rounded-3xl border border-gray-200 bg-gradient-to-br from-white to-pink-50 p-6 shadow-sm">
+          <div className="mb-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-pink-500">Description</p>
+          </div>
+          <div
+            className="space-y-2 text-base leading-7 text-gray-700 [&_a]:text-pink-600 [&_h1]:mb-2 [&_h2]:mb-2 [&_h3]:mb-1"
+            dangerouslySetInnerHTML={{ __html: descriptionHtml }}
+          />
+        </section>
       </div>
     </div>
   )

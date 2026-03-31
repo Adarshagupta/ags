@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
-import { findManyProductsCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
+import { findManyProductsCompat, withProductWriteCompatibility } from '@/lib/product-db'
 
 function toNumber(value: unknown, fallback: number) {
   const n = Number(value)
@@ -12,6 +12,7 @@ type ProductVariantInput = {
   color?: unknown
   size?: unknown
   image?: unknown
+  price?: unknown
 }
 
 function normalizeVariants(input: unknown) {
@@ -23,11 +24,19 @@ function normalizeVariants(input: unknown) {
       const color = String(variant?.color || '').trim()
       const size = String(variant?.size || '').trim()
       const image = String(variant?.image || '').trim()
+      const price = Number(variant?.price)
 
       if (!image || (!color && !size)) return null
-      return { color, size, image }
+      return {
+        color,
+        size,
+        image,
+        ...(Number.isFinite(price) && price >= 0 ? { price } : {}),
+      }
     })
-    .filter((variant): variant is { color: string; size: string; image: string } => Boolean(variant))
+    .filter(
+      (variant): variant is { color: string; size: string; image: string; price?: number } => Boolean(variant)
+    )
 }
 
 export async function GET(request: NextRequest) {
@@ -35,6 +44,8 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url)
     const category = searchParams.get('category')
     const search = searchParams.get('search')
+    const idsParam = searchParams.get('ids')
+    const limitParam = Number(searchParams.get('limit'))
 
     const where: any = {
       NOT: {
@@ -42,6 +53,21 @@ export async function GET(request: NextRequest) {
           has: ARCHIVED_PRODUCT_TAG,
         },
       },
+    }
+
+    if (idsParam) {
+      const ids = Array.from(
+        new Set(
+          idsParam
+            .split(',')
+            .map((value) => value.trim())
+            .filter(Boolean)
+        )
+      )
+
+      if (ids.length > 0) {
+        where.id = { in: ids }
+      }
     }
 
     if (category && category !== 'all') {
@@ -58,6 +84,7 @@ export async function GET(request: NextRequest) {
     const products = await findManyProductsCompat({
       where,
       orderBy: { createdAt: 'desc' },
+      ...(Number.isFinite(limitParam) && limitParam > 0 ? { take: Math.min(limitParam, 100) } : {}),
     })
 
     return NextResponse.json({ products })
@@ -106,6 +133,7 @@ export async function POST(request: NextRequest) {
 
     const data = {
       name,
+      miniDescription: String(body?.miniDescription || '').trim() || null,
       description,
       category,
       price,
@@ -121,19 +149,9 @@ export async function POST(request: NextRequest) {
       isAvailable: body?.isAvailable !== false,
     }
 
-    let product
-
-    try {
-      product = await prisma.product.create({ data })
-    } catch (error) {
-      if (!isMissingProductFoodTypeColumnError(error)) {
-        throw error
-      }
-
-      product = await prisma.product.create({
-        data: stripFoodTypeLabelField(data),
-      })
-    }
+    const product = await withProductWriteCompatibility(data, (safeData) =>
+      prisma.product.create({ data: safeData })
+    )
 
     return NextResponse.json({ product }, { status: 201 })
   } catch (error) {

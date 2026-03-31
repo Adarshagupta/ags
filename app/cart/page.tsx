@@ -8,6 +8,20 @@ import { useEffect, useState } from 'react'
 import { useCartStore } from '@/lib/store/cart'
 import { formatPrice } from '@/lib/utils'
 import BottomNav from '@/components/BottomNav'
+import RecommendationShelf from '@/components/recommendations/RecommendationShelf'
+import { getRecentViewedProductIds } from '@/lib/recommendation-session'
+import { resolveImageUrl } from '@/lib/image-url'
+
+interface RecommendationProduct {
+  id: string
+  name: string
+  price: number
+  image: string
+  category: string
+  discount: number
+  isVeg: boolean
+  isAvailable: boolean
+}
 
 interface GiftWrap {
   id: string
@@ -21,13 +35,15 @@ export default function CartPage() {
   const router = useRouter()
   const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems, clearCart, giftOptions, setGiftOptions } = useCartStore()
   const [giftWraps, setGiftWraps] = useState<GiftWrap[]>([])
+  const [recommendedProducts, setRecommendedProducts] = useState<RecommendationProduct[]>([])
+  const [recommendationTitle, setRecommendationTitle] = useState('Related Products')
   const [mounted, setMounted] = useState(false)
   const totalItems = getTotalItems()
   const subtotal = getTotalPrice()
   const selectedWrap = Array.isArray(giftWraps) ? giftWraps.find(w => w.id === giftOptions.giftWrapId) : null
   const giftWrapPrice = selectedWrap?.price || 0
   const deliveryFee = (subtotal + giftWrapPrice) > 199 ? 0 : 40
-  const tax = (subtotal + giftWrapPrice) * 0.05
+  const tax = 0
   const total = subtotal + giftWrapPrice + deliveryFee + tax
 
   useEffect(() => {
@@ -45,6 +61,33 @@ export default function CartPage() {
     }
     fetchGiftWraps()
   }, [])
+
+  useEffect(() => {
+    if (!mounted || items.length === 0) {
+      setRecommendedProducts([])
+      return
+    }
+
+    const fetchCartRecommendations = async () => {
+      try {
+        const productIds = Array.from(new Set(items.map((item) => item.id)))
+        const viewedProductIds = getRecentViewedProductIds()
+        const params = new URLSearchParams({
+          productIds: productIds.join(','),
+          viewedProductIds: viewedProductIds.join(','),
+        })
+        const response = await fetch(`/api/recommendations/cart?${params.toString()}`)
+        if (!response.ok) return
+        const data = await response.json()
+        setRecommendedProducts(Array.isArray(data.products) ? data.products : [])
+        setRecommendationTitle(String(data.title || 'Related Products'))
+      } catch (error) {
+        console.error('Error fetching cart recommendations:', error)
+      }
+    }
+
+    void fetchCartRecommendations()
+  }, [items, mounted])
 
   if (!mounted) {
     return (
@@ -189,6 +232,26 @@ export default function CartPage() {
                 </div>
               </motion.div>
             ))}
+
+          {recommendedProducts.length > 0 ? (
+            <div className="pt-3 pb-28 lg:pb-20">
+              <RecommendationShelf
+                title={recommendationTitle}
+                description="Add more items before checkout."
+                products={recommendedProducts}
+                actionLabel="Add"
+                onAdd={(product) =>
+                  useCartStore.getState().addItem({
+                    id: product.id,
+                    name: product.name,
+                    price: product.price - product.price * ((product.discount || 0) / 100),
+                    image: resolveImageUrl(product.image),
+                    isVeg: product.isVeg,
+                  })
+                }
+              />
+            </div>
+          ) : null}
 
           {/* Fixed Bottom Checkout Bar */}
           <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 shadow-lg z-40">

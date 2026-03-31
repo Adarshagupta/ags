@@ -8,22 +8,23 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  phone         String?   @unique
-  name          String
-  password      String?
-  role          UserRole  @default(CUSTOMER)
-  image         String?
-  emailVerified DateTime?
-  addresses     Address[]
-  orders        Order[]
-  giftRecipients GiftRecipient[]
-  seller        Seller?
-  accounts      Account[]
-  sessions      Session[]
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id                String             @id @default(cuid())
+  email             String             @unique
+  phone             String?            @unique
+  name              String
+  password          String?
+  role              UserRole           @default(CUSTOMER)
+  image             String?
+  emailVerified     DateTime?
+  addresses         Address[]
+  orders            Order[]
+  giftRecipients    GiftRecipient[]
+  seller            Seller?
+  accounts          Account[]
+  sessions          Session[]
+  productViewEvents ProductViewEvent[]
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
 
   @@index([email])
   @@index([phone])
@@ -65,62 +66,66 @@ model VerificationToken {
 }
 
 model Address {
-  id              String   @id @default(cuid())
-  userId          String
-  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  label           String   // Home, Work, Other
-  street          String
-  apartment       String?
-  landmark        String?
-  city            String
-  state           String
-  pincode         String
-  latitude        Float
-  longitude       Float
-  isDefault       Boolean  @default(false)
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  orders          Order[]
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  label      String
+  street     String
+  apartment  String?
+  landmark   String?
+  city       String
+  state      String
+  pincode    String
+  latitude   Float
+  longitude  Float
+  isDefault  Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  orders     Order[]
 
   @@index([userId])
 }
 
 model Banner {
-  id          String   @id @default(cuid())
-  title       String
-  subtitle    String?
-  image       String
-  link        String?
-  order       Int      @default(0)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  title     String
+  subtitle  String?
+  image     String
+  link      String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([isActive])
   @@index([order])
 }
 
 model Product {
-  id              String       @id @default(cuid())
-  name            String
-  description     String
-  category        String
-  price           Float
-  image           String
-  images          String[]     @default([])
-  variants        Json[]       @default([])
-  imageAlt        String?
-  isAvailable     Boolean      @default(true)
-  showFoodTypeLabel Boolean    @default(false)
-  isVeg           Boolean      @default(true)
-  prepTime        Int          @default(15) // in minutes
-  tags            String[]
-  discount        Float?       @default(0)
-  sellerId        String?
-  seller          Seller?      @relation(fields: [sellerId], references: [id])
-  orderItems      OrderItem[]
-  createdAt       DateTime     @default(now())
-  updatedAt       DateTime     @updatedAt
+  id                        String               @id @default(cuid())
+  name                      String
+  miniDescription           String?
+  description               String
+  category                  String
+  price                     Float
+  image                     String
+  images                    String[]             @default([])
+  variants                  Json[]               @default([])
+  imageAlt                  String?
+  isAvailable               Boolean              @default(true)
+  showFoodTypeLabel         Boolean              @default(false)
+  isVeg                     Boolean              @default(true)
+  prepTime                  Int                  @default(15)
+  tags                      String[]
+  discount                  Float?               @default(0)
+  sellerId                  String?
+  seller                    Seller?              @relation(fields: [sellerId], references: [id])
+  orderItems                OrderItem[]
+  productViewEvents         ProductViewEvent[]
+  sourceRecommendationRules RecommendationRule[] @relation("SourceProductRecommendationRules")
+  targetRecommendationRules RecommendationRule[] @relation("TargetProductRecommendationRules")
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
 
   @@index([category])
   @@index([isAvailable])
@@ -128,56 +133,43 @@ model Product {
 }
 
 model Order {
-  id                String         @id @default(cuid())
-  orderNumber       String         @unique
+  id                String           @id @default(cuid())
+  orderNumber       String           @unique
   userId            String
-  user              User           @relation(fields: [userId], references: [id])
+  user              User             @relation(fields: [userId], references: [id])
   items             OrderItem[]
-  status            OrderStatus    @default(PENDING)
-  
-  // Delivery Details
+  status            OrderStatus      @default(PENDING)
   addressId         String?
-  address           Address?       @relation(fields: [addressId], references: [id])
+  address           Address?         @relation(fields: [addressId], references: [id])
   deliveryPartnerId String?
   deliveryPartner   DeliveryPartner? @relation(fields: [deliveryPartnerId], references: [id])
-  
-  // Pricing
   subtotal          Float
   deliveryFee       Float
   tax               Float
-  discount          Float          @default(0)
+  discount          Float            @default(0)
   total             Float
-  
-  // Payment
   paymentMethod     PaymentMethod
-  paymentStatus     PaymentStatus  @default(PENDING)
-  
-  // Timing
-  estimatedTime     Int            // in minutes
-  placedAt          DateTime       @default(now())
+  paymentStatus     PaymentStatus    @default(PENDING)
+  estimatedTime     Int
+  placedAt          DateTime         @default(now())
   acceptedAt        DateTime?
   preparingAt       DateTime?
   outForDeliveryAt  DateTime?
   deliveredAt       DateTime?
   cancelledAt       DateTime?
-  
-  // Tracking
-  trackingUpdates   Json[]         @default([])
-  
-  // Gift Features
-  isGift            Boolean        @default(false)
+  trackingUpdates   Json[]           @default([])
+  isGift            Boolean          @default(false)
   recipientId       String?
-  recipient         GiftRecipient? @relation(fields: [recipientId], references: [id])
+  recipient         GiftRecipient?   @relation(fields: [recipientId], references: [id])
   occasionId        String?
-  occasion          Occasion?      @relation(fields: [occasionId], references: [id])
+  occasion          Occasion?        @relation(fields: [occasionId], references: [id])
   giftWrapId        String?
-  giftWrap          GiftWrap?      @relation(fields: [giftWrapId], references: [id])
+  giftWrap          GiftWrap?        @relation(fields: [giftWrapId], references: [id])
   greetingMessage   String?
   senderName        String?
-  showSenderName    Boolean        @default(true)
-  
-  createdAt         DateTime       @default(now())
-  updatedAt         DateTime       @updatedAt
+  showSenderName    Boolean          @default(true)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
 
   @@index([userId])
   @@index([status])
@@ -186,33 +178,33 @@ model Order {
 }
 
 model OrderItem {
-  id          String   @id @default(cuid())
-  orderId     String
-  order       Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  productId   String
-  product     Product  @relation(fields: [productId], references: [id])
-  quantity    Int
-  price       Float
-  createdAt   DateTime @default(now())
+  id        String   @id @default(cuid())
+  orderId   String
+  order     Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  productId String
+  product   Product  @relation(fields: [productId], references: [id])
+  quantity  Int
+  price     Float
+  createdAt DateTime @default(now())
 
   @@index([orderId])
   @@index([productId])
 }
 
 model DeliveryPartner {
-  id              String            @id @default(cuid())
-  name            String
-  phone           String            @unique
-  email           String            @unique
-  password        String
-  vehicleType     String
-  vehicleNumber   String
-  isAvailable     Boolean           @default(true)
-  currentLat      Float?
-  currentLng      Float?
-  orders          Order[]
-  createdAt       DateTime          @default(now())
-  updatedAt       DateTime          @updatedAt
+  id            String   @id @default(cuid())
+  name          String
+  phone         String   @unique
+  email         String   @unique
+  password      String
+  vehicleType   String
+  vehicleNumber String
+  isAvailable   Boolean  @default(true)
+  currentLat    Float?
+  currentLng    Float?
+  orders        Order[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
 
   @@index([isAvailable])
 }
@@ -226,7 +218,7 @@ model Seller {
   gstin           String?   @unique
   phone           String
   email           String
-  commission      Float     @default(15) // Commission percentage
+  commission      Float     @default(15)
   bankAccountName String?
   bankAccountNo   String?
   ifscCode        String?
@@ -249,25 +241,26 @@ enum UserRole {
 }
 
 model Category {
-  id          String        @id @default(cuid())
-  name        String        @unique
-  image       String
-  type        CategoryType  @default(PRODUCT)
-  parentId    String?
-  parent      Category?     @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children    Category[]    @relation("CategoryHierarchy")
-  isActive    Boolean       @default(true)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
+  id                  String               @id @default(cuid())
+  name                String               @unique
+  image               String
+  type                CategoryType         @default(PRODUCT)
+  parentId            String?
+  parent              Category?            @relation("CategoryHierarchy", fields: [parentId], references: [id])
+  children            Category[]           @relation("CategoryHierarchy")
+  recommendationRules RecommendationRule[] @relation("SourceCategoryRecommendationRules")
+  isActive            Boolean              @default(true)
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
 
   @@index([parentId])
   @@index([type])
 }
 
 enum CategoryType {
-  PRODUCT       // Product categories (Flowers, Cakes, etc.)
-  RECIPIENT     // For whom (Men, Women, Children)
-  OCCASION      // Occasions (Birthday, Anniversary, etc.)
+  PRODUCT
+  RECIPIENT
+  OCCASION
 }
 
 enum OrderStatus {
@@ -293,70 +286,115 @@ enum PaymentStatus {
   REFUNDED
 }
 
+enum RecommendationScopeType {
+  PRODUCT
+  CATEGORY
+}
+
+enum RecommendationKind {
+  RELATED
+  ADDON
+  COMBO
+}
+
 model GiftRecipient {
-  id          String    @id @default(cuid())
-  userId      String
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  name        String
-  phone       String
-  email       String?
-  relationship String  // Friend, Family, Colleague, etc.
-  birthDate   DateTime?
-  anniversary DateTime?
-  interests   String[]
-  notes       String?
-  orders      Order[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id           String    @id @default(cuid())
+  userId       String
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name         String
+  phone        String
+  email        String?
+  relationship String
+  birthDate    DateTime?
+  anniversary  DateTime?
+  interests    String[]
+  notes        String?
+  orders       Order[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 
   @@index([userId])
 }
 
 model GiftWrap {
-  id          String    @id @default(cuid())
-  name        String    @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
   description String
   price       Float
   image       String
-  type        String    // premium, eco-friendly, themed, simple
-  isActive    Boolean   @default(true)
+  type        String
+  isActive    Boolean  @default(true)
   orders      Order[]
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 
   @@index([type])
 }
 
 model Occasion {
-  id          String    @id @default(cuid())
-  name        String    @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
   emoji       String
   description String
   icon        String
-  isActive    Boolean   @default(true)
+  isActive    Boolean  @default(true)
   orders      Order[]
-  createdAt   DateTime  @default(now())
+  createdAt   DateTime @default(now())
 }
 
 model AppSettings {
-  id               String   @id @default("default")
-  siteName         String   @default("Chapter Kurus")
-  supportPhone     String?
-  supportEmail     String?
-  supportHours     String?
-  supportMessage   String?
-  deliveryEstimate String   @default("Estimated delivery: 20-30 minutes")
-  deliveryNote     String?
-  announcementText String?
-  storeAddress     String?
-  mapLatitude      Float    @default(27.7172)
-  mapLongitude     Float    @default(85.3240)
-  homepageShowBanner        Boolean @default(true)
-  homepageShowTopCategories Boolean @default(true)
+  id                          String   @id @default("default")
+  siteName                    String   @default("Chapter Kurus")
+  supportPhone                String?
+  supportEmail                String?
+  supportHours                String?
+  supportMessage              String?
+  deliveryEstimate            String   @default("Estimated delivery: 20-30 minutes")
+  deliveryNote                String?
+  announcementText            String?
+  storeAddress                String?
+  mapLatitude                 Float    @default(27.7172)
+  mapLongitude                Float    @default(85.3240)
+  homepageShowBanner          Boolean  @default(true)
+  homepageShowTopCategories   Boolean  @default(true)
   homepageShowCategorySections Boolean @default(true)
-  homepageShowOccasionTabs  Boolean @default(true)
-  homepageShowRecommendations Boolean @default(true)
-  homepageRecommendationMode  String  @default("LATEST")
+  homepageShowOccasionTabs    Boolean  @default(true)
+  homepageShowRecommendations Boolean  @default(true)
+  homepageRecommendationMode  String   @default("LATEST")
   homepageRecommendationTitle String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
+  createdAt                   DateTime @default(now())
+  updatedAt                   DateTime @updatedAt
+}
+
+model ProductViewEvent {
+  id        String   @id @default(cuid())
+  productId String
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  sessionId String?
+  viewedAt  DateTime @default(now())
+
+  @@index([productId])
+  @@index([userId, viewedAt])
+  @@index([sessionId, viewedAt])
+  @@index([viewedAt])
+}
+
+model RecommendationRule {
+  id               String                  @id @default(cuid())
+  scopeType        RecommendationScopeType
+  sourceProductId  String?
+  sourceProduct    Product?                @relation("SourceProductRecommendationRules", fields: [sourceProductId], references: [id], onDelete: Cascade)
+  sourceCategoryId String?
+  sourceCategory   Category?               @relation("SourceCategoryRecommendationRules", fields: [sourceCategoryId], references: [id], onDelete: Cascade)
+  targetProductId  String
+  targetProduct    Product                 @relation("TargetProductRecommendationRules", fields: [targetProductId], references: [id], onDelete: Cascade)
+  kind             RecommendationKind
+  position         Int                     @default(0)
+  createdAt        DateTime                @default(now())
+  updatedAt        DateTime                @updatedAt
+
+  @@index([scopeType, sourceProductId, kind, position])
+  @@index([scopeType, sourceCategoryId, kind, position])
+  @@index([targetProductId])
 }

@@ -4,7 +4,16 @@ import { prisma } from '@/lib/prisma'
 export async function GET() {
   try {
     const users = await prisma.user.findMany({
+      where: {
+        role: { in: ['CUSTOMER', 'ADMIN'] },
+      },
       include: {
+        orders: {
+          select: {
+            total: true,
+            createdAt: true,
+          },
+        },
         _count: {
           select: {
             orders: true,
@@ -14,7 +23,19 @@ export async function GET() {
       },
       orderBy: { createdAt: 'desc' }
     })
-    return NextResponse.json(users)
+
+    const response = users.map((user) => {
+      const totalSpent = user.orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
+      const lastOrderAt = user.orders.length > 0 ? user.orders[0].createdAt : null
+      return {
+        ...user,
+        totalSpent,
+        lastOrderAt,
+        orders: undefined,
+      }
+    })
+
+    return NextResponse.json(response)
   } catch (error) {
     console.error('Error fetching users:', error)
     return NextResponse.json({ error: 'Failed to fetch users' }, { status: 500 })

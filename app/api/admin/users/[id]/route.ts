@@ -37,13 +37,19 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
           include: {
             items: {
               include: {
-                product: true,
+                product: {
+                  select: {
+                    id: true,
+                    name: true,
+                    image: true,
+                    category: true,
+                  },
+                },
               },
             },
             address: true,
           },
           orderBy: { createdAt: 'desc' },
-          take: 10,
         },
         _count: {
           select: {
@@ -58,7 +64,14 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
       return NextResponse.json({ error: 'User not found' }, { status: 404 })
     }
 
-    return NextResponse.json(user)
+    const totalSpent = user.orders.reduce((sum, order) => sum + Number(order.total || 0), 0)
+    const completedOrders = user.orders.filter((order) => order.status === 'DELIVERED').length
+
+    return NextResponse.json({
+      ...user,
+      totalSpent,
+      completedOrders,
+    })
   } catch (error) {
     console.error('Error fetching user details:', error)
     return NextResponse.json({ error: 'Failed to fetch user details' }, { status: 500 })

@@ -1,12 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
-import { findFirstProductCompat, isMissingProductFoodTypeColumnError, stripFoodTypeLabelField } from '@/lib/product-db'
+import { findFirstProductCompat, withProductWriteCompatibility } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
   size?: unknown
   image?: unknown
+  price?: unknown
 }
 
 function normalizeVariants(input: unknown) {
@@ -18,11 +19,19 @@ function normalizeVariants(input: unknown) {
       const color = String(variant?.color || '').trim()
       const size = String(variant?.size || '').trim()
       const image = String(variant?.image || '').trim()
+      const price = Number(variant?.price)
 
       if (!image || (!color && !size)) return null
-      return { color, size, image }
+      return {
+        color,
+        size,
+        image,
+        ...(Number.isFinite(price) && price >= 0 ? { price } : {}),
+      }
     })
-    .filter((variant): variant is { color: string; size: string; image: string } => Boolean(variant))
+    .filter(
+      (variant): variant is { color: string; size: string; image: string; price?: number } => Boolean(variant)
+    )
 }
 
 export async function GET(
@@ -76,37 +85,23 @@ export async function PATCH(
       data.tags = sanitizeProductTags(body.tags)
     }
 
-    let product
-
-    try {
-      product = await prisma.product.updateMany({
-        where: {
-          id,
-          NOT: {
-            tags: {
-              has: ARCHIVED_PRODUCT_TAG,
-            },
-          },
-        },
-        data,
-      })
-    } catch (error) {
-      if (!isMissingProductFoodTypeColumnError(error)) {
-        throw error
-      }
-
-      product = await prisma.product.updateMany({
-        where: {
-          id,
-          NOT: {
-            tags: {
-              has: ARCHIVED_PRODUCT_TAG,
-            },
-          },
-        },
-        data: stripFoodTypeLabelField(data),
-      })
+    if (body?.miniDescription !== undefined) {
+      data.miniDescription = String(body.miniDescription || '').trim() || null
     }
+
+    const product = await withProductWriteCompatibility(data, (safeData) =>
+      prisma.product.updateMany({
+        where: {
+          id,
+          NOT: {
+            tags: {
+              has: ARCHIVED_PRODUCT_TAG,
+            },
+          },
+        },
+        data: safeData,
+      })
+    )
 
     if (product.count === 0) {
       return NextResponse.json(

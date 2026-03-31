@@ -89,12 +89,12 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/icons/logo_transparent.png', sizes: '512x512', type: 'image/png' },
     ],
     apple: [
-      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
+      { url: '/icons/logo_transparent.png', sizes: '512x512', type: 'image/png' },
     ],
-    shortcut: '/icons/icon-512x512.png',
+    shortcut: '/icons/logo_transparent.png',
   },
 }
 
@@ -106,8 +106,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/icons/icon-512x512.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
+        <link rel="icon" href="/icons/logo_transparent.png" type="image/png" />
+        <link rel="apple-touch-icon" href="/icons/logo_transparent.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Chapter Kurus" />
