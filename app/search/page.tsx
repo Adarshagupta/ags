@@ -1,7 +1,6 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { motion } from 'framer-motion'
 import Header from '@/components/Header'
 import BottomNav from '@/components/BottomNav'
 import ProductCard from '@/components/ProductCard'
@@ -9,38 +8,40 @@ import ProductCard from '@/components/ProductCard'
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [products, setProducts] = useState<any[]>([])
-  const [filteredProducts, setFilteredProducts] = useState<any[]>([])
   const [mounted, setMounted] = useState(false)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     setMounted(true)
-    fetchProducts()
   }, [])
 
   useEffect(() => {
-    if (searchQuery.trim()) {
-      const filtered = products.filter(product =>
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      setFilteredProducts(filtered)
-    } else {
-      setFilteredProducts([])
-    }
-  }, [searchQuery, products])
+    if (!mounted) return
 
-  const fetchProducts = async () => {
-    try {
-      const res = await fetch('/api/products')
-      if (res.ok) {
-        const data = await res.json()
-        setProducts(data.products || [])
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error)
+    const normalizedQuery = searchQuery.trim()
+    if (!normalizedQuery) {
+      setProducts([])
+      setLoading(false)
+      return
     }
-  }
+
+    const timer = window.setTimeout(async () => {
+      try {
+        setLoading(true)
+        const res = await fetch(`/api/products?view=card&limit=40&search=${encodeURIComponent(normalizedQuery)}`)
+        if (res.ok) {
+          const data = await res.json()
+          setProducts(data.products || [])
+        }
+      } catch (error) {
+        console.error('Error fetching products:', error)
+      } finally {
+        setLoading(false)
+      }
+    }, 250)
+
+    return () => window.clearTimeout(timer)
+  }, [searchQuery, mounted])
 
   if (!mounted) return null
 
@@ -82,14 +83,27 @@ export default function SearchPage() {
             <div className="text-7xl mb-3">🔍</div>
             <h2 className="text-base font-semibold text-gray-900">Search gifts</h2>
           </div>
-        ) : filteredProducts.length === 0 ? (
+        ) : loading ? (
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <div key={index} className="overflow-hidden rounded-xl border border-neutral-100 bg-white">
+                <div className="aspect-square w-full animate-pulse bg-neutral-100" />
+                <div className="space-y-2 p-3">
+                  <div className="h-4 w-3/4 animate-pulse rounded bg-neutral-100" />
+                  <div className="h-3 w-full animate-pulse rounded bg-neutral-100" />
+                  <div className="h-4 w-1/2 animate-pulse rounded bg-neutral-100" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : products.length === 0 ? (
           <div className="text-center py-20">
             <div className="text-7xl mb-3">😔</div>
             <h2 className="text-base font-semibold text-gray-900">No results</h2>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2 sm:gap-3">
-            {filteredProducts.map((product) => (
+            {products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}
           </div>

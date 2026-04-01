@@ -1,6 +1,6 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useCartStore } from '@/lib/store/cart'
@@ -25,6 +25,7 @@ interface ProductCardProps {
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { addItem, items, updateQuantity } = useCartStore()
+  const [imageLoaded, setImageLoaded] = useState(false)
   const cartItem = items.find((item) => item.id === product.id)
   const quantity = cartItem?.quantity || 0
 
@@ -60,17 +61,17 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.id}`}>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        whileTap={{ scale: 0.98 }}
-        className="bg-white rounded-xl overflow-hidden border border-neutral-100 cursor-pointer"
-      >
+      <div className="bg-white rounded-xl overflow-hidden border border-neutral-100 cursor-pointer transition-transform active:scale-[0.985]">
       <div className="relative aspect-square w-full">
-        <Image unoptimized src={imageUrl}
+        {!imageLoaded ? <div className="absolute inset-0 animate-pulse bg-neutral-100" /> : null}
+        <Image
+          unoptimized
+          src={imageUrl}
           alt={product.name}
           fill
-          className="object-cover"
+          loading="lazy"
+          onLoad={() => setImageLoaded(true)}
+          className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
         
@@ -116,39 +117,32 @@ export default function ProductCard({ product }: ProductCardProps) {
           </div>
 
           {quantity === 0 ? (
-            <motion.button
-              whileTap={{ scale: 0.95 }}
+            <button
               onClick={handleAdd}
-              className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium shadow-sm whitespace-nowrap"
+              className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium shadow-sm whitespace-nowrap active:scale-95"
             >
               Add
-            </motion.button>
+            </button>
           ) : (
-            <motion.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              className="flex items-center bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-lg shadow-sm overflow-hidden"
-            >
-              <motion.button
-                whileTap={{ scale: 0.9 }}
+            <div className="flex items-center bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-lg shadow-sm overflow-hidden">
+              <button
                 onClick={handleDecrement}
-                className="w-5 h-6 flex items-center justify-center text-sm font-bold leading-none"
+                className="w-5 h-6 flex items-center justify-center text-sm font-bold leading-none active:scale-90"
               >
                 −
-              </motion.button>
+              </button>
               <span className="text-[11px] font-semibold px-0.5 min-w-[14px] text-center">{quantity}</span>
-              <motion.button
-                whileTap={{ scale: 0.9 }}
+              <button
                 onClick={handleIncrement}
-                className="w-5 h-6 flex items-center justify-center text-sm font-bold leading-none"
+                className="w-5 h-6 flex items-center justify-center text-sm font-bold leading-none active:scale-90"
               >
                 &#43;
-              </motion.button>
-            </motion.div>
+              </button>
+            </div>
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
     </Link>
   )
 }

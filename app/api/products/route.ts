@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
-import { findManyProductsCompat, withProductWriteCompatibility } from '@/lib/product-db'
+import { findManyProductCardsCompat, findManyProductsCompat, withProductWriteCompatibility } from '@/lib/product-db'
 
 type ProductVariantInput = {
   color?: unknown
@@ -42,6 +42,7 @@ export async function GET(request: NextRequest) {
     const search = searchParams.get('search')
     const idsParam = searchParams.get('ids')
     const limitParam = Number(searchParams.get('limit'))
+    const view = String(searchParams.get('view') || '').toLowerCase()
 
     const where: any = {
       isAvailable: true,
@@ -108,11 +109,16 @@ export async function GET(request: NextRequest) {
       ]
     }
 
-    const products = await findManyProductsCompat({
+    const queryArgs = {
       where,
-      orderBy: { createdAt: 'desc' },
+      orderBy: { createdAt: 'desc' as const },
       ...(Number.isFinite(limitParam) && limitParam > 0 ? { take: Math.min(limitParam, 60) } : {}),
-    })
+    }
+
+    const products =
+      view === 'card'
+        ? await findManyProductCardsCompat(queryArgs)
+        : await findManyProductsCompat(queryArgs)
 
     return NextResponse.json(
       { products },

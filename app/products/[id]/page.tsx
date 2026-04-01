@@ -86,10 +86,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [buyTogether, setBuyTogether] = useState<RecommendationProduct[]>([])
   const [relatedProducts, setRelatedProducts] = useState<RecommendationProduct[]>([])
   const [subProducts, setSubProducts] = useState<RecommendationProduct[]>([])
+  const [loadingDeferredSections, setLoadingDeferredSections] = useState(false)
   const addItem = useCartStore((state) => state.addItem)
   const totalCartItems = useCartStore((state) => state.getTotalItems())
   const [cartToastMessage, setCartToastMessage] = useState('')
   const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const requestIdRef = useRef(0)
 
   useEffect(() => {
     void fetchProductData()
@@ -105,54 +107,78 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     }
   }, [])
 
+  const loadDeferredProductData = async (productData: Product, requestId: number) => {
+    setLoadingDeferredSections(true)
+    const viewedProductIds = rememberViewedProduct(String(id))
+    const sessionId = getOrCreateRecommendationSessionId()
+
+    void fetch(`/api/products/${id}/view`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ sessionId }),
+    }).catch(() => null)
+
+    const subProductIds = extractSubProductIdsFromTags(productData.tags)
+
+    const [recommendationsResult, subProductsResult] = await Promise.allSettled([
+      fetch(`/api/products/${id}/recommendations?viewedProductIds=${encodeURIComponent(viewedProductIds.join(','))}`),
+      subProductIds.length > 0
+        ? fetch(`/api/products?view=card&ids=${encodeURIComponent(subProductIds.join(','))}&limit=12`)
+        : Promise.resolve(null),
+    ])
+
+    if (requestIdRef.current !== requestId) return
+
+    if (recommendationsResult.status === 'fulfilled' && recommendationsResult.value?.ok) {
+      const recommendations = await recommendationsResult.value.json()
+      setBuyTogether(Array.isArray(recommendations.buyTogether) ? recommendations.buyTogether : [])
+      setAddons(Array.isArray(recommendations.addons) ? recommendations.addons : [])
+      setRelatedProducts(Array.isArray(recommendations.related) ? recommendations.related : [])
+    } else {
+      setBuyTogether([])
+      setAddons([])
+      setRelatedProducts([])
+    }
+
+    if (subProductsResult.status === 'fulfilled' && subProductsResult.value?.ok) {
+      const subProductsData = await subProductsResult.value.json()
+      const list = Array.isArray(subProductsData.products) ? subProductsData.products : []
+      setSubProducts(list.filter((item: RecommendationProduct) => item.id !== String(id)))
+    } else {
+      setSubProducts([])
+    }
+
+    if (requestIdRef.current === requestId) {
+      setLoadingDeferredSections(false)
+    }
+  }
+
   const fetchProductData = async () => {
+    const requestId = requestIdRef.current + 1
+    requestIdRef.current = requestId
+    setLoading(true)
+    setProduct(null)
+    setAddons([])
+    setBuyTogether([])
+    setRelatedProducts([])
+    setSubProducts([])
+    setLoadingDeferredSections(false)
+
     try {
       const res = await fetch(`/api/products/${id}`)
       if (res.ok) {
         const data = await res.json()
+        if (requestIdRef.current !== requestId) return
         setProduct(data)
-
-        const viewedProductIds = rememberViewedProduct(String(id))
-        const sessionId = getOrCreateRecommendationSessionId()
-
-        void fetch(`/api/products/${id}/view`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ sessionId }),
-        }).catch(() => null)
-
-        const recommendationsRes = await fetch(
-          `/api/products/${id}/recommendations?viewedProductIds=${encodeURIComponent(viewedProductIds.join(','))}`
-        )
-        if (recommendationsRes.ok) {
-          const recommendations = await recommendationsRes.json()
-          setBuyTogether(Array.isArray(recommendations.buyTogether) ? recommendations.buyTogether : [])
-          setAddons(Array.isArray(recommendations.addons) ? recommendations.addons : [])
-          setRelatedProducts(Array.isArray(recommendations.related) ? recommendations.related : [])
-        } else {
-          setBuyTogether([])
-          setAddons([])
-          setRelatedProducts([])
-        }
-
-        const subProductIds = extractSubProductIdsFromTags(data.tags)
-        if (subProductIds.length > 0) {
-          const subProductsRes = await fetch(`/api/products?ids=${encodeURIComponent(subProductIds.join(','))}&limit=12`)
-          if (subProductsRes.ok) {
-            const subProductsData = await subProductsRes.json()
-            const list = Array.isArray(subProductsData.products) ? subProductsData.products : []
-            setSubProducts(list.filter((item: RecommendationProduct) => item.id !== String(id)))
-          }
-        } else {
-          setSubProducts([])
-        }
+        setLoading(false)
+        void loadDeferredProductData(data, requestId)
       } else {
         router.push('/')
+        setLoading(false)
       }
     } catch (error) {
       console.error('Error fetching product:', error)
       router.push('/')
-    } finally {
       setLoading(false)
     }
   }
@@ -225,6 +251,82 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const descriptionHtml = renderProductDescriptionMarkdown(product.description)
   const miniDescription = String(product.miniDescription || '').trim()
   const visibleTags = stripSubProductTags(product.tags)
+
+  const MobileRecommendationSkeleton = () => (
+    <div className="px-4 py-6">
+      <div className="mb-3 h-6 w-40 animate-pulse rounded bg-gray-200" />
+      <div className="flex gap-3 overflow-x-auto pb-2">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="w-32 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <div className="h-32 animate-pulse bg-gray-100" />
+            <div className="space-y-2 p-2">
+              <div className="h-3 w-5/6 animate-pulse rounded bg-gray-100" />
+              <div className="h-4 w-1/2 animate-pulse rounded bg-gray-100" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const MobileRelatedSkeleton = () => (
+    <div className="px-4 py-6 pb-24">
+      <div className="mb-4 flex items-center justify-between">
+        <div className="h-7 w-40 animate-pulse rounded bg-gray-200" />
+        <div className="h-1 w-12 animate-pulse rounded-full bg-gray-200" />
+      </div>
+      <div className="grid grid-cols-2 gap-3">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+            <div className="h-44 animate-pulse bg-gray-100" />
+            <div className="space-y-2 p-3">
+              <div className="h-4 w-4/5 animate-pulse rounded bg-gray-100" />
+              <div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" />
+              <div className="h-5 w-1/2 animate-pulse rounded bg-gray-100" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const DesktopRecommendationSkeleton = () => (
+    <div className="mt-10">
+      <div className="mb-4 h-8 w-48 animate-pulse rounded bg-gray-200" />
+      <div className="grid grid-cols-4 gap-6">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div key={index} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
+            <div className="h-48 animate-pulse bg-gray-100" />
+            <div className="space-y-3 p-4">
+              <div className="h-4 w-5/6 animate-pulse rounded bg-gray-100" />
+              <div className="h-5 w-1/2 animate-pulse rounded bg-gray-100" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+
+  const DesktopRelatedSkeleton = () => (
+    <div className="mt-12 mb-8">
+      <div className="mb-8 flex items-center gap-4">
+        <div className="h-9 w-56 animate-pulse rounded bg-gray-200" />
+        <div className="h-1 flex-1 animate-pulse rounded-full bg-gray-200" />
+      </div>
+      <div className="grid grid-cols-3 gap-6">
+        {Array.from({ length: 3 }).map((_, index) => (
+          <div key={index} className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
+            <div className="h-72 animate-pulse bg-gray-100" />
+            <div className="space-y-3 p-5">
+              <div className="h-5 w-5/6 animate-pulse rounded bg-gray-100" />
+              <div className="h-5 w-2/3 animate-pulse rounded bg-gray-100" />
+              <div className="h-6 w-1/2 animate-pulse rounded bg-gray-100" />
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
 
   return (
     <div className="min-h-screen bg-white pb-20 lg:pb-0">
@@ -431,6 +533,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Add-ons Section */}
+        {loadingDeferredSections && addons.length === 0 ? <MobileRecommendationSkeleton /> : null}
         {addons.length > 0 && (
           <div className="px-4 py-6 bg-gray-50">
             <h2 className="text-lg font-bold text-gray-900 mb-3">Add Extra Love 💝</h2>
@@ -470,6 +573,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         )}
 
         {/* Related Products Section */}
+        {loadingDeferredSections && relatedProducts.length === 0 ? <MobileRelatedSkeleton /> : null}
         {relatedProducts.length > 0 && (
           <div className="px-4 py-6 pb-24">
             <div className="flex items-center justify-between mb-4">
@@ -525,6 +629,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
+        {loadingDeferredSections && buyTogether.length === 0 && subProducts.length === 0 ? <MobileRecommendationSkeleton /> : null}
         {(buyTogether.length > 0 || subProducts.length > 0) && (
           <div className="space-y-6 px-4 pb-24">
             {buyTogether.length > 0 ? (
@@ -743,6 +848,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Add-ons Section - Desktop */}
+        {loadingDeferredSections && addons.length === 0 ? <DesktopRecommendationSkeleton /> : null}
         {addons.length > 0 && (
           <div className="mt-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-6">Add Extra Love 💝</h2>
@@ -783,6 +889,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         )}
 
         {/* Related Products Section - Desktop */}
+        {loadingDeferredSections && relatedProducts.length === 0 ? <DesktopRelatedSkeleton /> : null}
         {relatedProducts.length > 0 && (
           <div className="mt-12 mb-8">
             <div className="flex items-center gap-4 mb-8">
@@ -857,6 +964,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </div>
         )}
 
+        {loadingDeferredSections && buyTogether.length === 0 ? <DesktopRecommendationSkeleton /> : null}
         {buyTogether.length > 0 ? (
           <div className="mt-10">
             <RecommendationShelf
@@ -869,6 +977,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           </div>
         ) : null}
 
+        {loadingDeferredSections && subProducts.length === 0 ? <DesktopRecommendationSkeleton /> : null}
         {subProducts.length > 0 ? (
           <div className="mt-10">
             <RecommendationShelf

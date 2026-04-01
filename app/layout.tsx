@@ -49,19 +49,19 @@ export function generateViewport(): Viewport {
 
 export const metadata: Metadata = {
   ...(metadataBaseUrl ? { metadataBase: new URL(metadataBaseUrl) } : {}),
-  title: 'Chapter Kurus - Gift & Flower Delivery | Same Day Delivery',
-  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with Chapter Kurus - Your trusted gift delivery partner.',
+  title: 'Upaharo - Gift & Flower Delivery | Same Day Delivery',
+  description: 'Send flowers, cakes, and personalized gifts with same-day delivery. Express your love with Upaharo - Your trusted gift delivery partner.',
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'Chapter Kurus - Flowers & Gifts',
+    title: 'Upaharo - Flowers & Gifts',
   },
-  applicationName: 'Chapter Kurus',
+  applicationName: 'Upaharo',
   keywords: ['flowers', 'gifts', 'cakes', 'delivery', 'same day delivery', 'birthday gifts', 'anniversary gifts'],
-  authors: [{ name: 'Chapter Kurus' }],
-  creator: 'Chapter Kurus',
-  publisher: 'Chapter Kurus',
+  authors: [{ name: 'Upaharo' }],
+  creator: 'Upaharo',
+  publisher: 'Upaharo',
   formatDetection: {
     telephone: false,
   },
@@ -69,21 +69,21 @@ export const metadata: Metadata = {
     type: 'website',
     locale: 'en_IN',
     url: 'https://fnp.com',
-    siteName: 'Chapter Kurus',
-    title: 'Chapter Kurus - Gift & Flower Delivery',
+    siteName: 'Upaharo',
+    title: 'Upaharo - Gift & Flower Delivery',
     description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'Chapter Kurus',
+        alt: 'Upaharo',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Chapter Kurus - Gift & Flower Delivery',
+    title: 'Upaharo - Gift & Flower Delivery',
     description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: ['/og-image.png'],
   },
@@ -110,7 +110,7 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/icons/logo_transparent.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-        <meta name="apple-mobile-web-app-title" content="Chapter Kurus" />
+        <meta name="apple-mobile-web-app-title" content="Upaharo" />
         <meta name="mobile-web-app-capable" content="yes" />
         {!isProduction && (
           <script

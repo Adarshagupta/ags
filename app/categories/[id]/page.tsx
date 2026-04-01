@@ -19,6 +19,7 @@ interface Category {
 interface Product {
   id: string
   name: string
+  miniDescription?: string | null
   description: string
   price: number
   image: string
@@ -50,7 +51,7 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
       }
 
       // Fetch products in this category
-      const productsRes = await fetch(`/api/products?categoryId=${id}`)
+      const productsRes = await fetch(`/api/products?view=card&categoryId=${id}`)
       if (productsRes.ok) {
         const productsData = await productsRes.json()
         setProducts(productsData.products || [])
