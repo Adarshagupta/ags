@@ -65,11 +65,11 @@ export default function ProductCard({ product }: ProductCardProps) {
       <div className="relative aspect-square w-full">
         {!imageLoaded ? <div className="absolute inset-0 animate-pulse bg-neutral-100" /> : null}
         <Image
-          unoptimized
           src={imageUrl}
           alt={product.name}
           fill
           loading="lazy"
+          quality={70}
           onLoad={() => setImageLoaded(true)}
           className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"

@@ -35,7 +35,7 @@ function CategoryAvatar({ category, size = 'large' }: { category: Category; size
   if (imageUrl) {
     return (
       <div className={`relative overflow-hidden border border-white/70 bg-white/90 shadow-sm ${dimensions}`}>
-        <Image unoptimized src={imageUrl} alt={category.name} fill className="object-cover" sizes="64px" />
+        <Image src={imageUrl} alt={category.name} fill className="object-cover" sizes="64px" quality={60} />
       </div>
     )
   }
