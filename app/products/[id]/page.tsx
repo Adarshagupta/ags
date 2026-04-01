@@ -11,6 +11,7 @@ import { resolveImageUrl } from '@/lib/image-url'
 import FoodTypeBadge from '@/components/FoodTypeBadge'
 import RecommendationShelf from '@/components/recommendations/RecommendationShelf'
 import { getOrCreateRecommendationSessionId, rememberViewedProduct } from '@/lib/recommendation-session'
+import { rememberViewedCategory } from '@/lib/personalization-consent'
 import { renderProductDescriptionMarkdown } from '@/lib/markdown-description'
 import { extractSubProductIdsFromTags, stripSubProductTags } from '@/lib/product-subproducts'
 import { formatPriceNoDecimals, formatTime } from '@/lib/utils'
@@ -170,6 +171,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         const data = await res.json()
         if (requestIdRef.current !== requestId) return
         setProduct(data)
+        rememberViewedCategory(String(data.category || ''))
         setLoading(false)
         void loadDeferredProductData(data, requestId)
       } else {

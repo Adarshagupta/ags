@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import ProductCard from '@/components/ProductCard'
 import { getRecentViewedProductIds } from '@/lib/recommendation-session'
+import { getRecentViewedCategories, hasPersonalizationConsent } from '@/lib/personalization-consent'
 
 const MIN_VIEW_HISTORY_FOR_PERSONALIZATION = 3
 
@@ -35,14 +36,28 @@ export default function HomeRecommendationSection({
   const [description, setDescription] = useState(initialDescription)
 
   useEffect(() => {
+    if (!hasPersonalizationConsent()) return
+
     const viewedProductIds = getRecentViewedProductIds()
-    if (viewedProductIds.length < MIN_VIEW_HISTORY_FOR_PERSONALIZATION) return
+    const viewedCategories = getRecentViewedCategories()
+    if (
+      viewedProductIds.length < MIN_VIEW_HISTORY_FOR_PERSONALIZATION &&
+      viewedCategories.length < MIN_VIEW_HISTORY_FOR_PERSONALIZATION
+    ) {
+      return
+    }
 
     const controller = new AbortController()
 
-    void fetch(`/api/recommendations/home?viewedProductIds=${encodeURIComponent(viewedProductIds.join(','))}`, {
-      signal: controller.signal,
-    })
+    const params = new URLSearchParams()
+    if (viewedProductIds.length > 0) {
+      params.set('viewedProductIds', viewedProductIds.join(','))
+    }
+    if (viewedCategories.length > 0) {
+      params.set('viewedCategories', viewedCategories.join(','))
+    }
+
+    void fetch(`/api/recommendations/home?${params.toString()}`, { signal: controller.signal })
       .then((res) => (res.ok ? res.json() : null))
       .then((data) => {
         if (!data || !Array.isArray(data.products) || data.products.length === 0) {

@@ -1,3 +1,5 @@
+import { hasPersonalizationConsent } from '@/lib/personalization-consent'
+
 const SESSION_KEY = 'ck-recommendation-session'
 const VIEWED_PRODUCTS_KEY = 'ck-viewed-products'
 const MAX_VIEWED_PRODUCTS = 30
@@ -12,6 +14,10 @@ function uniqueIds(ids: string[]) {
 
 export function getOrCreateRecommendationSessionId() {
   if (isBrowser() === false) {
+    return ''
+  }
+
+  if (!hasPersonalizationConsent()) {
     return ''
   }
 
@@ -30,7 +36,7 @@ export function getOrCreateRecommendationSessionId() {
 }
 
 export function getRecentViewedProductIds() {
-  if (isBrowser() === false) {
+  if (isBrowser() === false || !hasPersonalizationConsent()) {
     return []
   }
 
@@ -48,6 +54,10 @@ export function getRecentViewedProductIds() {
 }
 
 export function rememberViewedProduct(productId: string) {
+  if (!hasPersonalizationConsent()) {
+    return []
+  }
+
   const nextIds = uniqueIds([productId, ...getRecentViewedProductIds()]).slice(0, MAX_VIEWED_PRODUCTS)
 
   if (isBrowser()) {
