@@ -220,6 +220,36 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     showAddedToCartToast('Added to cart')
   }
 
+  const handleShareProduct = async () => {
+    if (!product || typeof window === 'undefined') return
+
+    const shareUrl = window.location.href
+    const shareData = {
+      title: product.name,
+      text: product.miniDescription || product.name,
+      url: shareUrl,
+    }
+
+    try {
+      if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+        await navigator.share(shareData)
+        return
+      }
+
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(shareUrl)
+        showAddedToCartToast('Link copied')
+        return
+      }
+    } catch (error) {
+      if ((error as { name?: string } | null)?.name === 'AbortError') {
+        return
+      }
+    }
+
+    showAddedToCartToast('Share not supported')
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-white pb-20 lg:pb-0">
@@ -344,6 +374,21 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
         <span className="hidden lg:inline">Back</span>
+      </button>
+      <button
+        type="button"
+        onClick={handleShareProduct}
+        className="fixed top-4 right-4 z-50 lg:hidden flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow-lg backdrop-blur-sm transition-colors hover:bg-white"
+        aria-label="Share product"
+      >
+        <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M8.59 13.51 15.42 17.5M15.41 6.5 8.59 10.49M21 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM9 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+          />
+        </svg>
       </button>
 
       {/* Mobile Layout */}
@@ -713,7 +758,24 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">{product.category}</span>
             </div>
 
-            <h1 className="text-4xl font-bold text-gray-900 leading-tight">{product.name}</h1>
+            <div className="flex items-start justify-between gap-4">
+              <h1 className="text-4xl font-bold leading-tight text-gray-900">{product.name}</h1>
+              <button
+                type="button"
+                onClick={handleShareProduct}
+                className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:border-pink-200 hover:text-pink-600"
+                aria-label="Share product"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M8.59 13.51 15.42 17.5M15.41 6.5 8.59 10.49M21 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM9 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm12 7a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"
+                  />
+                </svg>
+              </button>
+            </div>
 
             {miniDescription ? <p className="text-base text-gray-600">{miniDescription}</p> : null}
 
