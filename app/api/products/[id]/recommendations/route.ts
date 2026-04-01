@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getProductRecommendations } from '@/lib/recommendations'
+import { getOrSetJson, REDIS_KEYS } from '@/lib/redis'
 
 type Params = {
   params: Promise<{ id: string }>
@@ -16,10 +17,16 @@ export async function GET(request: NextRequest, { params }: Params) {
           .filter(Boolean)
       : []
 
-    const recommendations = await getProductRecommendations({
-      productId: id,
-      viewedProductIds,
-    })
+    const viewedKey = viewedProductIds.slice(0, 20).join(',') || 'none'
+    const recommendations = await getOrSetJson(
+      REDIS_KEYS.PRODUCT_RECOMMENDATIONS(id, viewedKey),
+      120,
+      async () =>
+        getProductRecommendations({
+          productId: id,
+          viewedProductIds,
+        })
+    )
 
     return NextResponse.json(recommendations)
   } catch (error) {

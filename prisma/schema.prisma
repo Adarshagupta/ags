@@ -343,7 +343,7 @@ model Occasion {
 
 model AppSettings {
   id                          String   @id @default("default")
-  siteName                    String   @default("Upaharo")
+  siteName                    String   @default("Chapter Kurus")
   supportPhone                String?
   supportEmail                String?
   supportHours                String?

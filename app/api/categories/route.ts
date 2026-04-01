@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getOrSetJson, REDIS_KEYS } from '@/lib/redis'
 
 export async function GET(request: NextRequest) {
   try {
@@ -11,10 +12,12 @@ export async function GET(request: NextRequest) {
       whereClause.type = type
     }
 
-    const categories = await prisma.category.findMany({
-      where: whereClause,
-      orderBy: { name: 'asc' },
-    })
+    const categories = await getOrSetJson(REDIS_KEYS.CATEGORIES(type || 'ALL'), 300, async () =>
+      prisma.category.findMany({
+        where: whereClause,
+        orderBy: { name: 'asc' },
+      })
+    )
 
     return NextResponse.json(categories)
   } catch (error: any) {

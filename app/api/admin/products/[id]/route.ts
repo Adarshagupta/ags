@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, appendArchivedProductTag, sanitizeProductTags } from '@/lib/product-archive'
 import { findFirstProductCompat, withProductWriteCompatibility } from '@/lib/product-db'
+import { redis, REDIS_KEYS } from '@/lib/redis'
 
 type ProductVariantInput = {
   color?: unknown
@@ -121,6 +122,8 @@ export async function PATCH(
       }
     })
 
+    await redis.del(REDIS_KEYS.PRODUCT_DETAIL(id), REDIS_KEYS.HOME)
+
     return NextResponse.json(updatedProduct)
   } catch (error: any) {
     return NextResponse.json(
@@ -173,12 +176,16 @@ export async function DELETE(
         },
       })
 
+      await redis.del(REDIS_KEYS.PRODUCT_DETAIL(product.id), REDIS_KEYS.HOME)
+
       return NextResponse.json({ success: true, archived: true })
     }
 
     await prisma.product.delete({
       where: { id: product.id }
     })
+
+    await redis.del(REDIS_KEYS.PRODUCT_DETAIL(product.id), REDIS_KEYS.HOME)
 
     return NextResponse.json({ success: true, archived: false })
   } catch (error: any) {

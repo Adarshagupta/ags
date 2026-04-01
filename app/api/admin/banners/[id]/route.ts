@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { redis, REDIS_KEYS } from '@/lib/redis'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -16,6 +17,7 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         isActive: body.isActive
       }
     })
+    await redis.del(REDIS_KEYS.HOME_BANNERS)
     return NextResponse.json(banner)
   } catch (error) {
     console.error('Error updating banner:', error)
@@ -29,6 +31,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     await prisma.banner.delete({
       where: { id }
     })
+    await redis.del(REDIS_KEYS.HOME_BANNERS)
     return NextResponse.json({ message: 'Banner deleted' })
   } catch (error) {
     console.error('Error deleting banner:', error)

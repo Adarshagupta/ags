@@ -3,6 +3,7 @@ import { getAppSettings } from '@/lib/app-settings'
 import { findManyProductsCompat } from '@/lib/product-db'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 import { getCartRecommendations } from '@/lib/recommendations'
+import { getOrSetJson, REDIS_KEYS } from '@/lib/redis'
 
 function unique(values: string[]) {
   return Array.from(new Set(values.filter(Boolean)))
@@ -34,19 +35,24 @@ export async function GET(request: NextRequest) {
     const recommendationMode = String(settings.homepageRecommendationMode || 'LATEST').toUpperCase()
 
     if (recommendationMode === 'BEST_OFFER') {
-      const bestOffers = await findManyProductsCompat({
-        where: {
-          isAvailable: true,
-          id: { notIn: productIds },
-          NOT: {
-            tags: {
-              has: ARCHIVED_PRODUCT_TAG,
+      const bestOffers = await getOrSetJson(
+        REDIS_KEYS.CART_RECOMMENDATIONS(productIds.join(','), 'best-offer'),
+        120,
+        async () =>
+          findManyProductsCompat({
+            where: {
+              isAvailable: true,
+              id: { notIn: productIds },
+              NOT: {
+                tags: {
+                  has: ARCHIVED_PRODUCT_TAG,
+                },
+              },
             },
-          },
-        },
-        orderBy: [{ discount: 'desc' }, { createdAt: 'desc' }],
-        take: 6,
-      })
+            orderBy: [{ discount: 'desc' }, { createdAt: 'desc' }],
+            take: 6,
+          })
+      )
 
       return NextResponse.json({
         mode: 'BEST_OFFER',
@@ -64,10 +70,15 @@ export async function GET(request: NextRequest) {
       })
     }
 
-    const recommendations = await getCartRecommendations({
-      productIds,
-      viewedProductIds,
-    })
+    const recommendations = await getOrSetJson(
+      REDIS_KEYS.CART_RECOMMENDATIONS(productIds.join(','), viewedProductIds.slice(0, 20).join(',') || 'none'),
+      120,
+      async () =>
+        getCartRecommendations({
+          productIds,
+          viewedProductIds,
+        })
+    )
 
     const products = [
       ...recommendations.addons,

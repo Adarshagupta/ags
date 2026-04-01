@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
 import { findManyProductsCompat, withProductWriteCompatibility } from '@/lib/product-db'
+import { redis, REDIS_KEYS } from '@/lib/redis'
 
 function toNumber(value: unknown, fallback: number) {
   const n = Number(value)
@@ -152,6 +153,8 @@ export async function POST(request: NextRequest) {
     const product = await withProductWriteCompatibility(data, (safeData) =>
       prisma.product.create({ data: safeData })
     )
+
+    await redis.del(REDIS_KEYS.HOME)
 
     return NextResponse.json({ product }, { status: 201 })
   } catch (error) {

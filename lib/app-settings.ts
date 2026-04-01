@@ -1,5 +1,6 @@
 import { prisma } from '@/lib/prisma'
 import { isMissingAppSettingsTableError } from '@/lib/product-db'
+import { getOrSetJson, REDIS_KEYS } from '@/lib/redis'
 
 export type PublicAppSettings = {
   siteName: string
@@ -45,41 +46,43 @@ export const DEFAULT_APP_SETTINGS: PublicAppSettings = {
 
 export async function getAppSettings(): Promise<PublicAppSettings> {
   try {
-    const settings = await prisma.appSettings.findUnique({
-      where: { id: 'default' },
+    return await getOrSetJson(REDIS_KEYS.APP_SETTINGS, 300, async () => {
+      const settings = await prisma.appSettings.findUnique({
+        where: { id: 'default' },
+      })
+
+      if (!settings) {
+        return DEFAULT_APP_SETTINGS
+      }
+
+      return {
+        siteName:
+          !settings.siteName || settings.siteName === 'Flowers N Petals'
+            ? DEFAULT_APP_SETTINGS.siteName
+            : settings.siteName,
+        supportPhone: settings.supportPhone || DEFAULT_APP_SETTINGS.supportPhone,
+        supportEmail: settings.supportEmail || DEFAULT_APP_SETTINGS.supportEmail,
+        supportHours: settings.supportHours || DEFAULT_APP_SETTINGS.supportHours,
+        supportMessage: settings.supportMessage || DEFAULT_APP_SETTINGS.supportMessage,
+        deliveryEstimate: settings.deliveryEstimate || DEFAULT_APP_SETTINGS.deliveryEstimate,
+        deliveryNote: settings.deliveryNote || DEFAULT_APP_SETTINGS.deliveryNote,
+        announcementText: settings.announcementText || DEFAULT_APP_SETTINGS.announcementText,
+        storeAddress: settings.storeAddress || DEFAULT_APP_SETTINGS.storeAddress,
+        mapLatitude: settings.mapLatitude ?? DEFAULT_APP_SETTINGS.mapLatitude,
+        mapLongitude: settings.mapLongitude ?? DEFAULT_APP_SETTINGS.mapLongitude,
+        homepageShowBanner: settings.homepageShowBanner ?? DEFAULT_APP_SETTINGS.homepageShowBanner,
+        homepageShowTopCategories: settings.homepageShowTopCategories ?? DEFAULT_APP_SETTINGS.homepageShowTopCategories,
+        homepageShowCategorySections:
+          settings.homepageShowCategorySections ?? DEFAULT_APP_SETTINGS.homepageShowCategorySections,
+        homepageShowOccasionTabs: settings.homepageShowOccasionTabs ?? DEFAULT_APP_SETTINGS.homepageShowOccasionTabs,
+        homepageShowRecommendations:
+          settings.homepageShowRecommendations ?? DEFAULT_APP_SETTINGS.homepageShowRecommendations,
+        homepageRecommendationMode:
+          settings.homepageRecommendationMode || DEFAULT_APP_SETTINGS.homepageRecommendationMode,
+        homepageRecommendationTitle:
+          settings.homepageRecommendationTitle || DEFAULT_APP_SETTINGS.homepageRecommendationTitle,
+      }
     })
-
-    if (!settings) {
-      return DEFAULT_APP_SETTINGS
-    }
-
-    return {
-      siteName:
-        !settings.siteName || settings.siteName === 'Flowers N Petals'
-          ? DEFAULT_APP_SETTINGS.siteName
-          : settings.siteName,
-      supportPhone: settings.supportPhone || DEFAULT_APP_SETTINGS.supportPhone,
-      supportEmail: settings.supportEmail || DEFAULT_APP_SETTINGS.supportEmail,
-      supportHours: settings.supportHours || DEFAULT_APP_SETTINGS.supportHours,
-      supportMessage: settings.supportMessage || DEFAULT_APP_SETTINGS.supportMessage,
-      deliveryEstimate: settings.deliveryEstimate || DEFAULT_APP_SETTINGS.deliveryEstimate,
-      deliveryNote: settings.deliveryNote || DEFAULT_APP_SETTINGS.deliveryNote,
-      announcementText: settings.announcementText || DEFAULT_APP_SETTINGS.announcementText,
-      storeAddress: settings.storeAddress || DEFAULT_APP_SETTINGS.storeAddress,
-      mapLatitude: settings.mapLatitude ?? DEFAULT_APP_SETTINGS.mapLatitude,
-      mapLongitude: settings.mapLongitude ?? DEFAULT_APP_SETTINGS.mapLongitude,
-      homepageShowBanner: settings.homepageShowBanner ?? DEFAULT_APP_SETTINGS.homepageShowBanner,
-      homepageShowTopCategories: settings.homepageShowTopCategories ?? DEFAULT_APP_SETTINGS.homepageShowTopCategories,
-      homepageShowCategorySections:
-        settings.homepageShowCategorySections ?? DEFAULT_APP_SETTINGS.homepageShowCategorySections,
-      homepageShowOccasionTabs: settings.homepageShowOccasionTabs ?? DEFAULT_APP_SETTINGS.homepageShowOccasionTabs,
-      homepageShowRecommendations:
-        settings.homepageShowRecommendations ?? DEFAULT_APP_SETTINGS.homepageShowRecommendations,
-      homepageRecommendationMode:
-        settings.homepageRecommendationMode || DEFAULT_APP_SETTINGS.homepageRecommendationMode,
-      homepageRecommendationTitle:
-        settings.homepageRecommendationTitle || DEFAULT_APP_SETTINGS.homepageRecommendationTitle,
-    }
   } catch (error) {
     if (isMissingAppSettingsTableError(error)) {
       return DEFAULT_APP_SETTINGS

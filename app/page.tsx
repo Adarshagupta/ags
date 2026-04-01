@@ -6,7 +6,7 @@ import HomepageBannerCarousel from '@/components/HomepageBannerCarousel'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 import { getAppSettings } from '@/lib/app-settings'
-import { findManyProductCardsCompat } from '@/lib/product-db'
+import { findManyProductsCompat } from '@/lib/product-db'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -39,7 +39,7 @@ async function getHomeData() {
           image: true,
         },
       }),
-      findManyProductCardsCompat({
+      findManyProductsCompat({
         where: {
           isAvailable: true,
           NOT: {

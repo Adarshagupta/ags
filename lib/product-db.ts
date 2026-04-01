@@ -26,24 +26,8 @@ export const LEGACY_PRODUCT_SELECT_WITH_MINI = {
   miniDescription: true,
 } satisfies Prisma.ProductSelect
 
-export const PRODUCT_CARD_SELECT = {
-  id: true,
-  name: true,
-  description: true,
-  category: true,
-  price: true,
-  image: true,
-  isVeg: true,
-  prepTime: true,
-  discount: true,
-  showFoodTypeLabel: true,
-  miniDescription: true,
-} satisfies Prisma.ProductSelect
-
 type LegacyProductShape = Prisma.ProductGetPayload<{ select: typeof LEGACY_PRODUCT_SELECT }>
-type ProductCardShape = Prisma.ProductGetPayload<{ select: typeof PRODUCT_CARD_SELECT }>
 export type ProductCompatResult = LegacyProductShape & { showFoodTypeLabel: boolean; miniDescription: string | null }
-export type ProductCardCompatResult = ProductCardShape & { showFoodTypeLabel: boolean; miniDescription: string | null }
 
 export function isMissingAppSettingsTableError(error: unknown) {
   const code = (error as { code?: string } | null)?.code
@@ -153,43 +137,6 @@ export async function findManyProductsCompat(
       })
 
       return products.map((product) => withProductCompatibility(product)) as ProductCompatResult[]
-    }
-  }
-}
-
-export async function findManyProductCardsCompat(
-  args: Omit<Prisma.ProductFindManyArgs, 'select'>
-): Promise<ProductCardCompatResult[]> {
-  try {
-    const products = await prisma.product.findMany({
-      ...args,
-      select: PRODUCT_CARD_SELECT,
-    })
-
-    return products.map((product) => withProductCompatibility(product)) as ProductCardCompatResult[]
-  } catch (error) {
-    if (!isMissingProductFoodTypeColumnError(error)) {
-      throw error
-    }
-
-    try {
-      const products = await prisma.product.findMany({
-        ...args,
-        select: LEGACY_PRODUCT_SELECT_WITH_MINI,
-      })
-
-      return products.map((product) => withProductCompatibility(product)) as ProductCardCompatResult[]
-    } catch (innerError) {
-      if (!isMissingProductFoodTypeColumnError(innerError)) {
-        throw innerError
-      }
-
-      const products = await prisma.product.findMany({
-        ...args,
-        select: LEGACY_PRODUCT_SELECT,
-      })
-
-      return products.map((product) => withProductCompatibility(product)) as ProductCardCompatResult[]
     }
   }
 }

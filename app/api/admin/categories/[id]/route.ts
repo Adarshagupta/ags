@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { redis, REDIS_KEYS } from '@/lib/redis'
 
 export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -15,6 +16,15 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
         isActive: body.isActive
       }
     })
+    await redis.del(
+      REDIS_KEYS.CATEGORIES('ALL'),
+      REDIS_KEYS.CATEGORIES('PRODUCT'),
+      REDIS_KEYS.CATEGORIES('OCCASION'),
+      REDIS_KEYS.CATEGORIES('RECIPIENT'),
+      REDIS_KEYS.CATEGORIES('HOME_PRODUCT'),
+      REDIS_KEYS.CATEGORIES('HOME_OCCASION'),
+      REDIS_KEYS.HOME
+    )
     return NextResponse.json(category)
   } catch (error) {
     console.error('Error updating category:', error)
@@ -28,6 +38,15 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     await prisma.category.delete({
       where: { id }
     })
+    await redis.del(
+      REDIS_KEYS.CATEGORIES('ALL'),
+      REDIS_KEYS.CATEGORIES('PRODUCT'),
+      REDIS_KEYS.CATEGORIES('OCCASION'),
+      REDIS_KEYS.CATEGORIES('RECIPIENT'),
+      REDIS_KEYS.CATEGORIES('HOME_PRODUCT'),
+      REDIS_KEYS.CATEGORIES('HOME_OCCASION'),
+      REDIS_KEYS.HOME
+    )
     return NextResponse.json({ message: 'Category deleted' })
   } catch (error) {
     console.error('Error deleting category:', error)

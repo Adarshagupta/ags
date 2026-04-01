@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { DEFAULT_APP_SETTINGS } from '@/lib/app-settings'
 import { isMissingAppSettingsTableError } from '@/lib/product-db'
+import { redis, REDIS_KEYS } from '@/lib/redis'
 
 function toNumber(value: unknown, fallback: number) {
   if (value === '' || value === null || value === undefined) {
@@ -96,6 +97,8 @@ export async function PATCH(request: NextRequest) {
           String(body?.homepageRecommendationTitle || DEFAULT_APP_SETTINGS.homepageRecommendationTitle).trim(),
       },
     })
+
+    await redis.del(REDIS_KEYS.APP_SETTINGS, REDIS_KEYS.HOME)
 
     return NextResponse.json(settings)
   } catch (error) {

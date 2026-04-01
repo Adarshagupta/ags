@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG, sanitizeProductTags } from '@/lib/product-archive'
 import { findManyProductCardsCompat, findManyProductsCompat, withProductWriteCompatibility } from '@/lib/product-db'
+import { getOrSetJson, REDIS_KEYS } from '@/lib/redis'
 
 type ProductVariantInput = {
   color?: unknown
@@ -115,10 +116,20 @@ export async function GET(request: NextRequest) {
       ...(Number.isFinite(limitParam) && limitParam > 0 ? { take: Math.min(limitParam, 60) } : {}),
     }
 
-    const products =
-      view === 'card'
-        ? await findManyProductCardsCompat(queryArgs)
-        : await findManyProductsCompat(queryArgs)
+    const cacheKey = REDIS_KEYS.PRODUCT_LIST(
+      JSON.stringify({
+        category,
+        categoryId,
+        search,
+        idsParam,
+        limit: Number.isFinite(limitParam) && limitParam > 0 ? Math.min(limitParam, 60) : null,
+        view: view || 'full',
+      })
+    )
+
+    const products = await getOrSetJson(cacheKey, view === 'card' ? 180 : 90, async () =>
+      view === 'card' ? findManyProductCardsCompat(queryArgs) : findManyProductsCompat(queryArgs)
+    )
 
     return NextResponse.json(
       { products },

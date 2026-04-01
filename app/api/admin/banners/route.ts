@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { redis, REDIS_KEYS } from '@/lib/redis'
 
 export async function GET() {
   try {
@@ -26,6 +27,7 @@ export async function POST(request: NextRequest) {
         isActive: body.isActive ?? true
       }
     })
+    await redis.del(REDIS_KEYS.HOME_BANNERS)
     return NextResponse.json(banner)
   } catch (error) {
     console.error('Error creating banner:', error)
