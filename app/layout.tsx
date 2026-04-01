@@ -75,7 +75,7 @@ export const metadata: Metadata = {
     description: 'Send flowers, cakes, and gifts with same-day delivery',
     images: [
       {
-        url: '/og-image.png',
+        url: '/favicon.svg',
         width: 1200,
         height: 630,
         alt: 'Upaharo',
@@ -86,16 +86,16 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: 'Upaharo - Gift & Flower Delivery',
     description: 'Send flowers, cakes, and gifts with same-day delivery',
-    images: ['/og-image.png'],
+    images: ['/favicon.svg'],
   },
   icons: {
     icon: [
-      { url: '/icons/logo_transparent.png', sizes: '512x512', type: 'image/png' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
     ],
     apple: [
-      { url: '/icons/logo_transparent.png', sizes: '512x512', type: 'image/png' },
+      { url: '/icons/icon-512x512.png', sizes: '512x512', type: 'image/png' },
     ],
-    shortcut: '/icons/logo_transparent.png',
+    shortcut: '/favicon.svg',
   },
 }
 
@@ -107,8 +107,8 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/icons/logo_transparent.png" type="image/png" />
-        <link rel="apple-touch-icon" href="/icons/logo_transparent.png" />
+        <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+        <link rel="apple-touch-icon" href="/icons/icon-512x512.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="Upaharo" />
