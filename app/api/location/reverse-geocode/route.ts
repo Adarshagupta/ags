@@ -21,28 +21,51 @@ export async function GET(request: NextRequest) {
       )
     }
 
-    // Call Google Maps Geocoding API with result_type for more precise address
-    const response = await fetch(
-      `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}&result_type=street_address|premise|subpremise|route&location_type=ROOFTOP|RANGE_INTERPOLATED`
-    )
+    // Reverse geocoding requires the Geocoding API. Start with a precise query,
+    // then fall back to a broader one if Google has no exact rooftop match.
+    const preciseUrl = new URL('https://maps.googleapis.com/maps/api/geocode/json')
+    preciseUrl.searchParams.set('latlng', `${lat},${lng}`)
+    preciseUrl.searchParams.set('key', apiKey)
+    preciseUrl.searchParams.set('result_type', 'street_address|premise|subpremise|route')
+    preciseUrl.searchParams.set('location_type', 'ROOFTOP|RANGE_INTERPOLATED')
+    preciseUrl.searchParams.set('region', 'np')
+    preciseUrl.searchParams.set('language', 'en')
 
+    const response = await fetch(preciseUrl.toString(), { cache: 'no-store' })
     const data = await response.json()
 
     // If precise address not found, try again without filters
     let result = data.results?.[0]
     if (!result) {
-      const fallbackResponse = await fetch(
-        `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}`
-      )
+      const fallbackUrl = new URL('https://maps.googleapis.com/maps/api/geocode/json')
+      fallbackUrl.searchParams.set('latlng', `${lat},${lng}`)
+      fallbackUrl.searchParams.set('key', apiKey)
+      fallbackUrl.searchParams.set('region', 'np')
+      fallbackUrl.searchParams.set('language', 'en')
+
+      const fallbackResponse = await fetch(fallbackUrl.toString(), { cache: 'no-store' })
       const fallbackData = await fallbackResponse.json()
       result = fallbackData.results?.[0]
     }
 
     if (!result) {
-      return NextResponse.json(
-        { error: 'Failed to reverse geocode location' },
-        { status: 400 }
-      )
+      return NextResponse.json({
+        address: '',
+        parsed: {
+          street: '',
+          area: '',
+          landmark: '',
+          city: '',
+          state: '',
+          pincode: '',
+          country: '',
+        },
+        details: {
+          googleStatus: data?.status || 'UNKNOWN_ERROR',
+          lat,
+          lng,
+        },
+      })
     }
 
     // Parse address components for detailed address
@@ -51,6 +74,12 @@ export async function GET(request: NextRequest) {
     
     addressComponents.forEach((component: any) => {
       const types = component.types
+      if (types.includes('establishment')) {
+        parsed.establishment = component.long_name
+      }
+      if (types.includes('point_of_interest')) {
+        parsed.pointOfInterest = component.long_name
+      }
       if (types.includes('subpremise')) {
         parsed.subpremise = component.long_name
       }
@@ -71,6 +100,9 @@ export async function GET(request: NextRequest) {
       }
       if (types.includes('sublocality_level_1') || types.includes('sublocality')) {
         parsed.sublocality = component.long_name
+      }
+      if (types.includes('neighborhood')) {
+        parsed.neighborhood = component.long_name
       }
       if (types.includes('locality')) {
         parsed.city = component.long_name
@@ -100,13 +132,28 @@ export async function GET(request: NextRequest) {
     if (parsed.sublocality) streetParts.push(parsed.sublocality)
     
     const detailedStreet = streetParts.join(', ') || result.formatted_address?.split(',')[0] || ''
+    const area =
+      parsed.sublocality3 ||
+      parsed.sublocality2 ||
+      parsed.sublocality ||
+      parsed.neighborhood ||
+      parsed.route ||
+      ''
+    const landmark =
+      parsed.establishment ||
+      parsed.pointOfInterest ||
+      parsed.premise ||
+      parsed.neighborhood ||
+      area ||
+      ''
 
     return NextResponse.json({ 
       address: result.formatted_address,
       fullResult: result,
       parsed: {
         street: detailedStreet,
-        landmark: parsed.sublocality || parsed.sublocality2 || '',
+        area,
+        landmark,
         city: parsed.city || parsed.district || '',
         state: parsed.state || '',
         pincode: parsed.pincode || '',

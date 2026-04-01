@@ -5,7 +5,7 @@ import { generateOrderNumber } from '@/lib/utils'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 import { LEGACY_PRODUCT_SELECT } from '@/lib/product-db'
 import { resolveUserId } from '@/lib/request-auth'
-import { createDodoCheckoutSession, isDodoConfigured } from '@/lib/dodo-payments'
+import { isKathmanduValleyLocation, SERVICE_AREA_UNAVAILABLE_MESSAGE } from '@/lib/service-area'
 
 export async function POST(request: NextRequest) {
   try {
@@ -37,10 +37,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid payment method' }, { status: 400 })
     }
 
-    if (paymentMethod === 'ONLINE' && !isDodoConfigured()) {
+    if (paymentMethod === 'ONLINE') {
       return NextResponse.json(
-        { error: 'Online payments are not configured yet. Add Dodo Payments credentials first.' },
-        { status: 500 }
+        { error: 'Online payment is temporarily unavailable. Please use cash on delivery for now.' },
+        { status: 400 }
       )
     }
 
@@ -123,6 +123,21 @@ export async function POST(request: NextRequest) {
       })
     }
 
+    const resolvedLatitude = hasIncomingCoords ? lat : address.latitude
+    const resolvedLongitude = hasIncomingCoords ? lng : address.longitude
+
+    if (
+      !isKathmanduValleyLocation({
+        city: address.city,
+        state: address.state,
+        address: address.street,
+        latitude: resolvedLatitude,
+        longitude: resolvedLongitude,
+      })
+    ) {
+      return NextResponse.json({ error: SERVICE_AREA_UNAVAILABLE_MESSAGE }, { status: 400 })
+    }
+
     // Generate order number
     const orderNumber = generateOrderNumber()
 
@@ -187,53 +202,6 @@ export async function POST(request: NextRequest) {
       )
     } catch (redisError) {
       console.warn('Redis publish failed (non-critical):', redisError)
-    }
-
-    if (paymentMethod === 'ONLINE') {
-      try {
-        const session = await createDodoCheckoutSession({
-          amountInMinor: Math.round(Number(total) * 100),
-          returnUrl: `${request.nextUrl.origin}/checkout/dodo-return?orderId=${order.id}`,
-          customer: {
-            email: user.email,
-            name: user.name,
-            phoneNumber: user.phone,
-          },
-          billingAddress: {
-            street: address.street,
-            city: address.city,
-            state: address.state,
-            zipcode: address.pincode,
-          },
-          metadata: {
-            orderId: order.id,
-            orderNumber: order.orderNumber,
-            userId,
-          },
-        })
-
-        return NextResponse.json(
-          {
-            order,
-            paymentUrl: session.checkout_url,
-            paymentProvider: 'DODO',
-          },
-          { status: 201 }
-        )
-      } catch (paymentError: any) {
-        await prisma.order.update({
-          where: { id: order.id },
-          data: { paymentStatus: 'FAILED' },
-        })
-
-        return NextResponse.json(
-          {
-            error: 'Failed to start Dodo payment',
-            details: paymentError?.message || 'Unknown payment error',
-          },
-          { status: 500 }
-        )
-      }
     }
 
     return NextResponse.json({ order }, { status: 201 })

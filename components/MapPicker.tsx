@@ -4,7 +4,19 @@ import { useEffect, useRef, useState } from 'react'
 import { Loader } from '@googlemaps/js-api-loader'
 
 interface MapPickerProps {
-  onLocationSelect: (lat: number, lng: number, address: string) => void
+  onLocationSelect: (
+    lat: number,
+    lng: number,
+    address: string,
+    parsed?: {
+      street?: string
+      area?: string
+      landmark?: string
+      city?: string
+      state?: string
+      pincode?: string
+    }
+  ) => void
   initialLat?: number
   initialLng?: number
 }
@@ -17,6 +29,7 @@ declare global {
 
 export default function MapPicker({ onLocationSelect, initialLat, initialLng }: MapPickerProps) {
   const mapRef = useRef<HTMLDivElement>(null)
+  const searchInputRef = useRef<HTMLInputElement>(null)
   const [map, setMap] = useState<any | null>(null)
   const [marker, setMarker] = useState<any | null>(null)
   const [geocoder, setGeocoder] = useState<any | null>(null)
@@ -109,6 +122,65 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
     void loadMap()
   }, [initialLat, initialLng])
 
+  const parseGeocoderResult = (result: any) => {
+    const addressComponents = result?.address_components || []
+    const parsed: Record<string, string> = {}
+
+    addressComponents.forEach((component: any) => {
+      const types = component.types || []
+
+      if (types.includes('establishment')) parsed.establishment = component.long_name
+      if (types.includes('point_of_interest')) parsed.pointOfInterest = component.long_name
+      if (types.includes('subpremise')) parsed.subpremise = component.long_name
+      if (types.includes('premise')) parsed.premise = component.long_name
+      if (types.includes('street_number')) parsed.streetNumber = component.long_name
+      if (types.includes('route')) parsed.route = component.long_name
+      if (types.includes('sublocality_level_3')) parsed.sublocality3 = component.long_name
+      if (types.includes('sublocality_level_2')) parsed.sublocality2 = component.long_name
+      if (types.includes('sublocality_level_1') || types.includes('sublocality')) {
+        parsed.sublocality = component.long_name
+      }
+      if (types.includes('neighborhood')) parsed.neighborhood = component.long_name
+      if (types.includes('locality')) parsed.city = component.long_name
+      if (types.includes('administrative_area_level_2')) parsed.district = component.long_name
+      if (types.includes('administrative_area_level_1')) parsed.state = component.long_name
+      if (types.includes('postal_code')) parsed.pincode = component.long_name
+    })
+
+    const streetParts = [
+      parsed.subpremise,
+      parsed.premise,
+      parsed.streetNumber,
+      parsed.route,
+      parsed.sublocality3,
+      parsed.sublocality2,
+      parsed.sublocality,
+    ].filter(Boolean)
+
+    const area =
+      parsed.sublocality3 ||
+      parsed.sublocality2 ||
+      parsed.sublocality ||
+      parsed.neighborhood ||
+      parsed.route ||
+      ''
+
+    return {
+      street: streetParts.join(', ') || result?.formatted_address?.split(',')[0] || '',
+      area,
+      landmark:
+        parsed.establishment ||
+        parsed.pointOfInterest ||
+        parsed.premise ||
+        parsed.neighborhood ||
+        area ||
+        '',
+      city: parsed.city || parsed.district || '',
+      state: parsed.state || '',
+      pincode: parsed.pincode || '',
+    }
+  }
+
   const initializeMap = (google: any, lat: number, lng: number, accuracy: number) => {
     if (!mapRef.current) return
     
@@ -134,12 +206,46 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
     })
 
     const geocoderInstance = new google.maps.Geocoder()
+    const autocompleteInstance =
+      searchInputRef.current
+        ? new google.maps.places.Autocomplete(searchInputRef.current, {
+            fields: ['address_components', 'formatted_address', 'geometry', 'name'],
+            componentRestrictions: { country: 'np' },
+          })
+        : null
 
     setMap(mapInstance)
     setMarker(markerInstance)
     setGeocoder(geocoderInstance)
     setSelectedPosition({ lat, lng })
     setIsLoading(false)
+
+    if (autocompleteInstance) {
+      autocompleteInstance.addListener('place_changed', () => {
+        const place = autocompleteInstance.getPlace()
+        const location = place?.geometry?.location
+
+        if (!location) return
+
+        const placeLat = location.lat()
+        const placeLng = location.lng()
+        const nextPosition = { lat: placeLat, lng: placeLng }
+
+        mapInstance.panTo(nextPosition)
+        mapInstance.setZoom(18)
+        markerInstance.setPosition(nextPosition)
+        setSelectedPosition(nextPosition)
+
+        onLocationSelect(
+          placeLat,
+          placeLng,
+          place.formatted_address || place.name || 'Selected place',
+          parseGeocoderResult(place)
+        )
+
+        reverseGeocode(placeLat, placeLng, geocoderInstance)
+      })
+    }
 
     // Handle map click
     mapInstance.addListener('click', (e: any) => {
@@ -172,7 +278,7 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
 
     geocoderInstance.geocode({ location: { lat, lng } }, (results: any, status: any) => {
       if (status === 'OK' && results && results[0]) {
-        onLocationSelect(lat, lng, results[0].formatted_address)
+        onLocationSelect(lat, lng, results[0].formatted_address, parseGeocoderResult(results[0]))
       } else {
         // Keep selection usable even when geocoding is unavailable.
         console.warn('Reverse geocoding failed:', status)
@@ -229,7 +335,7 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
   }
 
   return (
-    <div className="relative w-full h-full min-h-[400px]">
+    <div className="relative w-full h-full min-h-[420px]">
       {isLoading && (
         <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
           <div className="flex flex-col items-center space-y-3">
@@ -239,8 +345,24 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
           </div>
         </div>
       )}
-      
-      <div ref={mapRef} className="w-full h-full rounded-lg" />
+
+      <div ref={mapRef} className="w-full h-full" />
+
+      <div className="absolute left-4 right-4 top-4 z-10">
+        <div className="rounded-2xl bg-white shadow-lg">
+          <div className="flex items-center gap-3 px-4 py-3">
+            <svg className="h-5 w-5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" />
+            </svg>
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search location, area or landmark"
+              className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
+            />
+          </div>
+        </div>
+      </div>
       
       <button
         onClick={handleUseCurrentLocation}
@@ -253,9 +375,9 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
         </svg>
       </button>
       
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg z-10">
+      <div className="absolute bottom-4 left-1/2 w-[calc(100%-32px)] max-w-sm -translate-x-1/2 rounded-full bg-white px-4 py-2 shadow-lg z-10">
         <p className="text-xs text-gray-600 text-center">
-          📍 Click or drag marker to select location
+          Tap anywhere or drag the pin to set the exact delivery point
         </p>
       </div>
     </div>

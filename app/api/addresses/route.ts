@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { prisma } from '@/lib/prisma'
 import { getTokenFromRequest, verifyToken } from '@/lib/auth'
 import { authOptions } from '@/lib/auth-options'
+import { isKathmanduValleyLocation, SERVICE_AREA_UNAVAILABLE_MESSAGE } from '@/lib/service-area'
 
 async function resolveUserId(request: NextRequest) {
   const token = getTokenFromRequest(request)
@@ -54,6 +55,18 @@ export async function POST(request: NextRequest) {
     // Ensure latitude and longitude are valid numbers
     const lat = typeof latitude === 'number' ? latitude : parseFloat(latitude) || 0
     const lng = typeof longitude === 'number' ? longitude : parseFloat(longitude) || 0
+
+    if (
+      !isKathmanduValleyLocation({
+        city,
+        state,
+        address: [street, landmark, apartment].filter(Boolean).join(', '),
+        latitude: lat,
+        longitude: lng,
+      })
+    ) {
+      return NextResponse.json({ error: SERVICE_AREA_UNAVAILABLE_MESSAGE }, { status: 400 })
+    }
 
     // If setting as default, unset other defaults
     if (isDefault) {

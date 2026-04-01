@@ -12,6 +12,7 @@ import LocationModal from '@/components/LocationModal'
 import BottomNav from '@/components/BottomNav'
 import SkeletonLoader from '@/components/SkeletonLoader'
 import { SessionSync } from '@/components/SessionSync'
+import { isKathmanduValleyLocation, SERVICE_AREA_UNAVAILABLE_MESSAGE } from '@/lib/service-area'
 
 interface GiftWrap {
   id: string
@@ -60,7 +61,7 @@ export default function CheckoutPage() {
   const [addressesLoading, setAddressesLoading] = useState(true)
   const [giftDataLoading, setGiftDataLoading] = useState(true)
   const [showMobileSummary, setShowMobileSummary] = useState(false)
-  const [paymentMethod, setPaymentMethod] = useState<'CASH' | 'ONLINE'>('CASH')
+  const [paymentMethod] = useState<'CASH'>('CASH')
   const [giftWraps, setGiftWraps] = useState<GiftWrap[]>([])
   const [occasions, setOccasions] = useState<Occasion[]>([])
   const [recipients, setRecipients] = useState<Recipient[]>([])
@@ -87,6 +88,16 @@ export default function CheckoutPage() {
   const deliveryFee = (subtotal + giftWrapPrice) > 199 ? 0 : 40
   const tax = 0
   const total = subtotal + giftWrapPrice + deliveryFee
+  const selectedAddress = addresses.find((address) => address.id === selectedAddressId) || null
+  const isSelectedAddressServiceable = selectedAddress
+    ? isKathmanduValleyLocation({
+        city: selectedAddress.city,
+        state: selectedAddress.state,
+        address: [selectedAddress.street, selectedAddress.landmark, selectedAddress.apartment].filter(Boolean).join(', '),
+        latitude: selectedAddress.latitude,
+        longitude: selectedAddress.longitude,
+      })
+    : true
 
   useEffect(() => {
     if (!_hasHydrated) return
@@ -188,6 +199,19 @@ export default function CheckoutPage() {
       return
     }
 
+    if (
+      !isKathmanduValleyLocation({
+        city: newAddress.city,
+        state: newAddress.state,
+        address: [newAddress.street, newAddress.landmark, newAddress.apartment].filter(Boolean).join(', '),
+        latitude: newAddress.latitude,
+        longitude: newAddress.longitude,
+      })
+    ) {
+      alert(SERVICE_AREA_UNAVAILABLE_MESSAGE)
+      return
+    }
+
     try {
       const res = await fetch('/api/addresses', {
         method: 'POST',
@@ -239,6 +263,11 @@ export default function CheckoutPage() {
       return
     }
 
+    if (!isSelectedAddressServiceable) {
+      alert(SERVICE_AREA_UNAVAILABLE_MESSAGE)
+      return
+    }
+
     if (giftOptions.isGift && !giftOptions.recipientId) {
       alert('Please select a gift recipient')
       return
@@ -247,7 +276,6 @@ export default function CheckoutPage() {
     setIsLoading(true)
 
     try {
-      const selectedAddress = addresses.find((address) => address.id === selectedAddressId)
       const addressLatitude = selectedAddress?.latitude ?? deliveryAddress?.latitude ?? null
       const addressLongitude = selectedAddress?.longitude ?? deliveryAddress?.longitude ?? null
       const response = await fetch('/api/orders', {
@@ -282,15 +310,6 @@ export default function CheckoutPage() {
       }
 
       const data = await response.json()
-
-      if (paymentMethod === 'ONLINE') {
-        if (!data.paymentUrl) {
-          throw new Error(data.error || 'Failed to start online payment')
-        }
-
-        window.location.href = data.paymentUrl
-        return
-      }
 
       // Set flag before clearing cart to prevent redirect
       setOrderPlaced(true)
@@ -372,6 +391,11 @@ export default function CheckoutPage() {
                 </div>
               ) : addresses.length > 0 ? (
                 <div className="space-y-2 lg:space-y-3">
+                  {!isSelectedAddressServiceable && selectedAddress ? (
+                    <div className="rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                      {SERVICE_AREA_UNAVAILABLE_MESSAGE}
+                    </div>
+                  ) : null}
                   {addresses.map((addr) => (
                     <label key={addr.id} className="flex items-start space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 rounded-xl cursor-pointer hover:border-pink-500 hover:shadow-sm transition-all active:scale-[0.98]"
                       style={{ borderColor: selectedAddressId === addr.id ? '#ec4899' : '#e5e7eb' }}>
@@ -744,8 +768,8 @@ export default function CheckoutPage() {
                     type="radio"
                     name="payment"
                     value="CASH"
-                    checked={paymentMethod === 'CASH'}
-                    onChange={(e) => setPaymentMethod(e.target.value as any)}
+                    checked
+                    readOnly
                     className="w-4 h-4 lg:w-5 lg:h-5 text-primary"
                   />
                   <div className="flex-1">
@@ -753,20 +777,9 @@ export default function CheckoutPage() {
                     <p className="text-xs lg:text-sm text-gray-600">Pay when you receive</p>
                   </div>
                 </label>
-                <label className="flex items-center space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all active:scale-[0.98]">
-                  <input
-                    type="radio"
-                    name="payment"
-                    value="ONLINE"
-                    checked={paymentMethod === 'ONLINE'}
-                    onChange={(e) => setPaymentMethod(e.target.value as any)}
-                    className="w-4 h-4 lg:w-5 lg:h-5 text-primary"
-                  />
-                  <div className="flex-1">
-                    <p className="font-semibold text-gray-900 text-sm lg:text-base">Online Payment</p>
-                    <p className="text-xs lg:text-sm text-gray-600">Dodo checkout charged in NPR with cards and supported local methods</p>
-                  </div>
-                </label>
+                <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+                  Online payment is temporarily unavailable. Please use cash on delivery for now.
+                </div>
               </div>
             </motion.div>
           </div>
@@ -838,16 +851,10 @@ export default function CheckoutPage() {
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
                     <div className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent" />
-                    <span>{paymentMethod === 'ONLINE' ? 'Redirecting to payment...' : 'Placing order...'}</span>
+                    <span>Placing order...</span>
                   </div>
                 ) : (
-                  <span>
-                    {paymentMethod === 'ONLINE'
-                      ? 'Continue to Payment'
-                      : giftOptions.isGift
-                        ? '🎁 Send as Gift'
-                        : 'Place Order'}
-                  </span>
+                  <span>{giftOptions.isGift ? '🎁 Send as Gift' : 'Place Order'}</span>
                 )}
               </motion.button>
             </motion.div>
@@ -903,16 +910,10 @@ export default function CheckoutPage() {
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
                         <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent" />
-                        <span className="text-sm">{paymentMethod === 'ONLINE' ? 'Opening...' : 'Processing...'}</span>
+                        <span className="text-sm">Processing...</span>
                       </div>
                     ) : (
-                      <span className="text-sm">
-                        {paymentMethod === 'ONLINE'
-                          ? 'Pay Online'
-                          : giftOptions.isGift
-                            ? '🎁 Send Gift'
-                            : 'Place Order'}
-                      </span>
+                      <span className="text-sm">{giftOptions.isGift ? '🎁 Send Gift' : 'Place Order'}</span>
                     )}
                   </motion.button>
                 </div>

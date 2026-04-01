@@ -1,10 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocationStore } from '@/lib/store/location'
 import { useUserStore } from '@/lib/store/user'
 import MapPicker from './MapPicker'
+import { isKathmanduValleyLocation, SERVICE_AREA_UNAVAILABLE_MESSAGE } from '@/lib/service-area'
 
 interface LocationModalProps {
   isOpen: boolean
@@ -16,10 +17,12 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
   const { setCurrentLocation, setDeliveryAddress, deliveryAddress } = useLocationStore()
   const { user } = useUserStore()
   const [isLoading, setIsLoading] = useState(false)
+  const [isResolvingAddress, setIsResolvingAddress] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [step, setStep] = useState<'select' | 'form'>('select')
   const [coords, setCoords] = useState<{ lat: number; lng: number } | null>(null)
   const [selectedAddress, setSelectedAddress] = useState('')
+  const latestLookupId = useRef(0)
   const [formData, setFormData] = useState({
     label: 'Home',
     street: '',
@@ -30,31 +33,98 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
     pincode: '',
   })
 
-  const handleLocationSelect = async (lat: number, lng: number, address: string) => {
+  const selectedSummary = [formData.apartment, formData.city, formData.state].filter(Boolean).join(', ')
+
+  const hydrateFromAddress = (address: string) => {
+    const parts = address
+      .split(',')
+      .map((part) => part.trim())
+      .filter(Boolean)
+
+    setFormData((prev) => ({
+      ...prev,
+      street: parts[0] || '',
+      landmark: '',
+      apartment: parts.at(1) || '',
+      city: parts.at(-3) || parts.at(-2) || '',
+      state: parts.at(-2) || '',
+      pincode: '',
+    }))
+  }
+
+  const applyParsedAddress = (parsed?: {
+    street?: string
+    area?: string
+    landmark?: string
+    city?: string
+    state?: string
+    pincode?: string
+  }) => {
+    if (!parsed) return
+
+    setFormData((prev) => ({
+      ...prev,
+      street: parsed.street || prev.street || '',
+      apartment: parsed.area || prev.apartment || '',
+      landmark: parsed.landmark || prev.landmark || '',
+      city: parsed.city || prev.city || '',
+      state: parsed.state || prev.state || '',
+      pincode: parsed.pincode || prev.pincode || '',
+    }))
+  }
+
+  const handleLocationSelect = async (
+    lat: number,
+    lng: number,
+    address: string,
+    parsed?: {
+      street?: string
+      area?: string
+      landmark?: string
+      city?: string
+      state?: string
+      pincode?: string
+    }
+  ) => {
+    const lookupId = Date.now()
+    latestLookupId.current = lookupId
     setCoords({ lat, lng })
-    setSelectedAddress(address)
-    
-    // Parse address to pre-fill form with detailed data
+    setError(null)
+
+    const immediateAddress =
+      address && address !== 'Resolving exact address...'
+        ? address
+        : 'Fetching exact address...'
+
+    setSelectedAddress(immediateAddress)
+    hydrateFromAddress(immediateAddress)
+    applyParsedAddress(parsed)
+    setIsResolvingAddress(!parsed?.street && !parsed?.city && !parsed?.state)
+
     try {
-      const response = await fetch(
-        `/api/location/reverse-geocode?lat=${lat}&lng=${lng}`
-      )
+      const controller = new AbortController()
+      const timeoutId = window.setTimeout(() => controller.abort(), 8000)
+      const response = await fetch(`/api/location/reverse-geocode?lat=${lat}&lng=${lng}`, {
+        cache: 'no-store',
+        signal: controller.signal,
+      })
+      window.clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        throw new Error('Reverse geocode request failed')
+      }
+
       const data = await response.json()
+      if (latestLookupId.current !== lookupId) {
+        return
+      }
 
       if (data.address) {
         setSelectedAddress(data.address)
       }
       
-      // Use the pre-parsed data from API for more accuracy
       if (data.parsed) {
-        setFormData((prev) => ({
-          ...prev,
-          street: data.parsed.street || '',
-          landmark: data.parsed.landmark || '',
-          city: data.parsed.city || '',
-          state: data.parsed.state || '',
-          pincode: data.parsed.pincode || '',
-        }))
+        applyParsedAddress(data.parsed)
       } else {
         // Fallback to manual parsing
         const addressComponents = data.fullResult?.address_components || []
@@ -81,6 +151,7 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
         setFormData((prev) => ({
           ...prev,
           street,
+          apartment: city || prev.apartment || '',
           city,
           state,
           pincode,
@@ -88,13 +159,34 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
       }
     } catch (err) {
       console.error('Error parsing address:', err)
+      if (!parsed?.street && !parsed?.city && !parsed?.state) {
+        setSelectedAddress(address && address !== 'Resolving exact address...' ? address : 'Move the pin slightly to retry address detection')
+      }
+    } finally {
+      if (latestLookupId.current === lookupId) {
+        setIsResolvingAddress(false)
+      }
     }
   }
 
   const handleProceedToForm = () => {
-    if (coords) {
-      setStep('form')
+    if (!coords) return
+
+    const isServiceable = isKathmanduValleyLocation({
+      city: formData.city,
+      state: formData.state,
+      address: selectedAddress,
+      latitude: coords.lat,
+      longitude: coords.lng,
+    })
+
+    if (!isServiceable) {
+      setError(SERVICE_AREA_UNAVAILABLE_MESSAGE)
+      return
     }
+
+    setError(null)
+    setStep('form')
   }
 
   const handleBackToMap = () => {
@@ -107,6 +199,18 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
     setError(null)
 
     try {
+      const isServiceable = isKathmanduValleyLocation({
+        city: formData.city,
+        state: formData.state,
+        address: selectedAddress || `${formData.street}, ${formData.city}, ${formData.state}`,
+        latitude: coords?.lat,
+        longitude: coords?.lng,
+      })
+
+      if (!isServiceable) {
+        throw new Error(SERVICE_AREA_UNAVAILABLE_MESSAGE)
+      }
+
       const location = {
         latitude: coords?.lat || 0,
         longitude: coords?.lng || 0,
@@ -172,9 +276,9 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
             exit={{ y: "100%" }}
             transition={{ type: "spring", damping: 30, stiffness: 300 }}
             onClick={(e) => e.stopPropagation()}
-            className="fixed bottom-0 left-0 right-0 z-[60] lg:relative lg:inset-0 lg:flex lg:items-center lg:justify-center lg:p-4"
+            className="fixed inset-0 z-[60]"
           >
-            <div className="bg-white rounded-t-3xl lg:rounded-2xl shadow-xl w-full max-h-[92vh] overflow-hidden flex flex-col lg:max-w-2xl mb-16 lg:mb-0">
+            <div className="bg-white h-[100dvh] w-full overflow-hidden flex flex-col">
               {/* Drag Handle - Mobile Only */}
               <div className="lg:hidden flex justify-center pt-3 pb-1">
                 <div className="w-10 h-1 bg-gray-300 rounded-full"></div>
@@ -221,30 +325,50 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
               )}
 
               {/* Scrollable Content */}
-              <div className="flex-1 overflow-y-auto px-5 py-4">{step === 'select' ? (
-                  <div className="space-y-4">
-                    {selectedAddress && (
-                      <motion.div 
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="bg-white border border-gray-200 rounded-xl p-3"
-                      >
-                        <p className="text-xs text-gray-500 mb-1 uppercase tracking-wide font-medium">Selected Location</p>
-                        <p className="text-sm text-gray-900 leading-relaxed">{selectedAddress}</p>
-                      </motion.div>
-                    )}
-                    
-                    <div className="h-[280px] rounded-2xl overflow-hidden border border-gray-200 shadow-sm">
+              <div className="flex-1 overflow-y-auto">{step === 'select' ? (
+                  <div className="space-y-4 py-4">
+                    <div className="mx-4 rounded-full border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
+                      Delivery is currently available only inside Kathmandu Valley.
+                    </div>
+
+                    <div className="relative h-[calc(100dvh-230px)] min-h-[440px] w-full overflow-hidden border-y border-gray-200 bg-gray-100">
                       <MapPicker 
                         onLocationSelect={handleLocationSelect}
                         initialLat={deliveryAddress?.latitude}
                         initialLng={deliveryAddress?.longitude}
                       />
+
+                      <div className="pointer-events-none absolute left-4 right-4 top-20 z-20">
+                        <motion.div
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          className="pointer-events-auto rounded-2xl bg-white/95 px-4 py-3 shadow-xl shadow-black/10 backdrop-blur"
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="min-w-0">
+                              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-gray-500">
+                                Selected Location
+                              </p>
+                              <p className="mt-1 line-clamp-2 text-sm font-medium text-gray-900">
+                                {selectedAddress || 'Tap on the map to choose your delivery location'}
+                              </p>
+                              {selectedSummary ? (
+                                <p className="mt-1 line-clamp-1 text-xs text-gray-600">{selectedSummary}</p>
+                              ) : null}
+                            </div>
+                            {isResolvingAddress ? (
+                              <span className="shrink-0 rounded-full bg-pink-50 px-2.5 py-1 text-[11px] font-semibold text-pink-600">
+                                Fetching...
+                              </span>
+                            ) : null}
+                          </div>
+                        </motion.div>
+                      </div>
                     </div>
                   </div>
 
                 ) : (
-                  <form onSubmit={handleSubmit} className="space-y-4">
+                  <form onSubmit={handleSubmit} className="space-y-4 px-5 py-4">
                     {/* Address Type */}
                     <div>
                       <label className="block text-xs font-semibold text-gray-500 mb-3 uppercase tracking-wider">
@@ -293,7 +417,7 @@ export default function LocationModal({ isOpen, onClose, onSaved }: LocationModa
                         value={formData.apartment}
                         onChange={(e) => setFormData({ ...formData, apartment: e.target.value })}
                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 transition-all"
-                        placeholder="Building or area name"
+                        placeholder="Area, road or place"
                       />
                     </div>
 
