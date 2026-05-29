@@ -15,10 +15,8 @@ export default function ProductFoodTypeFields({
   onShowFoodTypeLabelChange,
   onIsVegChange,
 }: ProductFoodTypeFieldsProps) {
-  const activeClassName =
-    accent === 'orange'
-      ? 'border-orange-500 bg-orange-50 text-orange-700'
-      : 'border-pink-500 bg-pink-50 text-pink-700'
+  const activeClassName = 'border-transparent bg-wine text-white'
+  void accent
 
   return (
     <div className="space-y-3">
@@ -27,9 +25,9 @@ export default function ProductFoodTypeFields({
           type="checkbox"
           checked={showFoodTypeLabel}
           onChange={(e) => onShowFoodTypeLabelChange(e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300"
+          className="h-4 w-4 rounded border-wine/30 text-wine focus:ring-wine/30"
         />
-        <span className="text-sm font-medium text-gray-700">Show veg / non-veg badge for this product</span>
+        <span className="text-sm font-medium text-ink/70">Show veg / non-veg badge for this product</span>
       </label>
 
       {showFoodTypeLabel && (
@@ -38,7 +36,7 @@ export default function ProductFoodTypeFields({
             type="button"
             onClick={() => onIsVegChange(true)}
             className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-              isVeg ? activeClassName : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+              isVeg ? activeClassName : 'border-wine/15 bg-white text-ink/70 hover:border-wine/30'
             }`}
           >
             Vegetarian
@@ -47,7 +45,7 @@ export default function ProductFoodTypeFields({
             type="button"
             onClick={() => onIsVegChange(false)}
             className={`rounded-full border px-4 py-2 text-sm font-medium transition ${
-              !isVeg ? activeClassName : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+              !isVeg ? activeClassName : 'border-wine/15 bg-white text-ink/70 hover:border-wine/30'
             }`}
           >
             Non-Vegetarian

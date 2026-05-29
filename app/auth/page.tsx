@@ -110,16 +110,17 @@ export default function AuthPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-cream">
       <div className="max-w-md mx-auto px-4 py-20">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
+          className="rounded-[22px] border border-wine/10 bg-white p-6 shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]"
         >
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+          <h1 className="font-display text-3xl font-semibold text-ink mb-2">
             {isLogin ? 'Welcome Back!' : 'Create Account'}
           </h1>
-          <p className="text-gray-600 mb-6">
+          <p className="text-ink/55 mb-6">
             {isLogin ? 'Login to continue ordering' : 'Sign up to start ordering'}
           </p>
 
@@ -127,7 +128,7 @@ export default function AuthPage() {
             <motion.div
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="bg-red-50 text-red-600 p-3 rounded-lg mb-4 text-sm"
+              className="bg-red-50 text-red-600 p-3 rounded-xl mb-4 text-sm"
             >
               {error}
             </motion.div>
@@ -137,7 +138,7 @@ export default function AuthPage() {
             {!isLogin && (
               <>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-ink/70 mb-2">
                     Full Name
                   </label>
                   <input
@@ -145,12 +146,12 @@ export default function AuthPage() {
                     required
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                    className="w-full px-4 py-3 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                     placeholder="John Doe"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                  <label className="block text-sm font-semibold text-ink/70 mb-2">
                     Phone Number
                   </label>
                   <input
@@ -158,7 +159,7 @@ export default function AuthPage() {
                     required
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                    className="w-full px-4 py-3 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                     placeholder="+977 9812345678"
                   />
                 </div>
@@ -166,7 +167,7 @@ export default function AuthPage() {
             )}
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-ink/70 mb-2">
                 Email Address
               </label>
               <input
@@ -174,13 +175,13 @@ export default function AuthPage() {
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                 placeholder="you@example.com"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-2">
+              <label className="block text-sm font-semibold text-ink/70 mb-2">
                 Password
               </label>
               <input
@@ -189,14 +190,14 @@ export default function AuthPage() {
                 minLength={6}
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                className="w-full px-4 py-3 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                 placeholder="••••••••"
               />
             </div>
 
             {!isLogin && (
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                <label className="block text-sm font-semibold text-ink/70 mb-2">
                   Confirm Password
                 </label>
                 <input
@@ -205,7 +206,7 @@ export default function AuthPage() {
                   minLength={6}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                  className="w-full px-4 py-3 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                   placeholder="Re-enter password"
                 />
               </div>
@@ -216,7 +217,7 @@ export default function AuthPage() {
               whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-3 rounded-lg font-semibold shadow-md smooth-transition disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full bg-wine text-white py-3 rounded-full font-semibold shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] smooth-transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-wine-deep"
             >
               {isLoading ? (
                 <div className="flex items-center justify-center space-x-2">
@@ -232,10 +233,10 @@ export default function AuthPage() {
           {/* Divider */}
           <div className="relative my-6">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300"></div>
+              <div className="w-full border-t border-wine/15"></div>
             </div>
             <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-white text-gray-500">Or continue with</span>
+              <span className="px-2 bg-white text-ink/55">Or continue with</span>
             </div>
           </div>
 
@@ -246,7 +247,7 @@ export default function AuthPage() {
             type="button"
             onClick={handleGoogleSignIn}
             disabled={googleLoading}
-            className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+            className="w-full flex items-center justify-center gap-3 bg-white border border-wine/20 text-ink py-3 rounded-full font-semibold hover:bg-cream transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
           >
             <svg className="w-5 h-5" viewBox="0 0 24 24">
               <path
@@ -276,7 +277,7 @@ export default function AuthPage() {
                 setError('')
                 setFormData({ email: '', password: '', confirmPassword: '', name: '', phone: '' })
               }}
-              className="text-pink-600 font-semibold hover:underline"
+              className="text-wine font-semibold hover:underline"
             >
               {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Login'}
             </button>

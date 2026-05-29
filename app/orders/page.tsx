@@ -122,7 +122,7 @@ export default function OrdersPage() {
       case 'cancelled':
         return 'bg-red-100 text-red-800'
       default:
-        return 'bg-gray-100 text-gray-800'
+        return 'bg-cream-deep text-ink/70'
     }
   }
 
@@ -157,40 +157,40 @@ export default function OrdersPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20 lg:pb-0">
+    <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       {/* Page-Specific Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <div className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-wine/10">
         <div className="flex items-center justify-between px-3 sm:px-4 py-3">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button className="p-2 -ml-2 hover:bg-cream-deep rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">Your Orders</h1>
-              <p className="text-xs text-gray-500">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</p>
+              <h1 className="font-display text-lg font-semibold text-ink">Your Orders</h1>
+              <p className="text-xs text-ink/55">{orders.length} {orders.length === 1 ? 'order' : 'orders'}</p>
             </div>
           </div>
         </div>
       </div>
       
       <div className="max-w-6xl mx-auto px-3 sm:px-4 py-3 sm:py-4">
-        <h1 className="text-base sm:text-xl lg:text-2xl font-bold text-gray-900 mb-4">📦 Your Orders</h1>
+        <h1 className="font-display text-base sm:text-xl lg:text-2xl font-semibold text-ink mb-4">Your Orders</h1>
 
         {loading ? (
           <div className="space-y-3">
             <SkeletonLoader variant="order" count={3} />
           </div>
         ) : orders.length === 0 ? (
-          <div className="p-12 text-center border-2 border-dashed border-gray-200 rounded-2xl">
+          <div className="p-12 text-center border border-dashed border-wine/20 bg-white rounded-[22px]">
             <div className="text-7xl mb-4">🎁</div>
-            <h2 className="text-lg font-semibold text-gray-900 mb-2">No orders yet</h2>
+            <h2 className="font-display text-lg font-semibold text-ink mb-2">No orders yet</h2>
             <a
               href="/"
-              className="inline-block bg-gradient-to-r from-orange-500 to-pink-500 text-white px-6 py-2.5 rounded-full font-semibold text-sm mt-4"
+              className="inline-block bg-wine text-white px-6 py-2.5 rounded-full font-semibold text-sm mt-4 shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep transition-colors"
             >
               Browse Gifts
             </a>
@@ -207,11 +207,11 @@ export default function OrdersPage() {
               )
 
               return (
-              <div key={order.id} className="p-4 pb-6 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors">
+              <div key={order.id} className="p-4 pb-6 rounded-[22px] border border-wine/10 bg-white shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)] active:bg-cream-deep/40 transition-colors">
                 <div className="flex items-center justify-between mb-3 gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-gray-900">#{order.id.slice(0, 8).toUpperCase()}</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="font-display text-xs font-semibold text-ink">#{order.id.slice(0, 8).toUpperCase()}</p>
+                    <p className="text-xs text-ink/45">
                       {new Date(order.createdAt).toLocaleDateString('en-US', {
                         year: 'numeric',
                         month: 'long',
@@ -232,23 +232,23 @@ export default function OrdersPage() {
                       <img
                         src={item.product.image}
                         alt={item.product.name}
-                        className="w-16 h-16 rounded-lg object-cover"
+                        className="w-16 h-16 rounded-2xl object-cover bg-cream-deep"
                       />
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-gray-900 truncate">{item.product.name}</h3>
-                        <p className="text-sm text-gray-500">Quantity: {item.quantity}</p>
+                        <h3 className="font-display font-semibold text-ink truncate">{item.product.name}</h3>
+                        <p className="text-sm text-ink/55">Quantity: {item.quantity}</p>
                       </div>
                       <div className="text-right">
-                        <p className="font-semibold text-gray-900">{formatPrice(item.price)}</p>
+                        <p className="font-semibold text-wine">{formatPrice(item.price)}</p>
                       </div>
                     </div>
                   ))}
                 </div>
 
                 {hasGiftDetails && (
-                  <div className="mb-4 rounded-xl border border-pink-100 bg-pink-50 p-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-wide text-pink-700">Gift Details</p>
-                    <div className="mt-2 space-y-1.5 text-xs text-pink-900">
+                  <div className="mb-4 rounded-xl border border-wine/10 bg-rose-soft p-3">
+                    <p className="text-[11px] font-semibold uppercase tracking-wide text-wine">Gift Details</p>
+                    <div className="mt-2 space-y-1.5 text-xs text-ink/80">
                       <p>
                         Order Type: <span className="font-semibold">{order.isGift ? 'Gift' : 'Direct'}</span>
                       </p>
@@ -287,18 +287,18 @@ export default function OrdersPage() {
                   </div>
                 )}
 
-                <div className="border-t pt-4 space-y-2">
+                <div className="border-t border-wine/10 pt-4 space-y-2">
                   {order.address && (
                     <div className="flex justify-between text-sm">
-                      <span className="text-gray-600">Delivery Address:</span>
-                      <span className="text-gray-900 font-medium text-right max-w-xs truncate">
+                      <span className="text-ink/55">Delivery Address:</span>
+                      <span className="text-ink font-medium text-right max-w-xs truncate">
                         {order.address.street}, {order.address.city}
                       </span>
                     </div>
                   )}
                   <div className="flex justify-between text-base font-semibold">
-                    <span className="text-gray-900">Total Amount:</span>
-                    <span className="text-orange-600">{formatPriceNoDecimals(order.total)}</span>
+                    <span className="text-ink">Total Amount:</span>
+                    <span className="text-wine">{formatPriceNoDecimals(order.total)}</span>
                   </div>
                 </div>
 
@@ -306,7 +306,7 @@ export default function OrdersPage() {
                   <button
                     type="button"
                     onClick={() => handleTrackOrder(order.id)}
-                    className="flex-1 px-4 py-2.5 border border-gray-300 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors text-sm font-medium active:scale-[0.98]"
+                    className="flex-1 px-4 py-2.5 border border-wine/20 text-wine bg-white rounded-full hover:bg-cream transition-colors text-sm font-semibold active:scale-[0.98]"
                   >
                     Track Order
                   </button>
@@ -314,7 +314,7 @@ export default function OrdersPage() {
                     type="button"
                     onClick={() => handleReorder(order)}
                     disabled={reorderingOrderId === order.id || order.items.length === 0}
-                    className="flex-1 px-4 py-2.5 bg-gradient-to-r from-orange-500 to-pink-500 text-white rounded-xl hover:shadow-md transition-all text-sm font-medium active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="flex-1 px-4 py-2.5 bg-wine text-white rounded-full shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep transition-all text-sm font-semibold active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {reorderingOrderId === order.id ? 'Adding...' : 'Reorder'}
                   </button>

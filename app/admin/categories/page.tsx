@@ -102,12 +102,12 @@ export default function AdminCategories() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Categories</h1>
-          <p className="text-gray-600 mt-1">Manage product, recipient & occasion categories</p>
+          <h1 className="font-display text-3xl font-semibold text-ink">Categories</h1>
+          <p className="text-ink/55 mt-1">Manage product, recipient & occasion categories</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold"
+          className="bg-wine hover:bg-wine-deep text-white px-6 py-2.5 rounded-full font-semibold"
         >
           {showForm ? 'Cancel' : '+ Add Category'}
         </button>
@@ -115,37 +115,37 @@ export default function AdminCategories() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-bold mb-4">{editingCategory ? 'Edit Category' : 'New Category'}</h2>
+        <div className="bg-white rounded-[22px] border border-wine/10 p-6 mb-6">
+          <h2 className="font-display text-xl font-semibold text-ink mb-4">{editingCategory ? 'Edit Category' : 'New Category'}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Name*</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Image URL*</label>
                 <input
                   type="text"
                   required
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Type*</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value as any })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 >
                   {CATEGORY_TYPES.map(type => (
                     <option key={type} value={type}>{type}</option>
@@ -153,11 +153,11 @@ export default function AdminCategories() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Parent Category</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Parent Category</label>
                 <select
                   value={formData.parentId}
                   onChange={(e) => setFormData({ ...formData, parentId: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 >
                   <option value="">None</option>
                   {categories.filter(c => c.type === formData.type && c.id !== editingCategory?.id).map(cat => (
@@ -171,17 +171,17 @@ export default function AdminCategories() {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-wine border-wine/30 rounded focus:ring-wine/30"
                   />
-                  <span className="text-sm font-medium text-gray-700">Active</span>
+                  <span className="text-sm font-medium text-ink/70">Active</span>
                 </label>
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold">
+              <button type="submit" className="bg-wine hover:bg-wine-deep text-white px-6 py-2 rounded-full font-semibold">
                 {editingCategory ? 'Update' : 'Create'} Category
               </button>
-              <button type="button" onClick={resetForm} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold">
+              <button type="button" onClick={resetForm} className="border border-wine/20 bg-white hover:bg-cream text-wine px-6 py-2 rounded-full font-semibold">
                 Cancel
               </button>
             </div>
@@ -193,25 +193,25 @@ export default function AdminCategories() {
       <div className="space-y-6">
         {CATEGORY_TYPES.map(type => (
           <div key={type}>
-            <h2 className="text-xl font-bold mb-3 text-gray-900">{type} Categories</h2>
+            <h2 className="font-display text-xl font-semibold mb-3 text-ink">{type} Categories</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               {categories.filter(cat => cat.type === type).map(category => (
-                <div key={category.id} className="bg-white rounded-xl border border-gray-200 p-4">
+                <div key={category.id} className="bg-white rounded-[22px] border border-wine/10 p-4">
                   <div className="flex items-center gap-3 mb-3">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="w-12 h-12 bg-cream-deep rounded-xl overflow-hidden flex-shrink-0">
                       <img src={category.image} alt={category.name} className="w-full h-full object-cover" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-bold text-gray-900">{category.name}</h3>
+                      <h3 className="font-display font-semibold text-ink">{category.name}</h3>
                     </div>
                     {category.isActive && (
-                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                      <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
                         Active
                       </span>
                     )}
                   </div>
                   <div className="flex gap-2">
-                    <button onClick={() => editCategory(category)} className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <button onClick={() => editCategory(category)} className="text-wine hover:text-wine-deep text-sm font-semibold">
                       Edit
                     </button>
                     <button onClick={() => deleteCategory(category.id)} className="text-red-600 hover:text-red-700 text-sm font-medium">

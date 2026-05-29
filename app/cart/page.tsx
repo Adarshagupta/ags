@@ -91,9 +91,9 @@ export default function CartPage() {
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-white flex items-center justify-center">
+      <div className="min-h-screen bg-cream flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-pink-500 border-t-transparent mx-auto" />
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-wine border-t-transparent mx-auto" />
         </div>
       </div>
     )
@@ -101,20 +101,20 @@ export default function CartPage() {
 
   if (totalItems === 0) {
     return (
-      <div className="min-h-screen bg-white pb-20 lg:pb-0">
-        <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <div className="min-h-screen bg-cream pb-20 lg:pb-0">
+        <div className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-wine/10">
           <div className="flex items-center justify-between px-4 py-3">
             <div className="flex items-center gap-3">
               <Link href="/">
-                <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
-                  <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <button className="p-2 -ml-2 hover:bg-cream-deep rounded-lg transition-colors">
+                  <svg className="w-5 h-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                   </svg>
                 </button>
               </Link>
               <div>
-                <h1 className="text-lg font-bold text-gray-900">Your Cart</h1>
-                <p className="text-xs text-gray-500">0 items</p>
+                <h1 className="font-display text-lg font-semibold text-ink">Your Cart</h1>
+                <p className="text-xs text-ink/55">0 items</p>
               </div>
             </div>
           </div>
@@ -128,11 +128,11 @@ export default function CartPage() {
             >
               🛍️
             </motion.div>
-            <h1 className="text-xl font-bold text-gray-900 mb-6">Cart is empty</h1>
+            <h1 className="font-display text-xl font-semibold text-ink mb-6">Cart is empty</h1>
             <Link href="/">
               <motion.button
                 whileTap={{ scale: 0.95 }}
-                className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-3 rounded-full font-semibold shadow-lg"
+                className="bg-wine text-white px-8 py-3 rounded-full font-semibold shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep transition-colors"
               >
                 Browse Gifts
               </motion.button>
@@ -145,21 +145,21 @@ export default function CartPage() {
   }
 
   return (
-    <div className="min-h-screen bg-white pb-20 lg:pb-0">
+    <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       {/* Page-Specific Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <div className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-wine/10">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
             <Link href="/">
-              <button className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button className="p-2 -ml-2 hover:bg-cream-deep rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
             </Link>
             <div>
-              <h1 className="text-lg font-bold text-gray-900">Your Cart</h1>
-              <p className="text-xs text-gray-500">{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
+              <h1 className="font-display text-lg font-semibold text-ink">Your Cart</h1>
+              <p className="text-xs text-ink/55">{totalItems} {totalItems === 1 ? 'item' : 'items'}</p>
             </div>
           </div>
           <button
@@ -180,9 +180,9 @@ export default function CartPage() {
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
-                className="p-3 lg:p-4 flex items-start space-x-3 border-b border-gray-100 last:border-0 active:bg-gray-50 transition-colors"
+                className="p-3 lg:p-4 flex items-start space-x-3 border-b border-wine/10 last:border-0 active:bg-cream-deep/60 transition-colors"
               >
-                <div className="relative h-20 w-20 flex-shrink-0 rounded-lg overflow-hidden bg-gray-50">
+                <div className="relative h-20 w-20 flex-shrink-0 rounded-2xl overflow-hidden bg-cream-deep">
                   <Image
                     src={item.image}
                     alt={item.name}
@@ -194,12 +194,12 @@ export default function CartPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-start justify-between mb-1">
                     <div className="flex-1 min-w-0 pr-2">
-                      <h3 className="font-semibold text-sm text-gray-900 truncate">{item.name}</h3>
-                      <p className="text-pink-600 font-bold text-sm">{formatPrice(item.price)}</p>
+                      <h3 className="font-display font-semibold text-sm text-ink truncate">{item.name}</h3>
+                      <p className="text-wine font-semibold text-sm">{formatPrice(item.price)}</p>
                     </div>
                     <button
                       onClick={() => removeItem(item.id)}
-                      className="text-gray-400 hover:text-red-500 p-1 -mr-1"
+                      className="text-ink/40 hover:text-red-500 p-1 -mr-1"
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -208,24 +208,24 @@ export default function CartPage() {
                   </div>
 
                   <div className="flex items-center justify-between mt-2">
-                    <div className="flex items-center space-x-2 bg-gray-50 rounded-lg p-1">
+                    <div className="flex items-center space-x-2 bg-cream-deep rounded-full p-1">
                       <motion.button
                         whileTap={{ scale: 0.9 }}
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                        className="bg-white text-gray-700 w-7 h-7 rounded-md font-bold shadow-sm border border-gray-200 hover:bg-gray-50"
+                        className="bg-white text-wine w-7 h-7 rounded-full font-bold shadow-sm border border-wine/15 hover:bg-cream"
                       >
                         −
                       </motion.button>
-                      <span className="font-semibold text-sm px-3 min-w-[2rem] text-center">{item.quantity}</span>
+                      <span className="font-semibold text-sm px-3 min-w-[2rem] text-center text-ink">{item.quantity}</span>
                       <motion.button
                         whileTap={{ scale: 0.9 }}
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                        className="bg-pink-500 text-white w-7 h-7 rounded-md font-bold shadow-sm hover:bg-pink-600"
+                        className="bg-wine text-white w-7 h-7 rounded-full font-bold shadow-sm hover:bg-wine-deep"
                       >
                         +
                       </motion.button>
                     </div>
-                    <p className="text-base font-bold text-gray-900">
+                    <p className="text-base font-semibold text-wine">
                       {formatPrice(item.price * item.quantity)}
                     </p>
                   </div>
@@ -254,16 +254,16 @@ export default function CartPage() {
           ) : null}
 
           {/* Fixed Bottom Checkout Bar */}
-          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 shadow-lg z-40">
+          <div className="fixed bottom-16 lg:bottom-0 left-0 right-0 bg-white border-t border-wine/10 px-4 py-3 shadow-[0_-12px_40px_-30px_rgba(43,29,34,0.5)] z-40">
             <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
               <div className="flex-1">
-                <p className="text-xs text-gray-500">Total Amount</p>
-                <p className="text-xl font-bold text-pink-600">{formatPrice(total)}</p>
+                <p className="text-xs text-ink/55">Total Amount</p>
+                <p className="text-xl font-semibold text-wine">{formatPrice(total)}</p>
               </div>
               <motion.button
                 whileTap={{ scale: 0.98 }}
                 onClick={() => router.push('/checkout')}
-                className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-8 py-3 rounded-xl font-semibold shadow-md hover:shadow-lg transition-all"
+                className="bg-wine text-white px-8 py-3 rounded-full font-semibold shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep transition-all"
               >
                 Checkout
               </motion.button>

@@ -105,12 +105,12 @@ export default function AdminProducts() {
     <div>
       <div className="mb-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Products</h1>
-          <p className="text-gray-600 mt-1">Manage your gift inventory</p>
+          <h1 className="font-display text-2xl md:text-3xl font-semibold text-ink">Products</h1>
+          <p className="text-ink/55 mt-1">Manage your gift inventory</p>
         </div>
         <Link
           href="/admin/products/new"
-          className="bg-orange-500 hover:bg-orange-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm md:text-base w-full md:w-auto text-center"
+          className="bg-wine hover:bg-wine-deep text-white px-5 py-2.5 rounded-full font-semibold transition-colors text-sm md:text-base w-full md:w-auto text-center"
         >
           + Add Product
         </Link>
@@ -123,41 +123,41 @@ export default function AdminProducts() {
           placeholder="Search products..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full md:max-w-md px-3 py-2.5 md:px-4 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+          className="w-full md:max-w-md px-3 py-2.5 md:px-4 bg-white border border-wine/15 rounded-xl focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink text-sm"
         />
       </div>
 
       {message && (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
+        <div className="mb-6 rounded-xl border border-wine/10 bg-white px-4 py-3 text-sm text-ink/70">
           {message}
         </div>
       )}
 
       {/* Products Table */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-[22px] border border-wine/10 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading products...</div>
+          <div className="p-8 text-center text-ink/55">Loading products...</div>
         ) : paginatedProducts.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No products found</div>
+          <div className="p-8 text-center text-ink/55">No products found</div>
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className="bg-gray-50">
+                <thead className="bg-cream-deep/50">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Product</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Category</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Product</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Category</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Price</th>
+                    <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-right text-xs font-semibold text-ink/55 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-wine/10">
                   {paginatedProducts.map((product) => (
-                    <tr key={product.id} className="hover:bg-gray-50">
+                    <tr key={product.id} className="hover:bg-cream/60">
                       <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                        <div className="w-12 h-12 bg-cream-deep rounded-xl overflow-hidden flex-shrink-0">
                           <Image unoptimized src={resolveImageUrl(product.image)}
                             alt={product.name}
                             width={48}
@@ -165,11 +165,11 @@ export default function AdminProducts() {
                             className="w-full h-full object-cover"
                           />
                         </div>
-                        <span className="font-medium text-gray-900">{product.name}</span>
+                        <span className="font-medium text-ink">{product.name}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-600">{product.category}</td>
-                    <td className="px-6 py-4 text-sm font-medium text-gray-900">Rs. {product.price}</td>
+                    <td className="px-6 py-4 text-sm text-ink/55">{product.category}</td>
+                    <td className="px-6 py-4 text-sm font-medium text-ink">Rs. {product.price}</td>
                     <td className="px-6 py-4">
                       <button
                         onClick={() => toggleAvailability(product.id, product.isAvailable)}
@@ -186,7 +186,7 @@ export default function AdminProducts() {
                       <div className="flex items-center justify-end gap-2">
                         <Link
                           href={`/admin/products/${product.id}`}
-                          className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+                          className="text-wine hover:text-wine-deep text-sm font-semibold"
                         >
                           Edit
                         </Link>
@@ -203,11 +203,11 @@ export default function AdminProducts() {
               </tbody>
             </table>
           </div>
-          <div className="md:hidden divide-y divide-gray-100">
+          <div className="md:hidden divide-y divide-wine/10">
             {paginatedProducts.map((product) => (
               <div key={`${product.id}-mobile`} className="p-4">
                 <div className="flex items-center gap-3">
-                  <div className="h-14 w-14 overflow-hidden rounded-lg bg-gray-100">
+                  <div className="h-14 w-14 overflow-hidden rounded-xl bg-cream-deep">
                     <Image
                       unoptimized
                       src={resolveImageUrl(product.image)}
@@ -218,9 +218,9 @@ export default function AdminProducts() {
                     />
                   </div>
                   <div className="flex-1">
-                    <div className="text-sm font-semibold text-gray-900">{product.name}</div>
-                    <div className="text-xs text-gray-500">{product.category}</div>
-                    <div className="mt-1 text-xs font-semibold text-gray-900">Rs. {product.price}</div>
+                    <div className="text-sm font-semibold text-ink">{product.name}</div>
+                    <div className="text-xs text-ink/55">{product.category}</div>
+                    <div className="mt-1 text-xs font-semibold text-ink">Rs. {product.price}</div>
                   </div>
                   <button
                     onClick={() => toggleAvailability(product.id, product.isAvailable)}
@@ -234,13 +234,13 @@ export default function AdminProducts() {
                 <div className="mt-3 grid grid-cols-2 gap-2">
                   <Link
                     href={`/admin/products/${product.id}`}
-                    className="rounded-lg border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                    className="rounded-xl border border-wine/15 px-3 py-2 text-center text-xs font-semibold text-wine hover:bg-cream"
                   >
                     Edit
                   </Link>
                   <button
                     onClick={() => deleteProduct(product.id)}
-                    className="rounded-lg border border-red-200 px-3 py-2 text-center text-xs font-semibold text-red-600 hover:bg-red-50"
+                    className="rounded-xl border border-red-200 px-3 py-2 text-center text-xs font-semibold text-red-600 hover:bg-red-50"
                   >
                     Delete
                   </button>
@@ -251,25 +251,25 @@ export default function AdminProducts() {
           
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="px-4 md:px-6 py-4 border-t border-gray-200 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-              <div className="text-xs md:text-sm text-gray-600">
+            <div className="px-4 md:px-6 py-4 border-t border-wine/10 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="text-xs md:text-sm text-ink/55">
                 Showing {((currentPage - 1) * itemsPerPage) + 1} to {Math.min(currentPage * itemsPerPage, filteredProducts.length)} of {filteredProducts.length} products
               </div>
               <div className="flex flex-wrap gap-2">
                 <button
                   onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
+                  className="px-3 py-2 bg-cream-deep text-ink/70 rounded-xl hover:bg-cream disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
                 >
                   Previous
                 </button>
-                <span className="px-3 py-2 text-gray-700 text-xs md:text-sm">
+                <span className="px-3 py-2 text-ink/70 text-xs md:text-sm">
                   Page {currentPage} of {totalPages}
                 </span>
                 <button
                   onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
+                  className="px-3 py-2 bg-cream-deep text-ink/70 rounded-xl hover:bg-cream disabled:opacity-50 disabled:cursor-not-allowed text-xs md:text-sm"
                 >
                   Next
                 </button>

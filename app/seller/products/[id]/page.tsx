@@ -301,37 +301,37 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
   }
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Loading product...</div>
+    return <div className="p-8 text-center text-ink/55">Loading product...</div>
   }
 
   return (
     <div className="px-4 py-6">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Edit Product</h1>
-          <p className="text-gray-600">Update your listed product details</p>
+          <h1 className="font-display text-2xl font-semibold text-ink">Edit Product</h1>
+          <p className="text-ink/55">Update your listed product details</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6 rounded-lg bg-white p-6 shadow">
+        <form onSubmit={handleSubmit} className="space-y-6 rounded-[22px] border border-wine/10 bg-white p-6 shadow-sm">
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Product Name *</label>
+            <label className="mb-2 block text-sm font-medium text-ink">Product Name *</label>
             <input
               type="text"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full rounded-lg border px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Description *</label>
+            <label className="mb-2 block text-sm font-medium text-ink">Description *</label>
             <textarea
               required
               rows={4}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full rounded-lg border px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
           </div>
 
@@ -351,7 +351,7 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Price (NPR)*</label>
+              <label className="mb-2 block text-sm font-medium text-ink">Price (NPR)*</label>
               <input
                 type="number"
                 required
@@ -359,24 +359,24 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="w-full rounded-lg border px-4 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Discount (%)</label>
+              <label className="mb-2 block text-sm font-medium text-ink">Discount (%)</label>
               <input
                 type="number"
                 min="0"
                 max="100"
                 value={formData.discount}
                 onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) || 0 })}
-                className="w-full rounded-lg border px-4 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-gray-700">Preparation Time</label>
+              <label className="mb-2 block text-sm font-medium text-ink">Preparation Time</label>
               <div className="flex gap-2">
                 <input
                   type="number"
@@ -384,42 +384,42 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
                   step={prepTimeUnit === 'days' ? '0.25' : '1'}
                   value={prepTimeInputValue}
                   onChange={(e) => handlePrepTimeValueChange(e.target.value)}
-                  className="w-full rounded-lg border px-4 py-2"
+                  className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
                 <select
                   value={prepTimeUnit}
                   onChange={(e) => setPrepTimeUnit(e.target.value as PrepTimeUnit)}
-                  className="rounded-lg border px-3 py-2 bg-white"
+                  className="rounded-xl border border-wine/15 px-3 py-2 bg-white text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 >
                   <option value="minutes">Minutes</option>
                   <option value="days">Days</option>
                 </select>
               </div>
-              <p className="mt-1 text-xs text-gray-500">Shown on product page as: {formatTime(formData.prepTime)}</p>
+              <p className="mt-1 text-xs text-ink/55">Shown on product page as: {formatTime(formData.prepTime)}</p>
             </div>
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Main Image URL *</label>
+            <label className="mb-2 block text-sm font-medium text-ink">Main Image URL *</label>
             <input
               type="text"
               required
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full rounded-lg border px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
               <input
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 onChange={(e) => setMainImageFile(e.target.files?.[0] || null)}
-                className="block w-full text-sm text-gray-700 sm:w-auto"
+                className="block w-full text-sm text-ink/70 sm:w-auto"
               />
               <button
                 type="button"
                 onClick={handleMainImageUpload}
                 disabled={!mainImageFile || uploadingMainImage}
-                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black disabled:opacity-50"
+                className="rounded-full bg-wine px-4 py-2 text-sm font-medium text-white hover:bg-wine-deep disabled:opacity-50"
               >
                 {uploadingMainImage ? 'Uploading...' : 'Upload Main Image'}
               </button>
@@ -427,42 +427,42 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Additional Images</label>
+            <label className="mb-2 block text-sm font-medium text-ink">Additional Images</label>
             {formData.images.map((img, index) => (
               <div key={index} className="mb-2 flex gap-2">
                 <input
                   type="text"
                   value={img}
                   onChange={(e) => updateImage(index, e.target.value)}
-                  className="flex-1 rounded-lg border px-4 py-2"
+                  className="flex-1 rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   placeholder={`Image ${index + 1} URL`}
                 />
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="rounded-lg bg-red-100 px-4 py-2 text-red-600 hover:bg-red-200"
+                  className="rounded-full bg-red-100 px-4 py-2 text-red-600 hover:bg-red-200"
                 >
                   Remove
                 </button>
               </div>
             ))}
-            <button type="button" onClick={addImageField} className="text-sm text-pink-600 hover:text-pink-700">
+            <button type="button" onClick={addImageField} className="text-sm text-wine hover:text-wine-deep font-medium">
               + Add Image
             </button>
-            <div className="mt-3 rounded-lg border border-dashed border-gray-300 p-3">
-              <p className="text-xs text-gray-600">Upload additional image</p>
+            <div className="mt-3 rounded-xl border border-dashed border-wine/20 p-3">
+              <p className="text-xs text-ink/55">Upload additional image</p>
               <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={(e) => setAdditionalImageFile(e.target.files?.[0] || null)}
-                  className="block w-full text-sm text-gray-700 sm:w-auto"
+                  className="block w-full text-sm text-ink/70 sm:w-auto"
                 />
                 <button
                   type="button"
                   onClick={handleAdditionalImageUpload}
                   disabled={!additionalImageFile || uploadingAdditionalImage}
-                  className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-medium text-white hover:bg-black disabled:opacity-50"
+                  className="rounded-full bg-wine px-4 py-2 text-sm font-medium text-white hover:bg-wine-deep disabled:opacity-50"
                 >
                   {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
                 </button>
@@ -472,43 +472,43 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
 
           <div>
             <div className="mb-2 flex items-center justify-between">
-              <label className="block text-sm font-medium text-gray-700">Product Variants</label>
+              <label className="block text-sm font-medium text-ink">Product Variants</label>
               <button
                 type="button"
                 onClick={addVariant}
-                className="rounded-lg bg-indigo-100 px-3 py-1.5 text-xs font-semibold text-indigo-700 hover:bg-indigo-200"
+                className="rounded-full bg-rose-soft px-3 py-1.5 text-xs font-semibold text-wine hover:bg-rose-soft/70"
               >
                 + Add Variant
               </button>
             </div>
             {formData.variants.length === 0 && (
-              <p className="rounded-lg border border-dashed border-gray-300 p-3 text-xs text-gray-500">
+              <p className="rounded-xl border border-dashed border-wine/20 p-3 text-xs text-ink/55">
                 Add color or size variants and upload a specific image for each variant.
               </p>
             )}
             {formData.variants.map((variant, index) => (
-              <div key={index} className="mb-3 rounded-lg border border-gray-200 p-3">
+              <div key={index} className="mb-3 rounded-xl border border-wine/10 p-3">
                 <div className="grid grid-cols-1 gap-2 md:grid-cols-3">
                   <input
                     type="text"
                     value={variant.color}
                     onChange={(e) => updateVariant(index, 'color', e.target.value)}
                     placeholder="Color (e.g., Red)"
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    className="rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="text"
                     value={variant.size}
                     onChange={(e) => updateVariant(index, 'size', e.target.value)}
                     placeholder="Size (e.g., Large)"
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    className="rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="text"
                     value={variant.image}
                     onChange={(e) => updateVariant(index, 'image', e.target.value)}
                     placeholder="Variant Image URL"
-                    className="rounded-lg border border-gray-300 px-3 py-2 text-sm"
+                    className="rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                 </div>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -524,13 +524,13 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
                           return nextFiles
                         })
                       }}
-                      className="block w-full text-xs text-gray-700 sm:w-auto"
+                      className="block w-full text-xs text-ink/70 sm:w-auto"
                     />
                     <button
                       type="button"
                       onClick={() => uploadVariantImage(index)}
                       disabled={!variantFiles[index] || uploadingVariantIndex === index}
-                      className="rounded-lg bg-gray-900 px-3 py-2 text-xs font-medium text-white hover:bg-black disabled:opacity-50"
+                      className="rounded-full bg-wine px-3 py-2 text-xs font-medium text-white hover:bg-wine-deep disabled:opacity-50"
                     >
                       {uploadingVariantIndex === index ? 'Uploading...' : 'Upload Variant Image'}
                     </button>
@@ -538,7 +538,7 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
                   <button
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="self-start rounded-lg bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100"
+                    className="self-start rounded-full bg-red-50 px-3 py-2 text-xs font-medium text-red-600 hover:bg-red-100"
                   >
                     Remove Variant
                   </button>
@@ -548,12 +548,12 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-gray-700">Image Alt Text</label>
+            <label className="mb-2 block text-sm font-medium text-ink">Image Alt Text</label>
             <input
               type="text"
               value={formData.imageAlt}
               onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
-              className="w-full rounded-lg border px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               placeholder="Description for accessibility"
             />
           </div>
@@ -570,9 +570,9 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
                 type="checkbox"
                 checked={formData.isAvailable}
                 onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-                className="h-4 w-4"
+                className="h-4 w-4 accent-wine"
               />
-              <span className="text-sm text-gray-700">Available</span>
+              <span className="text-sm text-ink/70">Available</span>
             </label>
           </div>
 
@@ -580,14 +580,14 @@ export default function EditSellerProductPage({ params }: { params: Promise<{ id
             <button
               type="button"
               onClick={() => router.back()}
-              className="rounded-lg border border-gray-300 px-6 py-2 hover:bg-gray-50"
+              className="rounded-full border border-wine/20 px-6 py-2 text-wine hover:border-wine/40 hover:bg-cream"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="rounded-lg bg-pink-600 px-6 py-2 text-white hover:bg-pink-700 disabled:bg-gray-400"
+              className="rounded-full bg-wine px-6 py-2 text-white hover:bg-wine-deep disabled:opacity-50"
             >
               {saving ? 'Saving...' : 'Save Changes'}
             </button>

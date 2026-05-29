@@ -95,10 +95,10 @@ export default function SubProductSelector({ value, onChange, excludeProductId }
   }
 
   return (
-    <div className="col-span-2 rounded-xl border border-gray-200 bg-gray-50/70 p-4 space-y-4">
+    <div className="col-span-2 rounded-xl border border-wine/10 bg-cream/70 p-4 space-y-4">
       <div>
-        <h3 className="text-sm font-semibold text-gray-900">Sub-products</h3>
-        <p className="text-xs text-gray-500 mt-1">Attach optional companion products like candles, toppers, or balloons.</p>
+        <h3 className="text-sm font-semibold text-ink">Sub-products</h3>
+        <p className="text-xs text-ink/55 mt-1">Attach optional companion products like candles, toppers, or balloons.</p>
       </div>
 
       <input
@@ -106,7 +106,7 @@ export default function SubProductSelector({ value, onChange, excludeProductId }
         value={query}
         onChange={(event) => setQuery(event.target.value)}
         placeholder="Search products to attach as sub-product..."
-        className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+        className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
       />
 
       <div className="grid gap-2 md:grid-cols-2">
@@ -115,31 +115,31 @@ export default function SubProductSelector({ value, onChange, excludeProductId }
             key={product.id}
             type="button"
             onClick={() => addSubProduct(product.id)}
-            className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-2 text-left hover:border-orange-300"
+            className="flex items-center gap-3 rounded-xl border border-wine/10 bg-white p-2 text-left hover:border-wine/30"
           >
-            <img src={resolveImageUrl(product.image)} alt={product.name} className="h-12 w-12 rounded-md object-cover" />
+            <img src={resolveImageUrl(product.image)} alt={product.name} className="h-12 w-12 rounded-lg object-cover" />
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-medium text-gray-800">{product.name}</p>
-              <p className="text-xs text-gray-500">{formatPriceNoDecimals(product.price)}</p>
+              <p className="truncate text-sm font-medium text-ink">{product.name}</p>
+              <p className="text-xs text-ink/55">{formatPriceNoDecimals(product.price)}</p>
             </div>
-            <span className="text-xs font-semibold text-orange-600">Add</span>
+            <span className="text-xs font-semibold text-wine">Add</span>
           </button>
         ))}
       </div>
 
       <div className="space-y-2">
-        <p className="text-xs font-semibold text-gray-700">Selected sub-products</p>
+        <p className="text-xs font-semibold text-ink/70">Selected sub-products</p>
         {selectedIds.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-gray-300 bg-white px-3 py-3 text-xs text-gray-500">
+          <div className="rounded-xl border border-dashed border-wine/20 bg-white px-3 py-3 text-xs text-ink/55">
             No sub-products selected.
           </div>
         ) : (
           selectedIds.map((id) => (
-            <div key={id} className="flex items-center justify-between rounded-lg border border-gray-200 bg-white px-3 py-2">
+            <div key={id} className="flex items-center justify-between rounded-xl border border-wine/10 bg-white px-3 py-2">
               <div className="min-w-0">
-                <p className="truncate text-sm font-medium text-gray-800">{selectedProducts[id]?.name || id}</p>
+                <p className="truncate text-sm font-medium text-ink">{selectedProducts[id]?.name || id}</p>
                 {selectedProducts[id] ? (
-                  <p className="text-xs text-gray-500">{formatPriceNoDecimals(selectedProducts[id].price)}</p>
+                  <p className="text-xs text-ink/55">{formatPriceNoDecimals(selectedProducts[id].price)}</p>
                 ) : null}
               </div>
               <button

@@ -15,11 +15,11 @@ export default function PersonalizationConsentBanner() {
   }
 
   return (
-    <div className="fixed inset-x-3 bottom-4 z-[90] mx-auto max-w-xl rounded-2xl border border-neutral-200 bg-white p-4 shadow-[0_20px_50px_-25px_rgba(15,23,42,0.45)]">
+    <div className="fixed inset-x-3 bottom-4 z-[90] mx-auto max-w-xl rounded-[22px] border border-wine/10 bg-white p-4 shadow-[0_24px_60px_-30px_rgba(43,29,34,0.5)]">
       <div className="space-y-3">
         <div>
-          <p className="text-sm font-semibold text-gray-900">Personalized recommendations</p>
-          <p className="mt-1 text-xs leading-5 text-gray-600">
+          <p className="font-display text-base font-semibold text-ink">Personalized recommendations</p>
+          <p className="mt-1 text-xs leading-5 text-ink/55">
             Allow us to use a small first-party cookie and recent product/category views to show more relevant items.
           </p>
         </div>
@@ -30,7 +30,7 @@ export default function PersonalizationConsentBanner() {
               setPersonalizationConsent('declined')
               setVisible(false)
             }}
-            className="flex-1 rounded-xl border border-gray-300 px-3 py-2 text-sm font-medium text-gray-700"
+            className="flex-1 rounded-full border border-wine/20 px-3 py-2 text-sm font-medium text-ink/70 transition hover:bg-cream"
           >
             Not now
           </button>
@@ -40,7 +40,7 @@ export default function PersonalizationConsentBanner() {
               setPersonalizationConsent('accepted')
               setVisible(false)
             }}
-            className="flex-1 rounded-xl bg-pink-600 px-3 py-2 text-sm font-semibold text-white"
+            className="flex-1 rounded-full bg-wine px-3 py-2 text-sm font-semibold text-white transition hover:bg-wine-deep"
           >
             Allow
           </button>

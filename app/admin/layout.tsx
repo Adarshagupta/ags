@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useUserStore } from '@/lib/store/user'
 
@@ -11,6 +11,7 @@ export default function AdminLayout({
   children: React.ReactNode
 }) {
   const router = useRouter()
+  const pathname = usePathname()
   const { user, _hasHydrated } = useUserStore()
   const [mounted, setMounted] = useState(false)
 
@@ -28,14 +29,17 @@ export default function AdminLayout({
 
   if (!mounted || !_hasHydrated || !user || user.role !== 'ADMIN') {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-cream">
         <div className="text-center">
           <div className="text-6xl mb-4">🔒</div>
-          <p className="text-gray-600">Checking access...</p>
+          <p className="text-ink/55">Checking access...</p>
         </div>
       </div>
     )
   }
+
+  const isActive = (href: string) =>
+    href === '/admin' ? pathname === '/admin' : pathname.startsWith(href)
 
   const menuItems = [
     { icon: '📊', label: 'Dashboard', href: '/admin' },
@@ -51,32 +55,36 @@ export default function AdminLayout({
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 md:bg-gray-50">
+    <div className="min-h-screen bg-cream">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-40">
+      <div className="bg-white border-b border-wine/10 sticky top-0 z-40">
         <div className="px-4 py-3 md:py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <Link href="/" className="text-lg md:text-2xl font-bold bg-gradient-to-r from-orange-500 to-pink-500 bg-clip-text text-transparent">
-                Upaharo Admin
+              <Link href="/" className="font-display text-lg md:text-2xl font-semibold text-wine">
+                Upaharo <span className="text-gold">Admin</span>
               </Link>
             </div>
             <div className="flex items-center gap-3 md:gap-4">
-              <span className="hidden md:inline text-sm text-gray-600">{user?.name || 'Admin'}</span>
-              <Link href="/" className="text-xs md:text-sm text-orange-600 hover:text-orange-700 font-medium">
+              <span className="hidden md:inline text-sm text-ink/55">{user?.name || 'Admin'}</span>
+              <Link href="/" className="text-xs md:text-sm text-wine hover:text-wine-deep font-semibold">
                 View Site →
               </Link>
             </div>
           </div>
         </div>
         {/* Mobile quick pills */}
-        <div className="md:hidden border-t border-gray-100 px-3 py-2">
+        <div className="md:hidden border-t border-wine/10 px-3 py-2">
           <div className="flex gap-2 overflow-x-auto scrollbar-hide">
             {menuItems.map((item) => (
               <Link
                 key={`${item.href}-mobile-pill`}
                 href={item.href}
-                className="flex items-center gap-2 whitespace-nowrap rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-semibold text-gray-700 shadow-sm"
+                className={`flex items-center gap-2 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  isActive(item.href)
+                    ? 'border-transparent bg-wine text-white'
+                    : 'border-wine/15 bg-white text-ink/70'
+                }`}
               >
                 <span>{item.icon}</span>
                 <span>{item.label}</span>
@@ -88,14 +96,18 @@ export default function AdminLayout({
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="hidden w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-73px)] sticky top-[73px] md:block">
+        <aside className="hidden w-64 bg-white border-r border-wine/10 min-h-[calc(100vh-73px)] sticky top-[73px] md:block">
           <nav className="p-4">
             <ul className="space-y-1">
               {menuItems.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 transition-colors text-gray-700 hover:text-gray-900"
+                    className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-colors ${
+                      isActive(item.href)
+                        ? 'bg-rose-soft text-wine'
+                        : 'text-ink/70 hover:bg-cream hover:text-ink'
+                    }`}
                   >
                     <span className="text-xl">{item.icon}</span>
                     <span className="font-medium">{item.label}</span>
@@ -113,13 +125,15 @@ export default function AdminLayout({
       </div>
 
       {/* Mobile App Bottom Nav */}
-      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white/95 backdrop-blur md:hidden">
+      <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-wine/10 bg-white/95 backdrop-blur md:hidden">
         <div className="grid grid-cols-5 py-2">
           {menuItems.slice(0, 5).map((item) => (
             <Link
               key={`${item.href}-mobile-tab`}
               href={item.href}
-              className="flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium text-gray-500"
+              className={`flex flex-col items-center justify-center gap-0.5 text-[10px] font-medium ${
+                isActive(item.href) ? 'text-wine' : 'text-ink/50'
+              }`}
             >
               <span className="text-base">{item.icon}</span>
               <span>{item.label}</span>

@@ -97,12 +97,12 @@ export default function AdminOccasions() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Occasions</h1>
-          <p className="text-gray-600 mt-1">Manage special occasion categories</p>
+          <h1 className="font-display text-3xl font-semibold text-ink">Occasions</h1>
+          <p className="text-ink/55 mt-1">Manage special occasion categories</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold"
+          className="bg-wine hover:bg-wine-deep text-white px-6 py-2.5 rounded-full font-semibold"
         >
           {showForm ? 'Cancel' : '+ Add Occasion'}
         </button>
@@ -110,50 +110,50 @@ export default function AdminOccasions() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-bold mb-4">{editingOccasion ? 'Edit Occasion' : 'New Occasion'}</h2>
+        <div className="bg-white rounded-[22px] border border-wine/10 p-6 mb-6">
+          <h2 className="font-display text-xl font-semibold text-ink mb-4">{editingOccasion ? 'Edit Occasion' : 'New Occasion'}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Name*</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Emoji*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Emoji*</label>
                 <input
                   type="text"
                   required
                   value={formData.emoji}
                   onChange={(e) => setFormData({ ...formData, emoji: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   placeholder="🎂"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Icon*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Icon*</label>
                 <input
                   type="text"
                   required
                   value={formData.icon}
                   onChange={(e) => setFormData({ ...formData, icon: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   placeholder="🎂"
                 />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Description*</label>
                 <textarea
                   required
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div className="flex items-center">
@@ -162,17 +162,17 @@ export default function AdminOccasions() {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-wine border-wine/30 rounded focus:ring-wine/30"
                   />
-                  <span className="text-sm font-medium text-gray-700">Active</span>
+                  <span className="text-sm font-medium text-ink/70">Active</span>
                 </label>
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold">
+              <button type="submit" className="bg-wine hover:bg-wine-deep text-white px-6 py-2 rounded-full font-semibold">
                 {editingOccasion ? 'Update' : 'Create'} Occasion
               </button>
-              <button type="button" onClick={resetForm} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold">
+              <button type="button" onClick={resetForm} className="border border-wine/20 bg-white hover:bg-cream text-wine px-6 py-2 rounded-full font-semibold">
                 Cancel
               </button>
             </div>
@@ -183,26 +183,26 @@ export default function AdminOccasions() {
       {/* Occasions List */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-3 p-8 text-center text-gray-500">Loading...</div>
+          <div className="col-span-3 p-8 text-center text-ink/55">Loading...</div>
         ) : occasions.length === 0 ? (
-          <div className="col-span-3 p-8 text-center text-gray-500">No occasions yet</div>
+          <div className="col-span-3 p-8 text-center text-ink/55">No occasions yet</div>
         ) : (
           occasions.map((occasion) => (
-            <div key={occasion.id} className="bg-white rounded-xl border border-gray-200 p-4">
+            <div key={occasion.id} className="bg-white rounded-[22px] border border-wine/10 p-4">
               <div className="flex items-center gap-3 mb-3">
                 <div className="text-3xl">{occasion.icon}</div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-900">{occasion.name}</h3>
+                  <h3 className="font-display font-semibold text-ink">{occasion.name}</h3>
                 </div>
                 {occasion.isActive && (
-                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
                     Active
                   </span>
                 )}
               </div>
-              <p className="text-sm text-gray-600 mb-3">{occasion.description}</p>
+              <p className="text-sm text-ink/55 mb-3">{occasion.description}</p>
               <div className="flex gap-2">
-                <button onClick={() => editOccasion(occasion)} className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <button onClick={() => editOccasion(occasion)} className="text-wine hover:text-wine-deep text-sm font-semibold">
                   Edit
                 </button>
                 <button onClick={() => deleteOccasion(occasion.id)} className="text-red-600 hover:text-red-700 text-sm font-medium">

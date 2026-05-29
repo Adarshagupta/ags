@@ -324,18 +324,18 @@ export default function CheckoutPage() {
 
   if (!deliveryAddress) {
     return (
-      <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
-        <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <div className="min-h-screen bg-cream pb-20 lg:pb-0">
+        <div className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-wine/10">
           <div className="flex items-center justify-between px-3 lg:px-4 py-3">
             <div className="flex items-center gap-3">
-              <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
-                <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-cream-deep rounded-lg transition-colors">
+                <svg className="w-5 h-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
               <div>
-                <h1 className="text-lg font-bold text-gray-900 lg:text-xl">Checkout</h1>
-                <p className="text-xs text-gray-500">Select delivery address</p>
+                <h1 className="font-display text-lg font-semibold text-ink lg:text-xl">Checkout</h1>
+                <p className="text-xs text-ink/55">Select delivery address</p>
               </div>
             </div>
           </div>
@@ -352,24 +352,24 @@ export default function CheckoutPage() {
   const selectedRecipient = recipients.find(r => r.id === giftOptions.recipientId)
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-32 lg:pb-0">
+    <div className="min-h-screen bg-cream pb-32 lg:pb-0">
       {/* Page-Specific Header */}
-      <div className="sticky top-0 z-50 bg-white border-b border-gray-100">
+      <div className="sticky top-0 z-50 bg-cream/95 backdrop-blur border-b border-wine/10">
         <div className="flex items-center justify-between px-3 lg:px-4 py-3">
           <div className="flex items-center gap-3">
-            <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-gray-50 rounded-lg transition-colors">
-              <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <button onClick={() => router.back()} className="p-2 -ml-2 hover:bg-cream-deep rounded-lg transition-colors">
+              <svg className="w-5 h-5 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <div>
-              <h1 className="text-lg font-bold text-gray-900 lg:text-xl">Checkout</h1>
-              <p className="text-xs text-gray-500">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
+              <h1 className="font-display text-lg font-semibold text-ink lg:text-xl">Checkout</h1>
+              <p className="text-xs text-ink/55">{items.length} {items.length === 1 ? 'item' : 'items'}</p>
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs text-gray-500">Total</p>
-            <p className="text-base font-bold text-pink-600">{formatPrice(total)}</p>
+            <p className="text-xs text-ink/55">Total</p>
+            <p className="text-base font-semibold text-wine">{formatPrice(total)}</p>
           </div>
         </div>
       </div>
@@ -383,7 +383,7 @@ export default function CheckoutPage() {
               animate={{ opacity: 1, y: 0 }}
               className=""
             >
-              <h2 className="text-base font-bold text-gray-900 mb-3 lg:text-xl lg:mb-4">📍 Delivery Address</h2>
+              <h2 className="font-display text-base font-semibold text-ink mb-3 lg:text-xl lg:mb-4">📍 Delivery Address</h2>
               
               {addressesLoading ? (
                 <div className="space-y-2 lg:space-y-3">
@@ -397,34 +397,34 @@ export default function CheckoutPage() {
                     </div>
                   ) : null}
                   {addresses.map((addr) => (
-                    <label key={addr.id} className="flex items-start space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 rounded-xl cursor-pointer hover:border-pink-500 hover:shadow-sm transition-all active:scale-[0.98]"
-                      style={{ borderColor: selectedAddressId === addr.id ? '#ec4899' : '#e5e7eb' }}>
+                    <label key={addr.id} className="flex items-start space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 rounded-2xl cursor-pointer hover:border-wine/40 hover:shadow-sm transition-all active:scale-[0.98]"
+                      style={{ borderColor: selectedAddressId === addr.id ? '#7c2a47' : 'rgba(124,42,71,0.12)' }}>
                       <input
                         type="radio"
                         name="address"
                         checked={selectedAddressId === addr.id}
                         onChange={() => setSelectedAddressId(addr.id)}
-                        className="mt-0.5 lg:mt-1"
+                        className="mt-0.5 lg:mt-1 accent-wine"
                       />
                       <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 text-sm lg:text-base">{addr.label || 'Address'}</p>
-                        <p className="text-gray-600 text-xs lg:text-sm line-clamp-2">{addr.street}, {addr.city}, {addr.state} - {addr.pincode}</p>
+                        <p className="font-semibold text-ink text-sm lg:text-base">{addr.label || 'Address'}</p>
+                        <p className="text-ink/55 text-xs lg:text-sm line-clamp-2">{addr.street}, {addr.city}, {addr.state} - {addr.pincode}</p>
                       </div>
                     </label>
                   ))}
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="w-full py-3 lg:py-2.5 bg-white border-2 border-dashed border-gray-300 rounded-xl text-gray-600 hover:border-pink-500 hover:text-pink-600 hover:shadow-sm transition-all text-sm lg:text-base active:scale-[0.98]"
+                    className="w-full py-3 lg:py-2.5 bg-white border-2 border-dashed border-wine/20 rounded-2xl text-ink/60 hover:border-wine/40 hover:text-wine hover:shadow-sm transition-all text-sm lg:text-base active:scale-[0.98]"
                   >
                     + Add New Address
                   </button>
                 </div>
               ) : (
-                <div className="text-center py-6 lg:py-8 bg-white rounded-xl border-2 border-dashed border-gray-300">
-                  <p className="text-gray-600 mb-3 lg:mb-4 text-sm lg:text-base">No delivery address added</p>
+                <div className="text-center py-6 lg:py-8 bg-white rounded-2xl border-2 border-dashed border-wine/20">
+                  <p className="text-ink/55 mb-3 lg:mb-4 text-sm lg:text-base">No delivery address added</p>
                   <button
                     onClick={() => setShowAddressForm(true)}
-                    className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-5 py-2.5 lg:px-6 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700 text-sm lg:text-base active:scale-95"
+                    className="bg-wine text-white px-5 py-2.5 lg:px-6 rounded-full shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep text-sm lg:text-base active:scale-95"
                   >
                     Add Delivery Address
                   </button>
@@ -433,17 +433,17 @@ export default function CheckoutPage() {
 
               {/* Add Address Form */}
               {showAddressForm && (
-                <div className="mt-3 lg:mt-4 p-3 lg:p-4 bg-white border-2 border-pink-200 rounded-xl">
-                  <h3 className="font-semibold mb-2 lg:mb-3 text-sm lg:text-base">New Address</h3>
+                <div className="mt-3 lg:mt-4 p-3 lg:p-4 bg-white border border-wine/15 rounded-2xl shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]">
+                  <h3 className="font-display font-semibold text-ink mb-2 lg:mb-3 text-sm lg:text-base">New Address</h3>
                   <div className="space-y-2 lg:space-y-3">
-                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-dashed border-pink-200 bg-pink-50 px-3 py-2 text-xs text-pink-700">
+                    <div className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-dashed border-wine/20 bg-rose-soft px-3 py-2 text-xs text-wine">
                       <span>
                         📍 Pick the exact pin on map for accurate delivery.
                       </span>
                       <button
                         type="button"
                         onClick={() => setIsLocationModalOpen(true)}
-                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-pink-600 shadow-sm hover:bg-pink-100"
+                        className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-wine shadow-sm hover:bg-cream"
                       >
                         Choose on Map
                       </button>
@@ -451,7 +451,7 @@ export default function CheckoutPage() {
                     <select
                       value={newAddress.label}
                       onChange={(e) => setNewAddress({...newAddress, label: e.target.value})}
-                      className="w-full px-3 py-2 lg:px-4 border rounded-lg bg-white text-sm lg:text-base"
+                      className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl bg-white text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                     >
                       <option value="Home">Home</option>
                       <option value="Work">Work</option>
@@ -461,7 +461,7 @@ export default function CheckoutPage() {
                       placeholder="Full Address (Street, Building, etc.) *"
                       value={newAddress.street}
                       onChange={(e) => setNewAddress({...newAddress, street: e.target.value})}
-                      className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
+                      className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                       rows={2}
                     />
                     <div className="grid grid-cols-2 gap-2 lg:gap-3">
@@ -470,14 +470,14 @@ export default function CheckoutPage() {
                         placeholder="Apt/Flat No."
                         value={newAddress.apartment}
                         onChange={(e) => setNewAddress({...newAddress, apartment: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
+                        className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                       />
                       <input
                         type="text"
                         placeholder="Landmark"
                         value={newAddress.landmark}
                         onChange={(e) => setNewAddress({...newAddress, landmark: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
+                        className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-2 lg:gap-3">
@@ -486,14 +486,14 @@ export default function CheckoutPage() {
                         placeholder="City *"
                         value={newAddress.city}
                         onChange={(e) => setNewAddress({...newAddress, city: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
+                        className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                       />
                       <input
                         type="text"
                         placeholder="State *"
                         value={newAddress.state}
                         onChange={(e) => setNewAddress({...newAddress, state: e.target.value})}
-                        className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
+                        className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                       />
                     </div>
                     <input
@@ -501,18 +501,18 @@ export default function CheckoutPage() {
                       placeholder="Pincode *"
                       value={newAddress.pincode}
                       onChange={(e) => setNewAddress({...newAddress, pincode: e.target.value})}
-                      className="w-full px-3 py-2 lg:px-4 border rounded-lg text-sm lg:text-base"
+                      className="w-full px-3 py-2 lg:px-4 border border-wine/15 rounded-xl text-ink text-sm lg:text-base outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                     />
                     <div className="flex gap-2">
                       <button
                         onClick={handleCreateAddress}
-                        className="flex-1 bg-gradient-to-r from-pink-500 to-rose-600 text-white py-2.5 rounded-lg shadow-md hover:from-pink-600 hover:to-rose-700 text-sm lg:text-base active:scale-95"
+                        className="flex-1 bg-wine text-white py-2.5 rounded-full shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep text-sm lg:text-base active:scale-95"
                       >
                         Save Address
                       </button>
                       <button
                         onClick={() => setShowAddressForm(false)}
-                        className="px-4 lg:px-6 bg-gray-200 text-gray-700 py-2.5 rounded-lg hover:bg-gray-300 text-sm lg:text-base active:scale-95"
+                        className="px-4 lg:px-6 border border-wine/20 bg-white text-wine py-2.5 rounded-full hover:bg-cream text-sm lg:text-base active:scale-95"
                       >
                         Cancel
                       </button>
@@ -558,15 +558,15 @@ export default function CheckoutPage() {
               className=""
             >
               <div className="flex items-center justify-between mb-3 lg:mb-4">
-                <h2 className="text-base font-bold text-gray-900 lg:text-xl">🎁 Send as Gift</h2>
+                <h2 className="font-display text-base font-semibold text-ink lg:text-xl">🎁 Send as Gift</h2>
                 <label className="flex items-center space-x-2 cursor-pointer">
                   <input
                     type="checkbox"
                     checked={giftOptions.isGift}
                     onChange={(e) => setGiftOptions({ ...giftOptions, isGift: e.target.checked })}
-                    className="w-4 h-4 lg:w-5 lg:h-5 text-pink-500 rounded"
+                    className="w-4 h-4 lg:w-5 lg:h-5 accent-wine rounded"
                   />
-                  <span className="text-xs lg:text-sm font-semibold text-gray-700">Yes, this is a gift</span>
+                  <span className="text-xs lg:text-sm font-semibold text-ink/70">Yes, this is a gift</span>
                 </label>
               </div>
 
@@ -574,18 +574,18 @@ export default function CheckoutPage() {
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="space-y-4 border-t pt-4"
+                  className="space-y-4 border-t border-wine/10 pt-4"
                 >
                   {/* Occasion */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-ink/70 mb-2">
                       Select Occasion
                     </label>
                     {giftDataLoading ? (
                       <div className="flex gap-2 overflow-x-auto pb-2">
                         {[1, 2, 3, 4].map((i) => (
                           <div key={i} className="flex-shrink-0 min-w-[100px]">
-                            <div className="animate-pulse bg-gray-200 h-20 rounded-lg"></div>
+                            <div className="animate-pulse bg-cream-deep h-20 rounded-xl"></div>
                           </div>
                         ))}
                       </div>
@@ -595,14 +595,14 @@ export default function CheckoutPage() {
                         <button
                           key={occ.id}
                           onClick={() => setGiftOptions({ ...giftOptions, occasionId: occ.id })}
-                          className={`flex-shrink-0 p-3 rounded-lg border-2 transition-all min-w-[100px] ${
+                          className={`flex-shrink-0 p-3 rounded-xl border-2 transition-all min-w-[100px] ${
                             giftOptions.occasionId === occ.id
-                              ? 'border-primary bg-primary/10 shadow-md'
-                              : 'border-gray-200 hover:border-primary'
+                              ? 'border-wine bg-rose-soft shadow-sm'
+                              : 'border-wine/15 hover:border-wine/40'
                           }`}
                         >
                           <span className="text-2xl block mb-1">{occ.emoji}</span>
-                          <span className="text-xs font-semibold text-gray-900 whitespace-nowrap">{occ.name}</span>
+                          <span className="text-xs font-semibold text-ink whitespace-nowrap">{occ.name}</span>
                         </button>
                       ))}
                     </div>
@@ -611,13 +611,13 @@ export default function CheckoutPage() {
 
                   {/* Recipient */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-ink/70 mb-2">
                       Select Recipient
                     </label>
                     <select
                       value={giftOptions.recipientId || ''}
                       onChange={(e) => setGiftOptions({ ...giftOptions, recipientId: e.target.value })}
-                      className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                      className="w-full px-4 py-2.5 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                     >
                       <option value="">Choose a recipient...</option>
                       {recipients.map((r) => (
@@ -628,7 +628,7 @@ export default function CheckoutPage() {
                     </select>
                     <a
                       href="/recipients"
-                      className="text-pink-600 text-xs font-semibold mt-2 hover:underline inline-block"
+                      className="text-wine text-xs font-semibold mt-2 hover:underline inline-block"
                     >
                       + Manage recipients
                     </a>
@@ -636,14 +636,14 @@ export default function CheckoutPage() {
 
                   {/* Gift Wrapping */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-ink/70 mb-2">
                       Choose Gift Wrapping
                     </label>
                     {giftDataLoading ? (
                       <div className="flex gap-3 overflow-x-auto pb-2">
                         {[1, 2, 3].map((i) => (
                           <div key={i} className="flex-shrink-0 min-w-[140px]">
-                            <div className="animate-pulse bg-gray-200 h-32 rounded-lg"></div>
+                            <div className="animate-pulse bg-cream-deep h-32 rounded-xl"></div>
                           </div>
                         ))}
                       </div>
@@ -652,17 +652,17 @@ export default function CheckoutPage() {
                       <button
                         type="button"
                         onClick={() => setGiftOptions({ ...giftOptions, giftWrapId: undefined })}
-                        className={`flex-shrink-0 p-4 rounded-lg border-2 transition-all min-w-[140px] ${
+                        className={`flex-shrink-0 p-4 rounded-xl border-2 transition-all min-w-[140px] ${
                           !giftOptions.giftWrapId
-                            ? 'border-primary bg-primary/10 shadow-md'
-                            : 'border-gray-200 hover:border-primary'
+                            ? 'border-wine bg-rose-soft shadow-sm'
+                            : 'border-wine/15 hover:border-wine/40'
                         }`}
                       >
                         <div className="text-center">
                           <span className="text-3xl block mb-2">🚫</span>
-                          <p className="font-semibold text-gray-900 text-sm">No Wrap</p>
-                          <p className="text-xs text-gray-600 mb-1">Use default packaging</p>
-                          <p className="text-pink-600 font-bold">+{formatPrice(0)}</p>
+                          <p className="font-semibold text-ink text-sm">No Wrap</p>
+                          <p className="text-xs text-ink/55 mb-1">Use default packaging</p>
+                          <p className="text-wine font-semibold">+{formatPrice(0)}</p>
                         </div>
                       </button>
                       {giftWraps.map((wrap) => {
@@ -677,17 +677,17 @@ export default function CheckoutPage() {
                                   giftWrapId: isSelected ? undefined : wrap.id,
                                 })
                               }
-                              className={`w-full p-4 rounded-lg border-2 transition-all ${
+                              className={`w-full p-4 rounded-xl border-2 transition-all ${
                                 isSelected
-                                  ? 'border-primary bg-primary/10 shadow-md'
-                                  : 'border-gray-200 hover:border-primary'
+                                  ? 'border-wine bg-rose-soft shadow-sm'
+                                  : 'border-wine/15 hover:border-wine/40'
                               }`}
                             >
                               <div className="text-center">
                                 <span className="text-3xl block mb-2">{wrap.image}</span>
-                                <p className="font-semibold text-gray-900 text-sm">{wrap.name}</p>
-                                <p className="text-xs text-gray-600 mb-1">{wrap.type}</p>
-                                <p className="text-pink-600 font-bold">+{formatPrice(wrap.price)}</p>
+                                <p className="font-semibold text-ink text-sm">{wrap.name}</p>
+                                <p className="text-xs text-ink/55 mb-1">{wrap.type}</p>
+                                <p className="text-wine font-semibold">+{formatPrice(wrap.price)}</p>
                               </div>
                             </button>
                             {isSelected ? (
@@ -697,7 +697,7 @@ export default function CheckoutPage() {
                                   event.stopPropagation()
                                   setGiftOptions({ ...giftOptions, giftWrapId: undefined })
                                 }}
-                                className="absolute right-1.5 top-1.5 h-6 w-6 rounded-full bg-white text-gray-600 shadow-sm border border-gray-200 hover:bg-gray-50"
+                                className="absolute right-1.5 top-1.5 h-6 w-6 rounded-full bg-white text-ink/60 shadow-sm border border-wine/15 hover:bg-cream"
                                 aria-label={`Remove ${wrap.name}`}
                               >
                                 ×
@@ -712,32 +712,32 @@ export default function CheckoutPage() {
 
                   {/* Greeting Message */}
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    <label className="block text-sm font-semibold text-ink/70 mb-2">
                       Greeting Message (Optional)
                     </label>
                     <textarea
                       value={giftOptions.greetingMessage || ''}
                       onChange={(e) => setGiftOptions({ ...giftOptions, greetingMessage: e.target.value })}
                       placeholder="Add a personal message on the card..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900"
+                      className="w-full px-4 py-3 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink"
                       rows={3}
                       maxLength={200}
                     />
-                    <p className="text-xs text-gray-500 mt-1">
+                    <p className="text-xs text-ink/55 mt-1">
                       {(giftOptions.greetingMessage || '').length}/200 characters
                     </p>
                   </div>
 
                   {/* Sender Details */}
-                  <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-                    <h3 className="font-semibold text-gray-900 text-sm">From</h3>
+                  <div className="bg-cream-deep p-4 rounded-2xl space-y-3">
+                    <h3 className="font-display font-semibold text-ink text-sm">From</h3>
                     <div>
                       <input
                         type="text"
                         value={giftOptions.senderName || user?.name || ''}
                         onChange={(e) => setGiftOptions({ ...giftOptions, senderName: e.target.value })}
                         placeholder="Your name"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-pink-500 focus:border-transparent text-gray-900 text-sm"
+                        className="w-full px-4 py-2.5 border border-wine/15 rounded-xl outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink text-sm"
                       />
                     </div>
                     <label className="flex items-center space-x-2 cursor-pointer">
@@ -745,9 +745,9 @@ export default function CheckoutPage() {
                         type="checkbox"
                         checked={giftOptions.showSenderName}
                         onChange={(e) => setGiftOptions({ ...giftOptions, showSenderName: e.target.checked })}
-                        className="w-4 h-4 text-pink-500 rounded"
+                        className="w-4 h-4 accent-wine rounded"
                       />
-                      <span className="text-sm text-gray-700">Show my name on the card</span>
+                      <span className="text-sm text-ink/70">Show my name on the card</span>
                     </label>
                   </div>
                 </motion.div>
@@ -761,20 +761,20 @@ export default function CheckoutPage() {
               transition={{ delay: 0.1 }}
               className=""
             >
-              <h2 className="text-base font-bold text-gray-900 mb-3 lg:text-xl lg:mb-4">💳 Payment Method</h2>
+              <h2 className="font-display text-base font-semibold text-ink mb-3 lg:text-xl lg:mb-4">💳 Payment Method</h2>
               <div className="space-y-2 lg:space-y-3">
-                <label className="flex items-center space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 border-gray-200 rounded-xl cursor-pointer hover:border-primary hover:shadow-sm transition-all active:scale-[0.98]">
+                <label className="flex items-center space-x-2 lg:space-x-3 p-3 lg:p-4 bg-white border-2 border-wine/15 rounded-2xl cursor-pointer hover:border-wine/40 hover:shadow-sm transition-all active:scale-[0.98]">
                   <input
                     type="radio"
                     name="payment"
                     value="CASH"
                     checked
                     readOnly
-                    className="w-4 h-4 lg:w-5 lg:h-5 text-primary"
+                    className="w-4 h-4 lg:w-5 lg:h-5 accent-wine"
                   />
                   <div className="flex-1">
-                    <p className="font-semibold text-gray-900 text-sm lg:text-base">Cash on Delivery</p>
-                    <p className="text-xs lg:text-sm text-gray-600">Pay when you receive</p>
+                    <p className="font-semibold text-ink text-sm lg:text-base">Cash on Delivery</p>
+                    <p className="text-xs lg:text-sm text-ink/55">Pay when you receive</p>
                   </div>
                 </label>
                 <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
@@ -791,50 +791,50 @@ export default function CheckoutPage() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
-              className="hidden lg:block bg-white rounded-xl shadow-sm p-6 sticky top-24"
+              className="hidden lg:block bg-white rounded-[22px] border border-wine/10 shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)] p-6 sticky top-24"
             >
-              <h2 className="text-xl font-bold text-gray-900 mb-4">Order Summary</h2>
+              <h2 className="font-display text-xl font-semibold text-ink mb-4">Order Summary</h2>
 
               <div className="space-y-3 mb-4">
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-ink/60">
                   <span>Items ({items.length})</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {giftWrapPrice > 0 && (
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-ink/60">
                     <span>🎁 {selectedWrap?.name}</span>
                     <span>+{formatPrice(giftWrapPrice)}</span>
                   </div>
                 )}
-                <div className="flex justify-between text-gray-600">
+                <div className="flex justify-between text-ink/60">
                   <span>Delivery</span>
                   <span className={deliveryFee === 0 ? 'text-green-600 font-semibold' : ''}>
                     {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
                   </span>
                 </div>
-                <div className="border-t pt-3 flex justify-between text-xl font-bold text-gray-900">
+                <div className="border-t border-wine/10 pt-3 flex justify-between text-xl font-semibold text-ink">
                   <span>Total</span>
-                  <span>{formatPriceNoDecimals(total)}</span>
+                  <span className="text-wine">{formatPriceNoDecimals(total)}</span>
                 </div>
               </div>
 
               {giftOptions.isGift && selectedRecipient && (
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-4 text-sm text-blue-800">
-                  <p className="font-semibold mb-1">🎁 Sending to:</p>
+                <div className="bg-rose-soft border border-wine/10 rounded-xl p-3 mb-4 text-sm text-ink/80">
+                  <p className="font-semibold mb-1 text-wine">🎁 Sending to:</p>
                   <p>{selectedRecipient.name}</p>
                   <p className="text-xs mt-1">📞 {selectedRecipient.phone}</p>
                 </div>
               )}
 
-              <div className="bg-green-50 border border-green-200 rounded-lg p-3 mb-4 text-sm text-green-800 flex items-start space-x-2">
+              <div className="bg-green-50 border border-green-200 rounded-xl p-3 mb-4 text-sm text-green-800 flex items-start space-x-2">
                 <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
                 </svg>
                 <span>{appSettings.deliveryEstimate}</span>
               </div>
 
-              <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 mb-4 text-sm text-gray-700 space-y-1">
-                <p className="font-semibold text-gray-900">Support</p>
+              <div className="bg-cream-deep border border-wine/10 rounded-xl p-3 mb-4 text-sm text-ink/70 space-y-1">
+                <p className="font-semibold text-ink">Support</p>
                 {appSettings.supportHours ? <p>Hours: {appSettings.supportHours}</p> : null}
                 {appSettings.supportPhone ? <p>Phone: {appSettings.supportPhone}</p> : null}
                 {appSettings.supportEmail ? <p>Email: {appSettings.supportEmail}</p> : null}
@@ -846,7 +846,7 @@ export default function CheckoutPage() {
                 whileTap={{ scale: 0.98 }}
                 onClick={handlePlaceOrder}
                 disabled={isLoading || (giftOptions.isGift && !giftOptions.recipientId)}
-                className="w-full bg-gradient-to-r from-pink-500 to-rose-600 text-white py-3 rounded-lg font-semibold shadow-md smooth-transition disabled:opacity-50 disabled:cursor-not-allowed hover:from-pink-600 hover:to-rose-700"
+                className="w-full bg-wine text-white py-3 rounded-full font-semibold shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] smooth-transition disabled:opacity-50 disabled:cursor-not-allowed hover:bg-wine-deep"
               >
                 {isLoading ? (
                   <div className="flex items-center justify-center space-x-2">
@@ -860,25 +860,25 @@ export default function CheckoutPage() {
             </motion.div>
 
             {/* Mobile Fixed Bottom Summary with Expandable Breakdown */}
-            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 z-50 shadow-xl">
+            <div className="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-wine/10 z-50 shadow-[0_-12px_40px_-30px_rgba(43,29,34,0.5)]">
               {/* Expandable Cost Breakdown */}
               <motion.div
                 initial={false}
                 animate={{ height: showMobileSummary ? 'auto' : 0 }}
                 className="overflow-hidden"
               >
-                <div className="px-3 py-3 border-b border-gray-100 space-y-2 text-sm">
-                  <div className="flex justify-between text-gray-600">
+                <div className="px-3 py-3 border-b border-wine/10 space-y-2 text-sm">
+                  <div className="flex justify-between text-ink/60">
                     <span>Items ({items.length})</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                   {giftWrapPrice > 0 && (
-                    <div className="flex justify-between text-gray-600">
+                    <div className="flex justify-between text-ink/60">
                       <span>🎁 {selectedWrap?.name}</span>
                       <span>+{formatPrice(giftWrapPrice)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-gray-600">
+                  <div className="flex justify-between text-ink/60">
                     <span>Delivery</span>
                     <span className={deliveryFee === 0 ? 'text-green-600 font-semibold' : ''}>
                       {deliveryFee === 0 ? 'FREE' : formatPrice(deliveryFee)}
@@ -893,19 +893,19 @@ export default function CheckoutPage() {
                   <div className="flex-1">
                     <button
                       onClick={() => setShowMobileSummary(!showMobileSummary)}
-                      className="flex items-center text-xs text-gray-600 mb-1"
+                      className="flex items-center text-xs text-ink/60 mb-1"
                     >
                       <span>{showMobileSummary ? '▼' : '▶'}</span>
                       <span className="ml-1">View details</span>
                     </button>
-                    <p className="text-xs text-gray-600">Total Amount</p>
-                    <p className="text-xl font-bold text-gray-900">{formatPriceNoDecimals(total)}</p>
+                    <p className="text-xs text-ink/60">Total Amount</p>
+                    <p className="text-xl font-semibold text-wine">{formatPriceNoDecimals(total)}</p>
                   </div>
                   <motion.button
                     whileTap={{ scale: 0.95 }}
                     onClick={handlePlaceOrder}
                     disabled={isLoading || (giftOptions.isGift && !giftOptions.recipientId)}
-                    className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-xl font-semibold shadow-md smooth-transition disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+                    className="bg-wine text-white px-6 py-3 rounded-full font-semibold shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] smooth-transition disabled:opacity-50 disabled:cursor-not-allowed active:scale-95 hover:bg-wine-deep"
                   >
                     {isLoading ? (
                       <div className="flex items-center space-x-2">
@@ -917,7 +917,7 @@ export default function CheckoutPage() {
                     )}
                   </motion.button>
                 </div>
-                <p className="text-xs text-gray-500">{appSettings.deliveryEstimate}</p>
+                <p className="text-xs text-ink/55">{appSettings.deliveryEstimate}</p>
               </div>
             </div>
           </div>

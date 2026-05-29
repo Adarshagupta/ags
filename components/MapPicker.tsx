@@ -337,11 +337,11 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
   return (
     <div className="relative w-full h-full min-h-[420px]">
       {isLoading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-gray-100 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-cream-deep z-10">
           <div className="flex flex-col items-center space-y-3">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500"></div>
-            <p className="text-sm text-gray-700 font-medium">{locationStatus}</p>
-            <p className="text-xs text-gray-500">Please allow location access for accurate results</p>
+            <div className="animate-spin rounded-full h-12 w-12 border-2 border-wine/20 border-t-wine"></div>
+            <p className="text-sm text-ink/70 font-medium">{locationStatus}</p>
+            <p className="text-xs text-ink/55">Please allow location access for accurate results</p>
           </div>
         </div>
       )}
@@ -349,16 +349,16 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
       <div ref={mapRef} className="w-full h-full" />
 
       <div className="absolute left-4 right-4 top-4 z-10">
-        <div className="rounded-2xl bg-white shadow-lg">
+        <div className="rounded-2xl border border-wine/10 bg-white shadow-lg">
           <div className="flex items-center gap-3 px-4 py-3">
-            <svg className="h-5 w-5 shrink-0 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="h-5 w-5 shrink-0 text-wine" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="m21 21-4.35-4.35M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z" />
             </svg>
             <input
               ref={searchInputRef}
               type="text"
               placeholder="Search location, area or landmark"
-              className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
+              className="w-full bg-transparent text-sm text-ink outline-none placeholder:text-ink/40"
             />
           </div>
         </div>
@@ -366,17 +366,17 @@ export default function MapPicker({ onLocationSelect, initialLat, initialLng }: 
       
       <button
         onClick={handleUseCurrentLocation}
-        className="absolute bottom-20 right-4 bg-white p-3 rounded-full shadow-lg hover:bg-gray-50 transition-colors z-10"
+        className="absolute bottom-20 right-4 bg-white p-3 rounded-full shadow-lg border border-wine/10 hover:bg-cream-deep transition-colors z-10"
         title="Use my current location"
       >
-        <svg className="w-6 h-6 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-6 h-6 text-wine" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
         </svg>
       </button>
       
-      <div className="absolute bottom-4 left-1/2 w-[calc(100%-32px)] max-w-sm -translate-x-1/2 rounded-full bg-white px-4 py-2 shadow-lg z-10">
-        <p className="text-xs text-gray-600 text-center">
+      <div className="absolute bottom-4 left-1/2 w-[calc(100%-32px)] max-w-sm -translate-x-1/2 rounded-full border border-wine/10 bg-white px-4 py-2 shadow-lg z-10">
+        <p className="text-xs text-ink/60 text-center">
           Tap anywhere or drag the pin to set the exact delivery point
         </p>
       </div>

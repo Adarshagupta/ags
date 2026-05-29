@@ -103,13 +103,13 @@ export default function SellerProfilePage() {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h1 className="text-xl md:text-2xl font-bold text-gray-900">Seller Profile</h1>
-            <p className="text-gray-600 text-sm">Manage your business information</p>
+            <h1 className="font-display text-xl md:text-2xl font-semibold text-ink">Seller Profile</h1>
+            <p className="text-ink/55 text-sm">Manage your business information</p>
           </div>
           {!editing && (
             <button
               onClick={() => setEditing(true)}
-              className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm transition-colors"
+              className="bg-wine text-white px-4 py-2 rounded-full hover:bg-wine-deep text-sm transition-colors"
             >
               Edit
             </button>
@@ -118,10 +118,10 @@ export default function SellerProfilePage() {
 
         {/* Status Cards - Mobile Optimized */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-600 mb-1">Status</p>
+          <div className="bg-white border border-wine/10 rounded-[22px] p-4">
+            <p className="text-xs text-ink/55 mb-1">Status</p>
             <span
-              className={`px-2 py-1 rounded-lg text-xs font-semibold inline-block ${
+              className={`px-2 py-1 rounded-full text-xs font-semibold inline-block ${
                 profile.isActive
                   ? 'bg-green-50 text-green-800'
                   : 'bg-red-50 text-red-800'
@@ -130,25 +130,25 @@ export default function SellerProfilePage() {
               {profile.isActive ? 'Active' : 'Inactive'}
             </span>
           </div>
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-600 mb-1">Verified</p>
+          <div className="bg-white border border-wine/10 rounded-[22px] p-4">
+            <p className="text-xs text-ink/55 mb-1">Verified</p>
             <span
-              className={`px-2 py-1 rounded-lg text-xs font-semibold inline-block ${
+              className={`px-2 py-1 rounded-full text-xs font-semibold inline-block ${
                 profile.isVerified
-                  ? 'bg-gray-100 text-gray-800'
-                  : 'bg-gray-100 text-gray-800'
+                  ? 'bg-green-50 text-green-800'
+                  : 'bg-amber-50 text-amber-800'
               }`}
             >
               {profile.isVerified ? 'Yes' : 'Pending'}
             </span>
           </div>
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-600 mb-1">Commission</p>
-            <p className="text-xl font-bold text-gray-900">{profile.commission}%</p>
+          <div className="bg-white border border-wine/10 rounded-[22px] p-4">
+            <p className="text-xs text-ink/55 mb-1">Commission</p>
+            <p className="font-display text-xl font-semibold text-ink">{profile.commission}%</p>
           </div>
-          <div className="bg-white border rounded-lg p-4">
-            <p className="text-xs text-gray-600 mb-1">Member Since</p>
-            <p className="text-sm font-medium text-gray-900">
+          <div className="bg-white border border-wine/10 rounded-[22px] p-4">
+            <p className="text-xs text-ink/55 mb-1">Member Since</p>
+            <p className="text-sm font-medium text-ink">
               {new Date(profile.createdAt).toLocaleDateString('en-NP', {
                 month: 'short',
                 year: 'numeric',
@@ -157,24 +157,24 @@ export default function SellerProfilePage() {
           </div>
         </div>
         {/* Profile Form */}
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg border p-4 md:p-6">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Business Information</h2>
+        <form onSubmit={handleSubmit} className="bg-white rounded-[22px] border border-wine/10 p-4 md:p-6">
+          <h2 className="font-display text-lg font-semibold text-ink mb-4">Business Information</h2>
 
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Owner Name
                 </label>
                 <input
                   type="text"
                   disabled
                   value={profile.user.name}
-                  className="w-full border rounded-lg px-3 py-2 bg-gray-50 text-gray-600 text-sm"
+                  className="w-full rounded-xl border border-wine/15 px-3 py-2 bg-cream text-ink/55 text-sm"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Business Name *
                 </label>
                 <input
@@ -185,15 +185,15 @@ export default function SellerProfilePage() {
                   onChange={(e) =>
                     setFormData({ ...formData, businessName: e.target.value })
                   }
-                  className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                    editing ? '' : 'bg-gray-50 text-gray-600'
+                  className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                    editing ? '' : 'bg-cream text-ink/55'
                   }`}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink mb-1">
                 Business Address *
               </label>
               <textarea
@@ -203,8 +203,8 @@ export default function SellerProfilePage() {
                 onChange={(e) =>
                   setFormData({ ...formData, businessAddress: e.target.value })
                 }
-                className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                  editing ? '' : 'bg-gray-50 text-gray-600'
+                className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                  editing ? '' : 'bg-cream text-ink/55'
                 }`}
                 rows={2}
               />
@@ -212,7 +212,7 @@ export default function SellerProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Phone *
                 </label>
                 <input
@@ -221,13 +221,13 @@ export default function SellerProfilePage() {
                   disabled={!editing}
                   value={formData.phone}
                   onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                    editing ? '' : 'bg-gray-50 text-gray-600'
+                  className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                    editing ? '' : 'bg-cream text-ink/55'
                   }`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   Email *
                 </label>
                 <input
@@ -236,8 +236,8 @@ export default function SellerProfilePage() {
                   disabled={!editing}
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                    editing ? '' : 'bg-gray-50 text-gray-600'
+                  className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                    editing ? '' : 'bg-cream text-ink/55'
                   }`}
                 />
               </div>
@@ -245,7 +245,7 @@ export default function SellerProfilePage() {
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   VAT / PAN Registration
                 </label>
                 <input
@@ -253,13 +253,13 @@ export default function SellerProfilePage() {
                   disabled={!editing}
                   value={formData.gstin}
                   onChange={(e) => setFormData({ ...formData, gstin: e.target.value })}
-                  className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                    editing ? '' : 'bg-gray-50 text-gray-600'
+                  className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                    editing ? '' : 'bg-cream text-ink/55'
                   }`}
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink mb-1">
                   PAN Number
                 </label>
                 <input
@@ -269,19 +269,19 @@ export default function SellerProfilePage() {
                   onChange={(e) =>
                     setFormData({ ...formData, panNumber: e.target.value })
                   }
-                  className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                    editing ? '' : 'bg-gray-50 text-gray-600'
+                  className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                    editing ? '' : 'bg-cream text-ink/55'
                   }`}
                 />
               </div>
             </div>
 
-            <div className="pt-4 border-t">
-              <h3 className="text-md font-semibold text-gray-900 mb-4">Bank Details</h3>
+            <div className="pt-4 border-t border-wine/10">
+              <h3 className="font-display text-md font-semibold text-ink mb-4">Bank Details</h3>
               
               <div className="grid grid-cols-1 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                  <label className="block text-sm font-medium text-ink mb-1">
                     Account Holder Name
                   </label>
                   <input
@@ -291,14 +291,14 @@ export default function SellerProfilePage() {
                     onChange={(e) =>
                       setFormData({ ...formData, bankAccountName: e.target.value })
                     }
-                    className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                      editing ? '' : 'bg-gray-50 text-gray-600'
+                    className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                      editing ? '' : 'bg-cream text-ink/55'
                     }`}
                   />
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-ink mb-1">
                       Account Number
                     </label>
                     <input
@@ -308,13 +308,13 @@ export default function SellerProfilePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, bankAccountNo: e.target.value })
                       }
-                      className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                        editing ? '' : 'bg-gray-50 text-gray-600'
+                      className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                        editing ? '' : 'bg-cream text-ink/55'
                       }`}
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                    <label className="block text-sm font-medium text-ink mb-1">
                       Bank Code / SWIFT
                     </label>
                     <input
@@ -324,8 +324,8 @@ export default function SellerProfilePage() {
                       onChange={(e) =>
                         setFormData({ ...formData, ifscCode: e.target.value })
                       }
-                      className={`w-full border rounded-lg px-3 py-2 text-sm ${
-                        editing ? '' : 'bg-gray-50 text-gray-600'
+                      className={`w-full rounded-xl border border-wine/15 px-3 py-2 text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40 ${
+                        editing ? '' : 'bg-cream text-ink/55'
                       }`}
                     />
                   </div>
@@ -334,7 +334,7 @@ export default function SellerProfilePage() {
             </div>
 
             {editing && (
-              <div className="flex gap-3 justify-end pt-4 border-t">
+              <div className="flex gap-3 justify-end pt-4 border-t border-wine/10">
                 <button
                   type="button"
                   onClick={() => {
@@ -351,14 +351,14 @@ export default function SellerProfilePage() {
                       panNumber: profile.panNumber || '',
                     })
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                  className="px-4 py-2 border border-wine/20 text-wine rounded-full hover:border-wine/40 hover:bg-cream text-sm"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:bg-gray-400 text-sm shadow-md active:scale-95 transition-all"
+                  className="px-4 py-2 bg-wine text-white rounded-full hover:bg-wine-deep disabled:opacity-50 text-sm shadow-md active:scale-95 transition-all"
                 >
                   {saving ? 'Saving...' : 'Save Changes'}
                 </button>

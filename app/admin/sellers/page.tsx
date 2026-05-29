@@ -83,7 +83,7 @@ export default function SellersPage() {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-wine"></div>
       </div>
     )
   }
@@ -92,70 +92,70 @@ export default function SellersPage() {
     <div className="p-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Sellers Management</h1>
-          <p className="text-gray-600">Manage sellers and their products</p>
+          <h1 className="font-display text-2xl font-semibold text-ink">Sellers Management</h1>
+          <p className="text-ink/55">Manage sellers and their products</p>
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700"
+          className="bg-wine text-white px-5 py-2.5 rounded-full font-semibold hover:bg-wine-deep"
         >
           + Add Seller
         </button>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-white rounded-[22px] border border-wine/10 overflow-hidden">
+        <table className="min-w-full divide-y divide-wine/10">
+          <thead className="bg-cream-deep/50">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Business
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Owner
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Contact
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Commission
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Products
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Status
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white divide-y divide-wine/10">
             {sellers.map((seller) => (
-              <tr key={seller.id}>
+              <tr key={seller.id} className="hover:bg-cream/60">
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
-                    <div className="text-sm font-medium text-gray-900">
+                    <div className="text-sm font-medium text-ink">
                       {seller.businessName}
                     </div>
-                    <div className="text-sm text-gray-500">{seller.businessAddress}</div>
+                    <div className="text-sm text-ink/55">{seller.businessAddress}</div>
                     {seller.gstin && (
-                      <div className="text-xs text-gray-400">VAT/PAN: {seller.gstin}</div>
+                      <div className="text-xs text-ink/40">VAT/PAN: {seller.gstin}</div>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{seller.user.name}</div>
+                  <div className="text-sm text-ink">{seller.user.name}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{seller.phone}</div>
-                  <div className="text-sm text-gray-500">{seller.email}</div>
+                  <div className="text-sm text-ink">{seller.phone}</div>
+                  <div className="text-sm text-ink/55">{seller.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{seller.commission}%</div>
+                  <div className="text-sm text-ink">{seller.commission}%</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{seller._count.products}</div>
+                  <div className="text-sm text-ink">{seller._count.products}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="flex flex-col gap-1">
@@ -183,7 +183,7 @@ export default function SellersPage() {
                   <div className="flex gap-2">
                     <button
                       onClick={() => setEditingSeller(seller)}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-wine hover:text-wine-deep font-semibold"
                     >
                       Edit
                     </button>
@@ -207,7 +207,7 @@ export default function SellersPage() {
         </table>
 
         {sellers.length === 0 && (
-          <div className="text-center py-12 text-gray-500">
+          <div className="text-center py-12 text-ink/55">
             No sellers found. Add your first seller to get started.
           </div>
         )}
@@ -285,16 +285,16 @@ function SellerModal({
   }
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <h2 className="text-xl font-bold mb-4">
+    <div className="fixed inset-0 bg-ink/50 flex items-center justify-center z-50 p-4">
+      <div className="bg-white rounded-[22px] p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+        <h2 className="font-display text-xl font-semibold text-ink mb-4">
           {seller ? 'Edit Seller' : 'Add New Seller'}
         </h2>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Owner Name *
               </label>
               <input
@@ -303,12 +303,12 @@ function SellerModal({
                 disabled={!!seller}
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Email *
               </label>
               <input
@@ -316,12 +316,12 @@ function SellerModal({
                 required
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Phone *
               </label>
               <input
@@ -330,13 +330,13 @@ function SellerModal({
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                 placeholder="+977 9812345678"
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             {!seller && (
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
+                <label className="block text-sm font-medium text-ink/70 mb-1">
                   Password *
                 </label>
                 <input
@@ -344,13 +344,13 @@ function SellerModal({
                   required={!seller}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  className="w-full border rounded-lg px-3 py-2"
+                  className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
             )}
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Business Name *
               </label>
               <input
@@ -358,12 +358,12 @@ function SellerModal({
                 required
                 value={formData.businessName}
                 onChange={(e) => setFormData({ ...formData, businessName: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Commission (%) *
               </label>
               <input
@@ -374,80 +374,80 @@ function SellerModal({
                 step="0.1"
                 value={formData.commission}
                 onChange={(e) => setFormData({ ...formData, commission: parseFloat(e.target.value) })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div className="col-span-2">
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Business Address *
               </label>
               <textarea
                 required
                 value={formData.businessAddress}
                 onChange={(e) => setFormData({ ...formData, businessAddress: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 rows={2}
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 VAT / PAN Registration
               </label>
               <input
                 type="text"
                 value={formData.gstin}
                 onChange={(e) => setFormData({ ...formData, gstin: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 PAN Number
               </label>
               <input
                 type="text"
                 value={formData.panNumber}
                 onChange={(e) => setFormData({ ...formData, panNumber: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Bank Account Name
               </label>
               <input
                 type="text"
                 value={formData.bankAccountName}
                 onChange={(e) => setFormData({ ...formData, bankAccountName: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Bank Account Number
               </label>
               <input
                 type="text"
                 value={formData.bankAccountNo}
                 onChange={(e) => setFormData({ ...formData, bankAccountNo: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-ink/70 mb-1">
                 Bank Code / SWIFT
               </label>
               <input
                 type="text"
                 value={formData.ifscCode}
                 onChange={(e) => setFormData({ ...formData, ifscCode: e.target.value })}
-                className="w-full border rounded-lg px-3 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
           </div>
@@ -456,14 +456,14 @@ function SellerModal({
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-5 py-2.5 border border-wine/20 bg-white text-wine rounded-full font-semibold hover:bg-cream"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:bg-gray-400"
+              className="px-5 py-2.5 bg-wine text-white rounded-full font-semibold hover:bg-wine-deep disabled:opacity-50"
             >
               {loading ? 'Saving...' : seller ? 'Update Seller' : 'Add Seller'}
             </button>

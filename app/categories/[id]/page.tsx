@@ -65,10 +65,10 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-cream">
         <Header />
         <div className="max-w-6xl mx-auto px-4 py-6">
-          <div className="h-8 bg-gray-200 rounded w-48 mb-6 animate-pulse"></div>
+          <div className="h-8 bg-cream-deep rounded w-48 mb-6 animate-pulse"></div>
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
             <SkeletonLoader variant="grid" count={8} />
           </div>
@@ -80,14 +80,14 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
 
   if (!category) {
     return (
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-cream">
         <Header />
         <div className="flex flex-col items-center justify-center h-96">
           <div className="text-6xl mb-4">😕</div>
-          <h2 className="text-xl font-semibold text-gray-900 mb-2">Category not found</h2>
+          <h2 className="font-display text-xl font-semibold text-ink mb-2">Category not found</h2>
           <button
             onClick={() => router.push('/')}
-            className="mt-4 bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-2 rounded-full font-medium shadow-md"
+            className="mt-4 bg-wine text-white px-6 py-2 rounded-full font-medium shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep transition-colors"
           >
             Go Home
           </button>
@@ -98,15 +98,15 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 lg:pb-0">
+    <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       <Header />
       
       {/* Category Header */}
-      <div className="bg-gradient-to-br from-pink-500 via-pink-600 to-rose-600 px-4 pt-6 pb-8">
+      <div className="bg-gradient-to-br from-wine via-wine to-wine-deep px-4 pt-6 pb-8">
         <div className="max-w-7xl mx-auto">
           <button
             onClick={() => router.back()}
-            className="flex items-center gap-2 text-pink-100 hover:text-white mb-4 transition-colors"
+            className="flex items-center gap-2 text-cream/80 hover:text-white mb-4 transition-colors"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -125,8 +125,8 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
               </div>
             )}
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white">{category.name}</h1>
-              <p className="text-pink-100 mt-1">{products.length} {products.length === 1 ? 'product' : 'products'} available</p>
+              <h1 className="font-display text-2xl sm:text-3xl font-semibold text-white">{category.name}</h1>
+              <p className="text-cream/80 mt-1">{products.length} {products.length === 1 ? 'product' : 'products'} available</p>
             </div>
           </div>
         </div>
@@ -141,11 +141,11 @@ export default function CategoryPage({ params }: { params: Promise<{ id: string 
             className="text-center py-20"
           >
             <div className="text-7xl mb-4">📦</div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-2">No products yet</h2>
-            <p className="text-gray-600 mb-6">Check back soon for new items in this category</p>
+            <h2 className="font-display text-xl font-semibold text-ink mb-2">No products yet</h2>
+            <p className="text-ink/55 mb-6">Check back soon for new items in this category</p>
             <button
               onClick={() => router.push('/')}
-              className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-6 py-3 rounded-full font-semibold shadow-lg"
+              className="bg-wine text-white px-6 py-3 rounded-full font-semibold shadow-[0_16px_34px_-22px_rgba(124,42,71,0.95)] hover:bg-wine-deep transition-colors"
             >
               Browse All Products
             </button>

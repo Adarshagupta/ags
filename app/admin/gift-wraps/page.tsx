@@ -100,12 +100,12 @@ export default function AdminGiftWraps() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Gift Wraps</h1>
-          <p className="text-gray-600 mt-1">Manage gift wrapping options</p>
+          <h1 className="font-display text-3xl font-semibold text-ink">Gift Wraps</h1>
+          <p className="text-ink/55 mt-1">Manage gift wrapping options</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold"
+          className="bg-wine hover:bg-wine-deep text-white px-6 py-2.5 rounded-full font-semibold"
         >
           {showForm ? 'Cancel' : '+ Add Gift Wrap'}
         </button>
@@ -113,56 +113,56 @@ export default function AdminGiftWraps() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-bold mb-4">{editingWrap ? 'Edit Gift Wrap' : 'New Gift Wrap'}</h2>
+        <div className="bg-white rounded-[22px] border border-wine/10 p-6 mb-6">
+          <h2 className="font-display text-xl font-semibold text-ink mb-4">{editingWrap ? 'Edit Gift Wrap' : 'New Gift Wrap'}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Name*</label>
                 <input
                   type="text"
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Price*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Price*</label>
                 <input
                   type="number"
                   required
                   step="0.01"
                   value={formData.price}
                   onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div className="col-span-2">
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Image URL*</label>
                 <input
                   type="text"
                   required
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Type*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Type*</label>
                 <select
                   value={formData.type}
                   onChange={(e) => setFormData({ ...formData, type: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 >
                   <option value="premium">Premium</option>
                   <option value="eco-friendly">Eco-Friendly</option>
@@ -176,17 +176,17 @@ export default function AdminGiftWraps() {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-wine border-wine/30 rounded focus:ring-wine/30"
                   />
-                  <span className="text-sm font-medium text-gray-700">Active</span>
+                  <span className="text-sm font-medium text-ink/70">Active</span>
                 </label>
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold">
+              <button type="submit" className="bg-wine hover:bg-wine-deep text-white px-6 py-2 rounded-full font-semibold">
                 {editingWrap ? 'Update' : 'Create'} Gift Wrap
               </button>
-              <button type="button" onClick={resetForm} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold">
+              <button type="button" onClick={resetForm} className="border border-wine/20 bg-white hover:bg-cream text-wine px-6 py-2 rounded-full font-semibold">
                 Cancel
               </button>
             </div>
@@ -197,29 +197,29 @@ export default function AdminGiftWraps() {
       {/* Gift Wraps List */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {loading ? (
-          <div className="col-span-3 p-8 text-center text-gray-500">Loading...</div>
+          <div className="col-span-3 p-8 text-center text-ink/55">Loading...</div>
         ) : giftWraps.length === 0 ? (
-          <div className="col-span-3 p-8 text-center text-gray-500">No gift wraps yet</div>
+          <div className="col-span-3 p-8 text-center text-ink/55">No gift wraps yet</div>
         ) : (
           giftWraps.map((wrap) => (
-            <div key={wrap.id} className="bg-white rounded-xl border border-gray-200 p-4">
+            <div key={wrap.id} className="bg-white rounded-[22px] border border-wine/10 p-4">
               <div className="flex items-start justify-between mb-3">
                 <div>
-                  <h3 className="font-bold text-gray-900">{wrap.name}</h3>
-                  <p className="text-sm text-gray-500">{wrap.type}</p>
-                  <p className="text-lg font-semibold text-orange-600">Rs. {wrap.price.toFixed(2)}</p>
+                  <h3 className="font-display font-semibold text-ink">{wrap.name}</h3>
+                  <p className="text-sm text-ink/55">{wrap.type}</p>
+                  <p className="text-lg font-semibold text-wine">Rs. {wrap.price.toFixed(2)}</p>
                 </div>
                 {wrap.isActive && (
-                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded text-xs font-medium">
+                  <span className="bg-green-100 text-green-700 px-2 py-1 rounded-lg text-xs font-medium">
                     Active
                   </span>
                 )}
               </div>
               {wrap.description && (
-                <p className="text-sm text-gray-600 mb-3">{wrap.description}</p>
+                <p className="text-sm text-ink/55 mb-3">{wrap.description}</p>
               )}
               <div className="flex gap-2">
-                <button onClick={() => editWrap(wrap)} className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                <button onClick={() => editWrap(wrap)} className="text-wine hover:text-wine-deep text-sm font-semibold">
                   Edit
                 </button>
                 <button onClick={() => deleteWrap(wrap.id)} className="text-red-600 hover:text-red-700 text-sm font-medium">

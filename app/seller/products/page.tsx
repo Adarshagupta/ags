@@ -83,31 +83,31 @@ export default function SellerProductsPage() {
     <div className="px-4 py-4 md:py-6">
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-900">My Products</h1>
-          <p className="text-gray-600 text-sm">Manage your product catalog</p>
+          <h1 className="font-display text-xl md:text-2xl font-semibold text-ink">My Products</h1>
+          <p className="text-ink/55 text-sm">Manage your product catalog</p>
         </div>
         <button
           onClick={() => router.push('/seller/products/new')}
-          className="bg-gray-900 text-white px-4 py-2 rounded-lg hover:bg-gray-800 text-sm md:text-base shadow-sm transition-colors"
+          className="bg-wine text-white px-4 py-2 rounded-full hover:bg-wine-deep text-sm md:text-base shadow-sm transition-colors"
         >
           + Add
         </button>
       </div>
 
       {message && (
-        <div className="mb-4 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700 shadow-sm">
+        <div className="mb-4 rounded-xl border border-wine/15 bg-white px-4 py-3 text-sm text-ink/70 shadow-sm">
           {message}
         </div>
       )}
 
       {products.length === 0 ? (
-        <div className="bg-white border rounded-xl shadow-sm p-12 text-center">
+        <div className="bg-white border border-wine/10 rounded-[22px] shadow-sm p-12 text-center">
           <div className="text-6xl mb-4">📦</div>
-          <h3 className="text-lg font-medium text-gray-900 mb-2">No products yet</h3>
-          <p className="text-gray-600 mb-6">Add your first product to get started</p>
+          <h3 className="font-display text-lg font-medium text-ink mb-2">No products yet</h3>
+          <p className="text-ink/55 mb-6">Add your first product to get started</p>
           <button
             onClick={() => router.push('/seller/products/new')}
-            className="bg-gray-900 text-white px-6 py-3 rounded-lg hover:bg-gray-800 inline-block transition-colors"
+            className="bg-wine text-white px-6 py-3 rounded-full hover:bg-wine-deep inline-block transition-colors"
           >
             + Add Product
           </button>
@@ -117,7 +117,7 @@ export default function SellerProductsPage() {
           {products.map((product) => (
             <div
               key={product.id}
-              className="bg-white border rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow"
+              className="bg-white border border-wine/10 rounded-[22px] shadow-sm overflow-hidden hover:shadow-md transition-shadow"
             >
               <div className="p-4">
                 <div className="flex gap-4">
@@ -129,10 +129,10 @@ export default function SellerProductsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2 mb-2">
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-semibold text-gray-900 truncate">
+                        <h3 className="font-display font-semibold text-ink truncate">
                           {product.name}
                         </h3>
-                        <p className="text-sm text-gray-600">{product.category}</p>
+                        <p className="text-sm text-ink/55">{product.category}</p>
                       </div>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold flex-shrink-0 ${
@@ -146,7 +146,7 @@ export default function SellerProductsPage() {
                     </div>
                     <div className="flex items-center justify-between">
                       <div className="flex gap-3 text-sm">
-                        <span className="font-semibold text-gray-900">Rs. {product.price}</span>
+                        <span className="font-semibold text-ink">Rs. {product.price}</span>
                         {product.discount > 0 && (
                           <span className="text-green-600">{product.discount}% off</span>
                         )}
@@ -155,22 +155,22 @@ export default function SellerProductsPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-2 mt-3 pt-3 border-t">
+                <div className="flex gap-2 mt-3 pt-3 border-t border-wine/10">
                   <button
                     onClick={() => router.push(`/seller/products/${product.id}`)}
-                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    className="flex-1 bg-cream-deep text-ink/70 py-2 px-3 rounded-full text-sm font-medium hover:bg-cream transition-colors"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => toggleAvailability(product.id, product.isAvailable)}
-                    className="flex-1 bg-gray-100 text-gray-700 py-2 px-3 rounded-lg text-sm font-medium hover:bg-gray-200 transition-colors"
+                    className="flex-1 bg-cream-deep text-ink/70 py-2 px-3 rounded-full text-sm font-medium hover:bg-cream transition-colors"
                   >
                     {product.isAvailable ? 'Hide' : 'Show'}
                   </button>
                   <button
                     onClick={() => deleteProduct(product.id)}
-                    className="flex-1 bg-red-50 text-red-600 py-2 px-3 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
+                    className="flex-1 bg-red-50 text-red-600 py-2 px-3 rounded-full text-sm font-medium hover:bg-red-100 transition-colors"
                   >
                     Delete
                   </button>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { AnimatePresence, motion } from 'framer-motion'
 import { resolveImageUrl } from '@/lib/image-url'
 
 type Banner = {
@@ -13,18 +14,21 @@ type Banner = {
   link?: string | null
 }
 
+const BANNER_DURATION = 5500
+
 export default function HomepageBannerCarousel({ banners }: { banners: Banner[] }) {
   const [activeIndex, setActiveIndex] = useState(0)
+  const [paused, setPaused] = useState(false)
 
   useEffect(() => {
-    if (banners.length <= 1) return
+    if (banners.length <= 1 || paused) return
 
-    const interval = window.setInterval(() => {
+    const interval = window.setTimeout(() => {
       setActiveIndex((current) => (current + 1) % banners.length)
-    }, 5000)
+    }, BANNER_DURATION)
 
-    return () => window.clearInterval(interval)
-  }, [banners.length])
+    return () => window.clearTimeout(interval)
+  }, [banners.length, activeIndex, paused])
 
   if (banners.length === 0) {
     return null
@@ -34,23 +38,43 @@ export default function HomepageBannerCarousel({ banners }: { banners: Banner[] 
   const imageUrl = resolveImageUrl(activeBanner.image)
 
   const content = (
-    <div className="group relative overflow-hidden rounded-[28px] bg-white shadow-[0_22px_50px_-34px_rgba(15,23,42,0.4)]">
-      <div className="relative min-h-[210px] md:min-h-[250px]">
-        <Image
-          src={imageUrl}
-          alt={activeBanner.title}
-          fill
-          priority
-          quality={75}
-          className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
-          sizes="(max-width: 768px) 100vw, 70vw"
-        />
+    <div className="group relative overflow-hidden rounded-[30px] border border-wine/10 bg-white p-[3px] shadow-[0_28px_60px_-40px_rgba(124,42,71,0.6)] ring-1 ring-gold/20">
+      <div className="relative min-h-[230px] overflow-hidden rounded-[27px] bg-gradient-to-br from-rose-soft to-cream-deep md:min-h-[300px]">
+        <AnimatePresence initial={false} mode="popLayout">
+          <motion.div
+            key={activeBanner.id}
+            initial={{ opacity: 0, scale: 1.1 }}
+            animate={{
+              opacity: 1,
+              scale: 1,
+              transition: {
+                opacity: { duration: 1, ease: 'easeOut' },
+                scale: { duration: BANNER_DURATION / 1000 + 1.4, ease: 'linear' },
+              },
+            }}
+            exit={{ opacity: 0, transition: { duration: 0.8, ease: 'easeInOut' } }}
+            className="absolute inset-0"
+          >
+            <Image
+              src={imageUrl}
+              alt={activeBanner.title}
+              fill
+              priority={activeIndex === 0}
+              quality={78}
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+              sizes="(max-width: 768px) 100vw, 70vw"
+            />
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Soft inner edge so the artwork sits gently inside the cream frame */}
+        <div className="pointer-events-none absolute inset-0 rounded-[27px] shadow-[inset_0_0_0_1px_rgba(124,42,71,0.08)]" />
       </div>
     </div>
   )
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3" onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
       {activeBanner.link ? <Link href={activeBanner.link}>{content}</Link> : content}
 
       {banners.length > 1 ? (
@@ -60,11 +84,20 @@ export default function HomepageBannerCarousel({ banners }: { banners: Banner[] 
               key={banner.id}
               type="button"
               onClick={() => setActiveIndex(index)}
-              className={`h-2.5 rounded-full transition-all ${
-                activeIndex === index ? 'w-8 bg-slate-900' : 'w-2.5 bg-slate-300'
-              }`}
+              className="relative h-1.5 overflow-hidden rounded-full bg-wine/15 transition-all"
+              style={{ width: activeIndex === index ? 34 : 14 }}
               aria-label={`Show banner ${index + 1}`}
-            />
+            >
+              {activeIndex === index ? (
+                <motion.span
+                  key={activeIndex}
+                  className="absolute inset-y-0 left-0 rounded-full bg-wine"
+                  initial={{ width: '0%' }}
+                  animate={{ width: paused ? '35%' : '100%' }}
+                  transition={{ duration: paused ? 0.3 : BANNER_DURATION / 1000, ease: 'linear' }}
+                />
+              ) : null}
+            </button>
           ))}
         </div>
       ) : null}

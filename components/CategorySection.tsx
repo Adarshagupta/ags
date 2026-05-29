@@ -57,7 +57,7 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
 
   return (
     <div>
-      {title && <h2 className="text-base font-semibold text-gray-900 mb-3">{title}</h2>}
+      {title && <h2 className="u-title text-xl mb-3">{title}</h2>}
       
       {/* Clean Horizontal Scroll */}
       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4">
@@ -71,9 +71,9 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
             <div
               className={`w-16 h-16 rounded-2xl flex items-center justify-center mb-2 transition-all overflow-hidden ${
                 selectedCategory === category.id
-                  ? 'ring-2 ring-pink-500 ring-offset-2'
+                  ? 'ring-2 ring-wine ring-offset-2'
                   : ''
-              } bg-gradient-to-br from-gray-50 to-gray-100`}
+              } bg-cream-deep`}
             >
               {category.image ? (
                 <Image unoptimized src={category.image}
@@ -83,15 +83,15 @@ export default function CategorySection({ type, title }: CategorySectionProps) {
                   className="w-full h-full object-cover"
                 />
               ) : (
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-pink-100 to-rose-100 flex items-center justify-center">
-                  <span className="text-lg font-semibold text-pink-600">
+                <div className="w-10 h-10 rounded-xl bg-rose-soft flex items-center justify-center">
+                  <span className="font-display text-lg font-semibold text-wine">
                     {category.name.charAt(0)}
                   </span>
                 </div>
               )}
             </div>
             <span className={`text-xs font-medium text-center w-16 line-clamp-1 ${
-              selectedCategory === category.id ? 'text-pink-600' : 'text-gray-600'
+              selectedCategory === category.id ? 'text-wine' : 'text-ink/60'
             }`}>
               {category.name}
             </span>

@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['var(--font-sans)', 'ui-sans-serif', 'system-ui', 'sans-serif'],
+        display: ['var(--font-display)', 'ui-serif', 'Georgia', 'serif'],
+      },
       colors: {
         primary: {
           DEFAULT: '#fc8019',
@@ -16,7 +20,24 @@ module.exports = {
         secondary: {
           DEFAULT: '#1a1a1a',
           light: '#3a3a3a'
-        }
+        },
+        wine: {
+          DEFAULT: '#7c2a47',
+          deep: '#5d1d34',
+        },
+        rose: {
+          brand: '#c2496a',
+          soft: '#f6e3e8',
+        },
+        gold: {
+          DEFAULT: '#b8893f',
+          soft: '#f3e7d0',
+        },
+        cream: {
+          DEFAULT: '#faf5f0',
+          deep: '#f3ebe2',
+        },
+        ink: '#2b1d22',
       },
       animation: {
         'fade-in': 'fadeIn 0.3s ease-in-out',

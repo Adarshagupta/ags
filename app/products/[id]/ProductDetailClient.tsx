@@ -254,7 +254,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white pb-20 lg:pb-0">
+      <div className="min-h-screen bg-cream pb-20 lg:pb-0">
         <Header />
         <div className="max-w-6xl mx-auto px-4 py-6">
           <SkeletonLoader variant="product" />
@@ -286,14 +286,14 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
 
   const MobileRecommendationSkeleton = () => (
     <div className="px-4 py-6">
-      <div className="mb-3 h-6 w-40 animate-pulse rounded bg-gray-200" />
+      <div className="mb-3 h-6 w-40 animate-pulse rounded bg-cream-deep" />
       <div className="flex gap-3 overflow-x-auto pb-2">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="w-32 flex-shrink-0 overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <div className="h-32 animate-pulse bg-gray-100" />
+          <div key={index} className="w-32 flex-shrink-0 overflow-hidden rounded-xl border border-ink/10 bg-white">
+            <div className="h-32 animate-pulse bg-cream-deep" />
             <div className="space-y-2 p-2">
-              <div className="h-3 w-5/6 animate-pulse rounded bg-gray-100" />
-              <div className="h-4 w-1/2 animate-pulse rounded bg-gray-100" />
+              <div className="h-3 w-5/6 animate-pulse rounded bg-cream-deep" />
+              <div className="h-4 w-1/2 animate-pulse rounded bg-cream-deep" />
             </div>
           </div>
         ))}
@@ -304,17 +304,17 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
   const MobileRelatedSkeleton = () => (
     <div className="px-4 py-6 pb-24">
       <div className="mb-4 flex items-center justify-between">
-        <div className="h-7 w-40 animate-pulse rounded bg-gray-200" />
-        <div className="h-1 w-12 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-7 w-40 animate-pulse rounded bg-cream-deep" />
+        <div className="h-1 w-12 animate-pulse rounded-full bg-cream-deep" />
       </div>
       <div className="grid grid-cols-2 gap-3">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <div className="h-44 animate-pulse bg-gray-100" />
+          <div key={index} className="overflow-hidden rounded-2xl border border-ink/10 bg-white">
+            <div className="h-44 animate-pulse bg-cream-deep" />
             <div className="space-y-2 p-3">
-              <div className="h-4 w-4/5 animate-pulse rounded bg-gray-100" />
-              <div className="h-4 w-2/3 animate-pulse rounded bg-gray-100" />
-              <div className="h-5 w-1/2 animate-pulse rounded bg-gray-100" />
+              <div className="h-4 w-4/5 animate-pulse rounded bg-cream-deep" />
+              <div className="h-4 w-2/3 animate-pulse rounded bg-cream-deep" />
+              <div className="h-5 w-1/2 animate-pulse rounded bg-cream-deep" />
             </div>
           </div>
         ))}
@@ -324,14 +324,14 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
 
   const DesktopRecommendationSkeleton = () => (
     <div className="mt-10">
-      <div className="mb-4 h-8 w-48 animate-pulse rounded bg-gray-200" />
+      <div className="mb-4 h-8 w-48 animate-pulse rounded bg-cream-deep" />
       <div className="grid grid-cols-4 gap-6">
         {Array.from({ length: 4 }).map((_, index) => (
-          <div key={index} className="overflow-hidden rounded-xl border border-gray-200 bg-white">
-            <div className="h-48 animate-pulse bg-gray-100" />
+          <div key={index} className="overflow-hidden rounded-xl border border-ink/10 bg-white">
+            <div className="h-48 animate-pulse bg-cream-deep" />
             <div className="space-y-3 p-4">
-              <div className="h-4 w-5/6 animate-pulse rounded bg-gray-100" />
-              <div className="h-5 w-1/2 animate-pulse rounded bg-gray-100" />
+              <div className="h-4 w-5/6 animate-pulse rounded bg-cream-deep" />
+              <div className="h-5 w-1/2 animate-pulse rounded bg-cream-deep" />
             </div>
           </div>
         ))}
@@ -342,17 +342,17 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
   const DesktopRelatedSkeleton = () => (
     <div className="mt-12 mb-8">
       <div className="mb-8 flex items-center gap-4">
-        <div className="h-9 w-56 animate-pulse rounded bg-gray-200" />
-        <div className="h-1 flex-1 animate-pulse rounded-full bg-gray-200" />
+        <div className="h-9 w-56 animate-pulse rounded bg-cream-deep" />
+        <div className="h-1 flex-1 animate-pulse rounded-full bg-cream-deep" />
       </div>
       <div className="grid grid-cols-3 gap-6">
         {Array.from({ length: 3 }).map((_, index) => (
-          <div key={index} className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
-            <div className="h-72 animate-pulse bg-gray-100" />
+          <div key={index} className="overflow-hidden rounded-2xl border border-ink/10 bg-white">
+            <div className="h-72 animate-pulse bg-cream-deep" />
             <div className="space-y-3 p-5">
-              <div className="h-5 w-5/6 animate-pulse rounded bg-gray-100" />
-              <div className="h-5 w-2/3 animate-pulse rounded bg-gray-100" />
-              <div className="h-6 w-1/2 animate-pulse rounded bg-gray-100" />
+              <div className="h-5 w-5/6 animate-pulse rounded bg-cream-deep" />
+              <div className="h-5 w-2/3 animate-pulse rounded bg-cream-deep" />
+              <div className="h-6 w-1/2 animate-pulse rounded bg-cream-deep" />
             </div>
           </div>
         ))}
@@ -361,7 +361,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
   )
 
   return (
-    <div className="min-h-screen bg-white pb-20 lg:pb-0">
+    <div className="min-h-screen bg-cream pb-20 lg:pb-0">
       {/* Header - Desktop only */}
       <div className="hidden lg:block">
         <Header />
@@ -370,7 +370,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
       {/* Back button - Fixed overlay on mobile */}
       <button
         onClick={() => router.back()}
-        className="fixed top-4 left-4 z-50 lg:hidden w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-gray-900 hover:bg-white transition-colors"
+        className="fixed top-4 left-4 z-50 lg:hidden w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full shadow-lg flex items-center justify-center text-ink hover:bg-white transition-colors"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -380,7 +380,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
       <button
         type="button"
         onClick={handleShareProduct}
-        className="fixed top-4 right-4 z-50 lg:hidden flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-gray-900 shadow-lg backdrop-blur-sm transition-colors hover:bg-white"
+        className="fixed top-4 right-4 z-50 lg:hidden flex h-10 w-10 items-center justify-center rounded-full bg-white/90 text-ink shadow-lg backdrop-blur-sm transition-colors hover:bg-white"
         aria-label="Share product"
       >
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -400,7 +400,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="relative w-full aspect-square bg-gradient-to-br from-pink-50 to-rose-50"
+            className="relative w-full aspect-square bg-gradient-to-br from-rose-soft to-cream-deep"
           >
             <Image unoptimized src={activeImage}
               alt={product.imageAlt || product.name}
@@ -428,7 +428,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                   whileTap={{ scale: 0.95 }}
                   onClick={() => setSelectedImage(idx)}
                   className={`relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 border-2 transition-all backdrop-blur-sm ${
-                    selectedImage === idx ? 'border-pink-500 shadow-lg ring-2 ring-white' : 'border-white/80 opacity-70 hover:opacity-100'
+                    selectedImage === idx ? 'border-wine shadow-lg ring-2 ring-white' : 'border-white/80 opacity-70 hover:opacity-100'
                   }`}
                 >
                   <Image unoptimized src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
@@ -443,9 +443,9 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           {/* Category & Tags */}
           <div className="flex items-center gap-2 flex-wrap">
             {product.showFoodTypeLabel && <FoodTypeBadge isVeg={product.isVeg} />}
-            <span className="text-xs text-gray-500 font-medium uppercase tracking-wider">{product.category}</span>
-            <span className="text-gray-300">•</span>
-            <div className="flex items-center gap-1 text-pink-500">
+            <span className="text-xs text-ink/55 font-medium uppercase tracking-wider">{product.category}</span>
+            <span className="text-ink/20">•</span>
+            <div className="flex items-center gap-1 text-wine">
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
               </svg>
@@ -454,13 +454,13 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           </div>
 
           {/* Product Name */}
-          <h1 className="text-2xl font-bold text-gray-900 leading-tight">{product.name}</h1>
+          <h1 className="font-display text-2xl font-bold text-ink leading-tight">{product.name}</h1>
 
-          {miniDescription ? <p className="text-sm text-gray-600">{miniDescription}</p> : null}
+          {miniDescription ? <p className="text-sm text-ink/60">{miniDescription}</p> : null}
 
           {variants.length > 0 && (
             <div>
-              <p className="text-xs font-semibold text-gray-700 mb-2 uppercase tracking-wider">Variants</p>
+              <p className="text-xs font-semibold text-ink/70 mb-2 uppercase tracking-wider">Variants</p>
               <div className="flex gap-2 overflow-x-auto pb-1 pr-1 scrollbar-hide">
                 <button
                   type="button"
@@ -470,19 +470,19 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                   }}
                   className={`w-40 flex-shrink-0 rounded-xl border p-2 text-left transition-colors ${
                     selectedVariantIndex === null
-                      ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
-                      : 'border-gray-300 bg-white hover:border-pink-400'
+                      ? 'border-wine bg-rose-soft ring-1 ring-wine/30'
+                      : 'border-ink/15 bg-white hover:border-wine/50'
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     <img
                       src={resolveImageUrl(product.image)}
                       alt={product.name}
-                      className="h-11 w-11 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                      className="h-11 w-11 flex-shrink-0 rounded-lg border border-ink/10 object-cover"
                     />
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-semibold text-gray-900">{product.name}</p>
-                      <p className="text-[11px] text-pink-600">{formatPriceNoDecimals(basePrice)}</p>
+                      <p className="truncate text-xs font-semibold text-ink">{product.name}</p>
+                      <p className="text-[11px] text-wine">{formatPriceNoDecimals(basePrice)}</p>
                     </div>
                   </div>
                 </button>
@@ -498,20 +498,20 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                       }}
                       className={`w-40 flex-shrink-0 rounded-xl border p-2 text-left transition-colors ${
                         selectedVariantIndex === index
-                          ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
-                          : 'border-gray-300 bg-white hover:border-pink-400'
+                          ? 'border-wine bg-rose-soft ring-1 ring-wine/30'
+                          : 'border-ink/15 bg-white hover:border-wine/50'
                       }`}
                     >
                       <div className="flex items-center gap-2">
                         <img
                           src={variant.image}
                           alt={label}
-                          className="h-11 w-11 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                          className="h-11 w-11 flex-shrink-0 rounded-lg border border-ink/10 object-cover"
                         />
                         <div className="min-w-0">
-                          <p className="truncate text-xs font-semibold text-gray-900">{label}</p>
+                          <p className="truncate text-xs font-semibold text-ink">{label}</p>
                           {typeof variant.price === 'number' ? (
-                            <p className="text-[11px] text-pink-600">{formatPriceNoDecimals(variant.price)}</p>
+                            <p className="text-[11px] text-wine">{formatPriceNoDecimals(variant.price)}</p>
                           ) : null}
                         </div>
                       </div>
@@ -528,7 +528,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               {visibleTags.map((tag, idx) => (
                 <span
                   key={idx}
-                  className="flex-shrink-0 px-2.5 py-0.5 bg-pink-50 text-pink-700 rounded-full text-[11px] font-medium border border-pink-100"
+                  className="flex-shrink-0 px-2.5 py-0.5 bg-rose-soft text-wine rounded-full text-[11px] font-medium border border-rose-soft"
                 >
                   {tag}
                 </span>
@@ -538,14 +538,14 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
         </div>
 
         {/* Fixed Bottom Bar with Quantity & Add to Cart */}
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 shadow-lg z-40">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-ink/10 px-4 py-3 shadow-lg z-40">
           <div className="flex items-center gap-3">
             {/* Quantity Selector */}
-            <div className="flex items-center bg-gray-50 rounded-lg p-1 gap-2">
+            <div className="flex items-center bg-cream-deep rounded-lg p-1 gap-2">
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="w-8 h-8 rounded-md bg-white text-gray-700 flex items-center justify-center font-bold shadow-sm border border-gray-200"
+                className="w-8 h-8 rounded-md bg-white text-ink/70 flex items-center justify-center font-bold shadow-sm border border-ink/10"
               >
                 −
               </motion.button>
@@ -553,7 +553,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setQuantity(quantity + 1)}
-                className="w-8 h-8 rounded-md bg-pink-500 text-white flex items-center justify-center font-bold shadow-sm"
+                className="w-8 h-8 rounded-md bg-wine text-white flex items-center justify-center font-bold shadow-sm"
               >
                 +
               </motion.button>
@@ -564,12 +564,12 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               whileTap={{ scale: 0.98 }}
               onClick={handleAddToCart}
               disabled={!product.isAvailable}
-              className="flex-1 bg-pink-500 hover:bg-pink-600 text-white font-semibold py-3 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-md flex items-center justify-center gap-2"
+              className="flex-1 bg-wine hover:bg-wine-deep text-white font-semibold py-3 rounded-lg disabled:bg-ink/20 disabled:cursor-not-allowed transition-colors shadow-md flex items-center justify-center gap-2"
             >
               {product.isAvailable ? (
                 <>
                   <span>Add to Cart</span>
-                  <span className="text-pink-100">•</span>
+                  <span className="text-white/60">•</span>
                   <span>Rs. {(finalPrice * quantity).toFixed(2)}</span>
                 </>
               ) : (
@@ -582,16 +582,16 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
         {/* Add-ons Section */}
         {loadingDeferredSections && addons.length === 0 ? <MobileRecommendationSkeleton /> : null}
         {addons.length > 0 && (
-          <div className="px-4 py-6 bg-gray-50">
-            <h2 className="text-lg font-bold text-gray-900 mb-3">Add Extra Love 💝</h2>
+          <div className="px-4 py-6 bg-cream-deep">
+            <h2 className="font-display text-lg font-bold text-ink mb-3">Add Extra Love 💝</h2>
             <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-2">
               {addons.map((addon) => (
                 <motion.div
                   key={addon.id}
                   whileTap={{ scale: 0.95 }}
-                  className="flex-shrink-0 w-32 bg-white rounded-xl border border-gray-200 overflow-hidden"
+                  className="flex-shrink-0 w-32 bg-white rounded-xl border border-ink/10 overflow-hidden"
                 >
-                  <div className="relative h-32 bg-gray-100">
+                  <div className="relative h-32 bg-cream-deep">
                     <Image unoptimized src={resolveImageUrl(addon.image)} alt={addon.name} fill className="object-cover" />
                     <button
                       type="button"
@@ -599,7 +599,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                         event.stopPropagation()
                         handleQuickAddRecommendation(addon)
                       }}
-                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-pink-600 text-white shadow-md transition hover:bg-pink-700"
+                      className="absolute right-2 top-2 flex h-7 w-7 items-center justify-center rounded-full bg-wine text-white shadow-md transition hover:bg-wine-deep"
                       aria-label={`Add ${addon.name} to cart`}
                     >
                       <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -608,8 +608,8 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                     </button>
                   </div>
                   <div className="p-2">
-                    <p className="text-xs font-semibold text-gray-900 truncate">{addon.name}</p>
-                    <p className="text-sm font-bold text-pink-600">
+                    <p className="text-xs font-semibold text-ink truncate">{addon.name}</p>
+                    <p className="text-sm font-bold text-wine">
                       {formatPriceNoDecimals(addon.price - addon.price * ((addon.discount || 0) / 100))}
                     </p>
                   </div>
@@ -624,8 +624,8 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
         {relatedProducts.length > 0 && (
           <div className="px-4 py-6 pb-24">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold text-gray-900">You May Also Like</h2>
-              <div className="w-12 h-1 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full"></div>
+              <h2 className="font-display text-xl font-bold text-ink">You May Also Like</h2>
+              <div className="w-12 h-1 bg-gradient-to-r from-wine to-rose-brand rounded-full"></div>
             </div>
             <div className="grid grid-cols-2 gap-3">
               {relatedProducts.map((relatedProduct, index) => (
@@ -645,26 +645,26 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                       className="object-contain group-hover:scale-105 transition-transform duration-500" 
                     />
                     {relatedProduct.discount > 0 && (
-                      <div className="absolute top-2 right-2 bg-gradient-to-r from-red-500 to-pink-600 text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg">
+                      <div className="absolute top-2 right-2 bg-gradient-to-r from-wine to-rose-brand text-white px-2.5 py-1 rounded-full text-xs font-bold shadow-lg">
                         {relatedProduct.discount}% OFF
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/20 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
                   </div>
                   <div className="p-3">
-                    <p className="text-sm font-semibold text-gray-900 line-clamp-2 min-h-[2.5rem] leading-tight">{relatedProduct.name}</p>
+                    <p className="text-sm font-semibold text-ink line-clamp-2 min-h-[2.5rem] leading-tight">{relatedProduct.name}</p>
                     <div className="flex items-center justify-between mt-2">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="text-lg font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">Rs. {(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                        <span className="text-lg font-bold bg-gradient-to-r from-wine to-rose-brand bg-clip-text text-transparent">Rs. {(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
                         {relatedProduct.discount > 0 && (
-                          <span className="text-xs text-gray-400 line-through">Rs. {relatedProduct.price}</span>
+                          <span className="text-xs text-ink/40 line-through">Rs. {relatedProduct.price}</span>
                         )}
                       </div>
                       <motion.div
                         whileHover={{ x: 3 }}
-                        className="w-6 h-6 bg-pink-50 rounded-full flex items-center justify-center group-hover:bg-pink-100 transition-colors"
+                        className="w-6 h-6 bg-rose-soft rounded-full flex items-center justify-center group-hover:bg-cream-deep transition-colors"
                       >
-                        <svg className="w-3 h-3 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3 h-3 text-wine" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
                         </svg>
                       </motion.div>
@@ -701,10 +701,10 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           </div>
         )}
 
-        <section className="mx-4 mb-28 rounded-2xl border border-gray-200 bg-gradient-to-br from-white to-pink-50 p-4">
-          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-pink-500">Description</p>
+        <section className="mx-4 mb-28 rounded-2xl border border-ink/10 bg-gradient-to-br from-white to-rose-soft p-4">
+          <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-wine">Description</p>
           <div
-            className="space-y-2 text-sm leading-6 text-gray-700 [&_a]:text-pink-600 [&_h1]:mt-3 [&_h2]:mt-3 [&_h3]:mt-2 [&_ul]:my-2"
+            className="space-y-2 text-sm leading-6 text-ink/70 [&_a]:text-wine [&_h1]:mt-3 [&_h2]:mt-3 [&_h3]:mt-2 [&_ul]:my-2"
             dangerouslySetInnerHTML={{ __html: descriptionHtml }}
           />
         </section>
@@ -719,7 +719,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="relative aspect-square bg-gradient-to-br from-pink-50 to-rose-50 rounded-2xl overflow-hidden"
+                className="relative aspect-square bg-gradient-to-br from-rose-soft to-cream-deep rounded-2xl overflow-hidden"
               >
                 <Image unoptimized src={activeImage}
                   alt={product.imageAlt || product.name}
@@ -742,7 +742,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                       key={idx}
                       onClick={() => setSelectedImage(idx)}
                       className={`relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all backdrop-blur-sm ${
-                        selectedImage === idx ? 'border-pink-500 shadow-lg ring-2 ring-white scale-105' : 'border-white/80 opacity-70 hover:opacity-100 hover:scale-105'
+                        selectedImage === idx ? 'border-wine shadow-lg ring-2 ring-white scale-105' : 'border-white/80 opacity-70 hover:opacity-100 hover:scale-105'
                       }`}
                     >
                       <Image unoptimized src={img} alt={`View ${idx + 1}`} fill className="object-cover" />
@@ -757,15 +757,15 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           <div className="flex flex-col space-y-6">
             <div className="flex items-center gap-2">
               {product.showFoodTypeLabel && <FoodTypeBadge isVeg={product.isVeg} className="h-5 w-5" />}
-              <span className="text-sm text-gray-500 font-medium uppercase tracking-wide">{product.category}</span>
+              <span className="text-sm text-ink/55 font-medium uppercase tracking-wide">{product.category}</span>
             </div>
 
             <div className="flex items-start justify-between gap-4">
-              <h1 className="text-4xl font-bold leading-tight text-gray-900">{product.name}</h1>
+              <h1 className="font-display text-4xl font-bold leading-tight text-ink">{product.name}</h1>
               <button
                 type="button"
                 onClick={handleShareProduct}
-                className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-gray-200 bg-white text-gray-700 shadow-sm transition hover:border-pink-200 hover:text-pink-600"
+                className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-full border border-ink/10 bg-white text-ink/70 shadow-sm transition hover:border-wine/30 hover:text-wine"
                 aria-label="Share product"
               >
                 <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -779,13 +779,13 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               </button>
             </div>
 
-            {miniDescription ? <p className="text-base text-gray-600">{miniDescription}</p> : null}
+            {miniDescription ? <p className="text-base text-ink/60">{miniDescription}</p> : null}
 
             <div className="flex items-baseline gap-4">
-              <span className="text-4xl font-bold text-pink-600">Rs. {finalPrice.toFixed(2)}</span>
+              <span className="font-display text-4xl font-bold text-wine">Rs. {finalPrice.toFixed(2)}</span>
               {product.discount > 0 && (
                 <>
-                  <span className="text-2xl text-gray-400 line-through">Rs. {product.price.toFixed(2)}</span>
+                  <span className="text-2xl text-ink/40 line-through">Rs. {product.price.toFixed(2)}</span>
                   <span className="text-base font-semibold text-green-600 bg-green-50 px-3 py-1 rounded-lg">
                     Save Rs. {(product.price - finalPrice).toFixed(2)}
                   </span>
@@ -793,7 +793,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               )}
             </div>
 
-            <div className="flex items-center gap-2 text-pink-500">
+            <div className="flex items-center gap-2 text-wine">
               <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
               </svg>
@@ -806,7 +806,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                 {visibleTags.map((tag, idx) => (
                   <span
                     key={idx}
-                    className="flex-shrink-0 px-3 py-1 bg-pink-50 text-pink-700 rounded-full text-xs font-medium border border-pink-100"
+                    className="flex-shrink-0 px-3 py-1 bg-rose-soft text-wine rounded-full text-xs font-medium border border-rose-soft"
                   >
                     {tag}
                   </span>
@@ -816,7 +816,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
 
             {variants.length > 0 && (
               <div>
-                <p className="text-sm font-semibold text-gray-700 mb-2">Variants</p>
+                <p className="text-sm font-semibold text-ink/70 mb-2">Variants</p>
                 <div className="flex gap-3 overflow-x-auto pb-1 pr-1 scrollbar-hide">
                   <button
                     type="button"
@@ -826,19 +826,19 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                     }}
                     className={`w-56 flex-shrink-0 rounded-xl border p-3 text-left transition-colors ${
                       selectedVariantIndex === null
-                        ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
-                        : 'border-gray-300 bg-white hover:border-pink-400'
+                        ? 'border-wine bg-rose-soft ring-1 ring-wine/30'
+                        : 'border-ink/15 bg-white hover:border-wine/50'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <img
                         src={resolveImageUrl(product.image)}
                         alt={product.name}
-                        className="h-14 w-14 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                        className="h-14 w-14 flex-shrink-0 rounded-lg border border-ink/10 object-cover"
                       />
                       <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-gray-900">{product.name}</p>
-                        <p className="text-sm text-pink-600">{formatPriceNoDecimals(basePrice)}</p>
+                        <p className="truncate text-sm font-semibold text-ink">{product.name}</p>
+                        <p className="text-sm text-wine">{formatPriceNoDecimals(basePrice)}</p>
                       </div>
                     </div>
                   </button>
@@ -854,20 +854,20 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                         }}
                         className={`w-56 flex-shrink-0 rounded-xl border p-3 text-left transition-colors ${
                           selectedVariantIndex === index
-                            ? 'border-pink-500 bg-pink-50 ring-1 ring-pink-300'
-                            : 'border-gray-300 bg-white hover:border-pink-400'
+                            ? 'border-wine bg-rose-soft ring-1 ring-wine/30'
+                            : 'border-ink/15 bg-white hover:border-wine/50'
                         }`}
                       >
                         <div className="flex items-center gap-3">
                           <img
                             src={variant.image}
                             alt={label}
-                            className="h-14 w-14 flex-shrink-0 rounded-lg border border-gray-200 object-cover"
+                            className="h-14 w-14 flex-shrink-0 rounded-lg border border-ink/10 object-cover"
                           />
                           <div className="min-w-0">
-                            <p className="truncate text-sm font-semibold text-gray-900">{label}</p>
+                            <p className="truncate text-sm font-semibold text-ink">{label}</p>
                             {typeof variant.price === 'number' ? (
-                              <p className="text-sm text-pink-600">{formatPriceNoDecimals(variant.price)}</p>
+                              <p className="text-sm text-wine">{formatPriceNoDecimals(variant.price)}</p>
                             ) : null}
                           </div>
                         </div>
@@ -880,18 +880,18 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
 
             {/* Quantity Selector */}
             <div className="flex items-center gap-6 pt-4">
-              <span className="text-base font-medium text-gray-700">Quantity:</span>
-              <div className="flex items-center bg-gray-50 rounded-lg p-1 gap-3">
+              <span className="text-base font-medium text-ink/70">Quantity:</span>
+              <div className="flex items-center bg-cream-deep rounded-lg p-1 gap-3">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="w-10 h-10 rounded-md bg-white text-gray-700 flex items-center justify-center font-bold shadow-sm border border-gray-200 hover:bg-gray-50"
+                  className="w-10 h-10 rounded-md bg-white text-ink/70 flex items-center justify-center font-bold shadow-sm border border-ink/10 hover:bg-cream-deep"
                 >
                   −
                 </button>
                 <span className="text-xl font-semibold w-12 text-center">{quantity}</span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="w-10 h-10 rounded-md bg-pink-500 text-white flex items-center justify-center font-bold shadow-sm hover:bg-pink-600"
+                  className="w-10 h-10 rounded-md bg-wine text-white flex items-center justify-center font-bold shadow-sm hover:bg-wine-deep"
                 >
                   +
                 </button>
@@ -903,7 +903,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
               whileTap={{ scale: 0.98 }}
               onClick={handleAddToCart}
               disabled={!product.isAvailable}
-              className="w-full bg-pink-500 hover:bg-pink-600 text-white font-semibold py-4 rounded-xl disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors shadow-lg text-lg"
+              className="w-full bg-wine hover:bg-wine-deep text-white font-semibold py-4 rounded-xl disabled:bg-ink/20 disabled:cursor-not-allowed transition-colors shadow-lg text-lg"
             >
               {product.isAvailable ? `Add to Cart • Rs. ${(finalPrice * quantity).toFixed(2)}` : 'Currently Unavailable'}
             </motion.button>
@@ -915,16 +915,16 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
         {loadingDeferredSections && addons.length === 0 ? <DesktopRecommendationSkeleton /> : null}
         {addons.length > 0 && (
           <div className="mt-12">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Add Extra Love 💝</h2>
+            <h2 className="font-display text-2xl font-bold text-ink mb-6">Add Extra Love 💝</h2>
             <div className="grid grid-cols-4 gap-6">
               {addons.map((addon) => (
                 <motion.div
                   key={addon.id}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-xl border border-ink/10 overflow-hidden hover:shadow-lg transition-shadow"
                 >
-                  <div className="relative h-48 bg-gray-100">
+                  <div className="relative h-48 bg-cream-deep">
                     <Image unoptimized src={resolveImageUrl(addon.image)} alt={addon.name} fill className="object-cover" />
                     <button
                       type="button"
@@ -932,7 +932,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                         event.stopPropagation()
                         handleQuickAddRecommendation(addon)
                       }}
-                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-pink-600 text-white shadow-md transition hover:bg-pink-700"
+                      className="absolute right-3 top-3 flex h-9 w-9 items-center justify-center rounded-full bg-wine text-white shadow-md transition hover:bg-wine-deep"
                       aria-label={`Add ${addon.name} to cart`}
                     >
                       <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -941,8 +941,8 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                     </button>
                   </div>
                   <div className="p-4">
-                    <p className="text-sm font-semibold text-gray-900 truncate">{addon.name}</p>
-                    <p className="text-lg font-bold text-pink-600 mt-1">
+                    <p className="text-sm font-semibold text-ink truncate">{addon.name}</p>
+                    <p className="text-lg font-bold text-wine mt-1">
                       {formatPriceNoDecimals(addon.price - addon.price * ((addon.discount || 0) / 100))}
                     </p>
                   </div>
@@ -957,8 +957,8 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
         {relatedProducts.length > 0 && (
           <div className="mt-12 mb-8">
             <div className="flex items-center gap-4 mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">You May Also Like</h2>
-              <div className="flex-1 h-1 bg-gradient-to-r from-pink-500 via-rose-500 to-transparent rounded-full"></div>
+              <h2 className="font-display text-3xl font-bold text-ink">You May Also Like</h2>
+              <div className="flex-1 h-1 bg-gradient-to-r from-wine via-rose-brand to-transparent rounded-full"></div>
             </div>
             <div className="grid grid-cols-3 gap-6">
               {relatedProducts.map((relatedProduct, index) => (
@@ -970,7 +970,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                   whileHover={{ y: -8 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => router.push(`/products/${relatedProduct.id}`)}
-                  className="group bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 border border-gray-100"
+                  className="group bg-white rounded-2xl overflow-hidden cursor-pointer shadow-md hover:shadow-2xl transition-all duration-300 border border-ink/10"
                 >
                   <div className="relative h-72 bg-white overflow-hidden">
                     <Image unoptimized src={resolveImageUrl(relatedProduct.image)} 
@@ -983,7 +983,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                         initial={{ scale: 0 }}
                         animate={{ scale: 1 }}
                         transition={{ delay: index * 0.1 + 0.3 }}
-                        className="absolute top-4 right-4 bg-gradient-to-r from-red-500 to-pink-600 text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm"
+                        className="absolute top-4 right-4 bg-gradient-to-r from-wine to-rose-brand text-white px-4 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm"
                       >
                         {relatedProduct.discount}% OFF
                       </motion.div>
@@ -994,7 +994,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                       whileHover={{ opacity: 1, y: 0 }}
                       className="absolute bottom-4 left-4 right-4 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300"
                     >
-                      <div className="bg-white/95 backdrop-blur-sm text-pink-600 px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
+                      <div className="bg-white/95 backdrop-blur-sm text-wine px-6 py-2.5 rounded-full text-sm font-semibold shadow-lg flex items-center gap-2">
                         <span>Quick View</span>
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -1003,18 +1003,18 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
                     </motion.div>
                   </div>
                   <div className="p-5">
-                    <p className="text-lg font-semibold text-gray-900 line-clamp-2 min-h-[3.5rem] leading-snug group-hover:text-pink-600 transition-colors">{relatedProduct.name}</p>
-                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-gray-100">
+                    <p className="text-lg font-semibold text-ink line-clamp-2 min-h-[3.5rem] leading-snug group-hover:text-wine transition-colors">{relatedProduct.name}</p>
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-ink/10">
                       <div className="flex items-baseline gap-2">
-                        <span className="text-2xl font-bold bg-gradient-to-r from-pink-600 to-rose-600 bg-clip-text text-transparent">Rs. {(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
+                        <span className="text-2xl font-bold bg-gradient-to-r from-wine to-rose-brand bg-clip-text text-transparent">Rs. {(relatedProduct.price - (relatedProduct.price * (relatedProduct.discount || 0) / 100)).toFixed(2)}</span>
                         {relatedProduct.discount > 0 && (
-                          <span className="text-sm text-gray-400 line-through">Rs. {relatedProduct.price}</span>
+                          <span className="text-sm text-ink/40 line-through">Rs. {relatedProduct.price}</span>
                         )}
                       </div>
                       <motion.button
                         whileHover={{ scale: 1.1, rotate: 5 }}
                         whileTap={{ scale: 0.9 }}
-                        className="w-10 h-10 bg-gradient-to-r from-pink-500 to-rose-600 rounded-full flex items-center justify-center text-white shadow-md group-hover:shadow-lg transition-shadow"
+                        className="w-10 h-10 bg-gradient-to-r from-wine to-rose-brand rounded-full flex items-center justify-center text-white shadow-md group-hover:shadow-lg transition-shadow"
                       >
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -1054,12 +1054,12 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           </div>
         ) : null}
 
-        <section className="mt-10 mb-8 rounded-3xl border border-gray-200 bg-gradient-to-br from-white to-pink-50 p-6 shadow-sm">
+        <section className="mt-10 mb-8 rounded-3xl border border-ink/10 bg-gradient-to-br from-white to-rose-soft p-6 shadow-sm">
           <div className="mb-4">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-pink-500">Description</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-wine">Description</p>
           </div>
           <div
-            className="space-y-2 text-base leading-7 text-gray-700 [&_a]:text-pink-600 [&_h1]:mb-2 [&_h2]:mb-2 [&_h3]:mb-1"
+            className="space-y-2 text-base leading-7 text-ink/70 [&_a]:text-wine [&_h1]:mb-2 [&_h2]:mb-2 [&_h3]:mb-1"
             dangerouslySetInnerHTML={{ __html: descriptionHtml }}
           />
         </section>
@@ -1070,7 +1070,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 12 }}
-          className="fixed bottom-28 left-1/2 z-[70] -translate-x-1/2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white shadow-xl lg:bottom-24"
+          className="fixed bottom-28 left-1/2 z-[70] -translate-x-1/2 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white shadow-xl lg:bottom-24"
         >
           {cartToastMessage}
         </motion.div>
@@ -1079,7 +1079,7 @@ export default function ProductDetailClient({ params }: { params: Promise<{ id: 
       <button
         type="button"
         onClick={() => router.push('/cart')}
-        className="fixed bottom-24 right-4 z-[65] flex h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-pink-600 px-4 text-white shadow-xl transition hover:bg-pink-700 lg:bottom-6 lg:right-6"
+        className="fixed bottom-24 right-4 z-[65] flex h-12 min-w-12 items-center justify-center gap-2 rounded-full bg-wine px-4 text-white shadow-xl transition hover:bg-wine-deep lg:bottom-6 lg:right-6"
         aria-label="Open cart"
       >
         <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">

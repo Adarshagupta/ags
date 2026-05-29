@@ -51,3 +51,4 @@ prisma/migrations/
 .dev.vars
 .dev.vars.*
 cloudflare-env.d.ts
+.env*

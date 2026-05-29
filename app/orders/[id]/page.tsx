@@ -65,10 +65,10 @@ const statusTheme: Record<
     panelClass: 'bg-emerald-50 border-emerald-200 text-emerald-800',
   },
   CANCELLED: {
-    badge: 'bg-rose-100 text-rose-700',
+    badge: 'bg-red-100 text-red-700',
     title: 'Cancelled',
     hint: 'This order was cancelled.',
-    panelClass: 'bg-rose-50 border-rose-200 text-rose-800',
+    panelClass: 'bg-red-50 border-red-200 text-red-800',
   },
 }
 
@@ -127,7 +127,7 @@ export default function OrderTrackingPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-cream">
         <div className="mx-auto max-w-5xl px-4 py-6 space-y-4">
           <SkeletonLoader variant="order" />
           <SkeletonLoader variant="text" count={4} />
@@ -138,13 +138,13 @@ export default function OrderTrackingPage() {
 
   if (!order) {
     return (
-      <div className="min-h-screen bg-slate-50 px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold text-slate-900 mb-2">Order not found</h1>
-        <p className="text-slate-600 mb-6">The order you are looking for is not available.</p>
+      <div className="min-h-screen bg-cream px-4 py-20 text-center">
+        <h1 className="font-display text-2xl font-semibold text-ink mb-2">Order not found</h1>
+        <p className="text-ink/55 mb-6">The order you are looking for is not available.</p>
         <button
           type="button"
           onClick={() => router.push('/orders')}
-          className="rounded-xl bg-slate-900 px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-full bg-wine px-5 py-2.5 text-sm font-semibold text-white hover:bg-wine-deep transition-colors"
         >
           Back to Orders
         </button>
@@ -162,22 +162,22 @@ export default function OrderTrackingPage() {
     Number.isFinite(Number(order.address?.latitude)) && Number.isFinite(Number(order.address?.longitude))
 
   return (
-    <div className="min-h-screen bg-slate-50 pb-8">
-      <div className="sticky top-0 z-40 border-b border-slate-200 bg-white/95 backdrop-blur">
+    <div className="min-h-screen bg-cream pb-8">
+      <div className="sticky top-0 z-40 border-b border-wine/10 bg-cream/95 backdrop-blur">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3 min-w-0">
             <button
               type="button"
               onClick={() => router.push('/orders')}
-              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-slate-200 text-slate-700 hover:bg-slate-50"
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-wine/20 text-wine hover:bg-cream"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M15 19l-7-7 7-7" />
               </svg>
             </button>
             <div className="min-w-0">
-              <p className="truncate text-sm font-semibold text-slate-900">Order #{order.orderNumber}</p>
-              <p className="truncate text-xs text-slate-500">{new Date(order.placedAt).toLocaleString()}</p>
+              <p className="truncate font-display text-sm font-semibold text-ink">Order #{order.orderNumber}</p>
+              <p className="truncate text-xs text-ink/55">{new Date(order.placedAt).toLocaleString()}</p>
             </div>
           </div>
           <span className={`rounded-full px-3 py-1 text-xs font-semibold ${activeTheme.badge}`}>
@@ -190,17 +190,17 @@ export default function OrderTrackingPage() {
         <motion.section
           initial={{ opacity: 0, y: 14 }}
           animate={{ opacity: 1, y: 0 }}
-          className="overflow-hidden rounded-2xl bg-gradient-to-br from-pink-600 to-rose-600 p-5 text-white shadow-lg"
+          className="overflow-hidden rounded-[22px] bg-gradient-to-br from-wine to-wine-deep p-5 text-white shadow-[0_24px_60px_-40px_rgba(124,42,71,0.9)]"
         >
           <div className="flex flex-wrap items-start justify-between gap-3">
             <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-pink-100">Current Status</p>
-              <h1 className="mt-1 text-2xl font-bold">{activeTheme.title}</h1>
-              <p className="mt-1 text-sm text-pink-50">{activeTheme.hint}</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-cream/70">Current Status</p>
+              <h1 className="mt-1 font-display text-2xl font-semibold">{activeTheme.title}</h1>
+              <p className="mt-1 text-sm text-cream/80">{activeTheme.hint}</p>
             </div>
             <div className="text-left sm:text-right">
-              <p className="text-xs uppercase tracking-[0.16em] text-pink-100">Order Total</p>
-              <p className="mt-1 text-2xl font-bold">{formatPriceNoDecimals(order.total)}</p>
+              <p className="text-xs uppercase tracking-[0.16em] text-cream/70">Order Total</p>
+              <p className="mt-1 font-display text-2xl font-semibold">{formatPriceNoDecimals(order.total)}</p>
             </div>
           </div>
           {currentStatus !== 'DELIVERED' && currentStatus !== 'CANCELLED' ? (
@@ -222,9 +222,9 @@ export default function OrderTrackingPage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.05 }}
-          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          className="rounded-[22px] border border-wine/10 bg-white p-4 shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]"
         >
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Tracking Timeline</h2>
+          <h2 className="mb-4 font-display text-lg font-semibold text-ink">Tracking Timeline</h2>
           <div className="space-y-4">
             {trackingSteps.map((step, index) => {
               const isCompleted = index <= completedIndex
@@ -235,20 +235,20 @@ export default function OrderTrackingPage() {
                   <div className="relative flex flex-col items-center">
                     <div
                       className={`flex h-7 w-7 items-center justify-center rounded-full border-2 text-[11px] font-bold ${
-                        isCompleted ? 'border-pink-600 bg-pink-600 text-white' : 'border-slate-300 bg-white text-slate-500'
+                        isCompleted ? 'border-wine bg-wine text-white' : 'border-wine/20 bg-white text-ink/50'
                       }`}
                     >
                       {index + 1}
                     </div>
                     {index < trackingSteps.length - 1 ? (
-                      <div className={`mt-1 h-7 w-0.5 ${isCompleted ? 'bg-pink-500' : 'bg-slate-200'}`} />
+                      <div className={`mt-1 h-7 w-0.5 ${isCompleted ? 'bg-wine' : 'bg-wine/15'}`} />
                     ) : null}
                   </div>
                   <div className="pt-0.5">
-                    <p className={`text-sm font-semibold ${isCompleted ? 'text-slate-900' : 'text-slate-500'}`}>
+                    <p className={`text-sm font-semibold ${isCompleted ? 'text-ink' : 'text-ink/50'}`}>
                       {step.label}
                     </p>
-                    {isCurrent ? <p className="text-xs text-pink-600">In progress</p> : null}
+                    {isCurrent ? <p className="text-xs text-wine">In progress</p> : null}
                   </div>
                 </div>
               )
@@ -266,12 +266,12 @@ export default function OrderTrackingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-[22px] border border-wine/10 bg-white p-4 shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]"
           >
-            <h2 className="mb-3 text-lg font-semibold text-slate-900">Delivery Address</h2>
+            <h2 className="mb-3 font-display text-lg font-semibold text-ink">Delivery Address</h2>
             {hasAddress ? (
-              <div className="space-y-1 text-sm text-slate-700">
-                <p className="font-semibold text-slate-900">{order.address.label || 'Address'}</p>
+              <div className="space-y-1 text-sm text-ink/70">
+                <p className="font-semibold text-ink">{order.address.label || 'Address'}</p>
                 <p>{order.address.street}</p>
                 {order.address.apartment ? <p>{order.address.apartment}</p> : null}
                 {order.address.landmark ? <p>{order.address.landmark}</p> : null}
@@ -279,13 +279,13 @@ export default function OrderTrackingPage() {
                   {order.address.city}, {order.address.state} - {order.address.pincode}
                 </p>
                 {hasCoordinates ? (
-                  <p className="pt-1 text-xs text-slate-500">
+                  <p className="pt-1 text-xs text-ink/45">
                     Coordinates: {Number(order.address.latitude).toFixed(5)}, {Number(order.address.longitude).toFixed(5)}
                   </p>
                 ) : null}
               </div>
             ) : (
-              <p className="text-sm text-slate-500">No address found for this order.</p>
+              <p className="text-sm text-ink/45">No address found for this order.</p>
             )}
           </motion.section>
 
@@ -293,25 +293,25 @@ export default function OrderTrackingPage() {
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.12 }}
-            className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+            className="rounded-[22px] border border-wine/10 bg-white p-4 shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]"
           >
-            <h2 className="mb-3 text-lg font-semibold text-slate-900">Bill Summary</h2>
+            <h2 className="mb-3 font-display text-lg font-semibold text-ink">Bill Summary</h2>
             <div className="space-y-2 text-sm">
-              <div className="flex items-center justify-between text-slate-600">
+              <div className="flex items-center justify-between text-ink/60">
                 <span>Subtotal</span>
                 <span>{formatPriceNoDecimals(order.subtotal)}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-600">
+              <div className="flex items-center justify-between text-ink/60">
                 <span>Delivery Fee</span>
                 <span>{formatPriceNoDecimals(order.deliveryFee)}</span>
               </div>
-              <div className="flex items-center justify-between text-slate-600">
+              <div className="flex items-center justify-between text-ink/60">
                 <span>Tax</span>
                 <span>{formatPriceNoDecimals(order.tax)}</span>
               </div>
-              <div className="border-t border-slate-200 pt-2 flex items-center justify-between text-base font-bold text-slate-900">
+              <div className="border-t border-wine/10 pt-2 flex items-center justify-between text-base font-semibold text-ink">
                 <span>Total</span>
-                <span>{formatPriceNoDecimals(order.total)}</span>
+                <span className="text-wine">{formatPriceNoDecimals(order.total)}</span>
               </div>
             </div>
           </motion.section>
@@ -321,27 +321,27 @@ export default function OrderTrackingPage() {
           initial={{ opacity: 0, y: 18 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.16 }}
-          className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"
+          className="rounded-[22px] border border-wine/10 bg-white p-4 shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]"
         >
-          <h2 className="mb-4 text-lg font-semibold text-slate-900">Items in This Order</h2>
+          <h2 className="mb-4 font-display text-lg font-semibold text-ink">Items in This Order</h2>
           <div className="space-y-3">
             {order.items.map((item: any) => (
-              <div key={item.id} className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 p-3">
+              <div key={item.id} className="flex items-center justify-between gap-3 rounded-xl border border-wine/10 p-3">
                 <div className="flex min-w-0 items-center gap-3">
                   <img
                     src={resolveImageUrl(item.product.image)}
                     alt={item.product.name}
-                    className="h-14 w-14 flex-shrink-0 rounded-lg object-cover border border-slate-200"
+                    className="h-14 w-14 flex-shrink-0 rounded-2xl object-cover border border-wine/10 bg-cream-deep"
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
                       {item.product.showFoodTypeLabel ? <FoodTypeBadge isVeg={item.product.isVeg} className="h-4 w-4" /> : null}
-                      <p className="truncate text-sm font-semibold text-slate-900">{item.product.name}</p>
+                      <p className="truncate font-display text-sm font-semibold text-ink">{item.product.name}</p>
                     </div>
-                    <p className="text-xs text-slate-500">Qty: {item.quantity}</p>
+                    <p className="text-xs text-ink/55">Qty: {item.quantity}</p>
                   </div>
                 </div>
-                <p className="text-sm font-semibold text-slate-900">{formatPrice(item.price * item.quantity)}</p>
+                <p className="text-sm font-semibold text-wine">{formatPrice(item.price * item.quantity)}</p>
               </div>
             ))}
           </div>

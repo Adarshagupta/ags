@@ -238,13 +238,13 @@ export default function NewProductPage() {
     <div className="px-4 py-6">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Add New Product</h1>
-          <p className="text-gray-600">Create a new product for your store</p>
+          <h1 className="font-display text-2xl font-semibold text-ink">Add New Product</h1>
+          <p className="text-ink/55">Create a new product for your store</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="bg-white rounded-lg shadow p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="bg-white border border-wine/10 rounded-[22px] shadow-sm p-6 space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink mb-2">
               Product Name *
             </label>
             <input
@@ -252,20 +252,20 @@ export default function NewProductPage() {
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               placeholder="e.g., Red Roses Bouquet"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink mb-2">
               Description *
             </label>
             <textarea
               required
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               rows={4}
               placeholder="Describe your product..."
             />
@@ -287,7 +287,7 @@ export default function NewProductPage() {
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-ink mb-2">
                 Price (NPR)*
               </label>
               <input
@@ -297,13 +297,13 @@ export default function NewProductPage() {
                 step="0.01"
                 value={formData.price}
                 onChange={(e) => setFormData({ ...formData, price: e.target.value })}
-                className="w-full border rounded-lg px-4 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 placeholder="0.00"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-ink mb-2">
                 Discount (%)
               </label>
               <input
@@ -312,13 +312,13 @@ export default function NewProductPage() {
                 max="100"
                 value={formData.discount}
                 onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) })}
-                className="w-full border rounded-lg px-4 py-2"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 placeholder="0"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-ink mb-2">
                 Preparation Time
               </label>
               <div className="flex gap-2">
@@ -328,24 +328,24 @@ export default function NewProductPage() {
                   step={prepTimeUnit === 'days' ? '0.25' : '1'}
                   value={prepTimeInputValue}
                   onChange={(e) => handlePrepTimeValueChange(e.target.value)}
-                  className="w-full border rounded-lg px-4 py-2"
+                  className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   placeholder="15"
                 />
                 <select
                   value={prepTimeUnit}
                   onChange={(e) => setPrepTimeUnit(e.target.value as PrepTimeUnit)}
-                  className="rounded-lg border px-3 py-2 bg-white"
+                  className="rounded-xl border border-wine/15 px-3 py-2 bg-white text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 >
                   <option value="minutes">Minutes</option>
                   <option value="days">Days</option>
                 </select>
               </div>
-              <p className="mt-1 text-xs text-gray-500">Shown on product page as: {formatTime(formData.prepTime)}</p>
+              <p className="mt-1 text-xs text-ink/55">Shown on product page as: {formatTime(formData.prepTime)}</p>
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink mb-2">
               Main Image URL *
             </label>
             <input
@@ -353,7 +353,7 @@ export default function NewProductPage() {
               required
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               placeholder="https://example.com/image.jpg"
             />
             <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -361,22 +361,22 @@ export default function NewProductPage() {
                 type="file"
                 accept="image/jpeg,image/png,image/webp,image/gif"
                 onChange={(e) => setMainImageFile(e.target.files?.[0] || null)}
-                className="block w-full text-sm text-gray-700 sm:w-auto"
+                className="block w-full text-sm text-ink/70 sm:w-auto"
               />
               <button
                 type="button"
                 onClick={handleMainImageUpload}
                 disabled={!mainImageFile || uploadingMainImage}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                className="px-4 py-2 bg-wine text-white rounded-full text-sm font-medium hover:bg-wine-deep disabled:opacity-50"
               >
                 {uploadingMainImage ? 'Uploading...' : 'Upload Main Image'}
               </button>
             </div>
-            <p className="mt-1 text-xs text-gray-500">JPG, PNG, WEBP or GIF. Max size 5MB.</p>
+            <p className="mt-1 text-xs text-ink/55">JPG, PNG, WEBP or GIF. Max size 5MB.</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink mb-2">
               Additional Images
             </label>
             {formData.images.map((img, index) => (
@@ -385,13 +385,13 @@ export default function NewProductPage() {
                   type="text"
                   value={img}
                   onChange={(e) => updateImage(index, e.target.value)}
-                  className="flex-1 border rounded-lg px-4 py-2"
+                  className="flex-1 rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   placeholder="https://example.com/image.jpg"
                 />
                 <button
                   type="button"
                   onClick={() => removeImage(index)}
-                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                  className="px-4 py-2 bg-red-100 text-red-600 rounded-full hover:bg-red-200"
                 >
                   Remove
                 </button>
@@ -400,24 +400,24 @@ export default function NewProductPage() {
             <button
               type="button"
               onClick={addImageField}
-              className="text-sm text-pink-600 hover:text-pink-700"
+              className="text-sm text-wine hover:text-wine-deep font-medium"
             >
               + Add Image
             </button>
-            <div className="mt-3 rounded-lg border border-dashed border-gray-300 p-3">
-              <p className="text-xs text-gray-600">Upload additional image</p>
+            <div className="mt-3 rounded-xl border border-dashed border-wine/20 p-3">
+              <p className="text-xs text-ink/55">Upload additional image</p>
               <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center">
                 <input
                   type="file"
                   accept="image/jpeg,image/png,image/webp,image/gif"
                   onChange={(e) => setAdditionalImageFile(e.target.files?.[0] || null)}
-                  className="block w-full text-sm text-gray-700 sm:w-auto"
+                  className="block w-full text-sm text-ink/70 sm:w-auto"
                 />
                 <button
                   type="button"
                   onClick={handleAdditionalImageUpload}
                   disabled={!additionalImageFile || uploadingAdditionalImage}
-                  className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                  className="px-4 py-2 bg-wine text-white rounded-full text-sm font-medium hover:bg-wine-deep disabled:opacity-50"
                 >
                   {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
                 </button>
@@ -427,43 +427,43 @@ export default function NewProductPage() {
 
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">Product Variants</label>
+              <label className="block text-sm font-medium text-ink">Product Variants</label>
               <button
                 type="button"
                 onClick={addVariant}
-                className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-200"
+                className="px-3 py-1.5 bg-rose-soft text-wine rounded-full text-xs font-semibold hover:bg-rose-soft/70"
               >
                 + Add Variant
               </button>
             </div>
             {formData.variants.length === 0 && (
-              <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg p-3">
+              <p className="text-xs text-ink/55 border border-dashed border-wine/20 rounded-xl p-3">
                 Add color or size variants and upload a specific image for each variant.
               </p>
             )}
             {formData.variants.map((variant, index) => (
-              <div key={index} className="mb-3 rounded-lg border border-gray-200 p-3">
+              <div key={index} className="mb-3 rounded-xl border border-wine/10 p-3">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
                   <input
                     type="text"
                     value={variant.color}
                     onChange={(e) => updateVariant(index, 'color', e.target.value)}
                     placeholder="Color (e.g., Red)"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="px-3 py-2 border border-wine/15 rounded-xl text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="text"
                     value={variant.size}
                     onChange={(e) => updateVariant(index, 'size', e.target.value)}
                     placeholder="Size (e.g., Large)"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="px-3 py-2 border border-wine/15 rounded-xl text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="text"
                     value={variant.image}
                     onChange={(e) => updateVariant(index, 'image', e.target.value)}
                     placeholder="Variant Image URL"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                    className="px-3 py-2 border border-wine/15 rounded-xl text-sm text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                 </div>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -479,13 +479,13 @@ export default function NewProductPage() {
                           return nextFiles
                         })
                       }}
-                      className="block w-full text-xs text-gray-700 sm:w-auto"
+                      className="block w-full text-xs text-ink/70 sm:w-auto"
                     />
                     <button
                       type="button"
                       onClick={() => uploadVariantImage(index)}
                       disabled={!variantFiles[index] || uploadingVariantIndex === index}
-                      className="px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-medium hover:bg-black disabled:opacity-50"
+                      className="px-3 py-2 bg-wine text-white rounded-full text-xs font-medium hover:bg-wine-deep disabled:opacity-50"
                     >
                       {uploadingVariantIndex === index ? 'Uploading...' : 'Upload Variant Image'}
                     </button>
@@ -493,7 +493,7 @@ export default function NewProductPage() {
                   <button
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 self-start"
+                    className="px-3 py-2 bg-red-50 text-red-600 rounded-full text-xs font-medium hover:bg-red-100 self-start"
                   >
                     Remove Variant
                   </button>
@@ -503,14 +503,14 @@ export default function NewProductPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label className="block text-sm font-medium text-ink mb-2">
               Image Alt Text
             </label>
             <input
               type="text"
               value={formData.imageAlt}
               onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
-              className="w-full border rounded-lg px-4 py-2"
+              className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               placeholder="Description for accessibility"
             />
           </div>
@@ -527,9 +527,9 @@ export default function NewProductPage() {
                 type="checkbox"
                 checked={formData.isAvailable}
                 onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-                className="w-4 h-4"
+                className="w-4 h-4 accent-wine"
               />
-              <span className="text-sm text-gray-700">Available</span>
+              <span className="text-sm text-ink/70">Available</span>
             </label>
           </div>
 
@@ -537,14 +537,14 @@ export default function NewProductPage() {
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+              className="px-6 py-2 border border-wine/20 text-wine rounded-full hover:border-wine/40 hover:bg-cream"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-700 disabled:bg-gray-400"
+              className="px-6 py-2 bg-wine text-white rounded-full hover:bg-wine-deep disabled:opacity-50"
             >
               {loading ? 'Creating...' : 'Create Product'}
             </button>

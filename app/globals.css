@@ -13,16 +13,17 @@
   --text-primary: #1a1a1a;
   --text-secondary: #6b7280;
   --border: #e5e7eb;
-}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --surface: #1a1a1a;
-    --text-primary: #ffffff;
-    --text-secondary: #9ca3af;
-    --border: #374151;
-  }
+  /* Premium brand palette (Upaharo) */
+  --wine: #7c2a47;
+  --wine-deep: #5d1d34;
+  --rose: #c2496a;
+  --rose-soft: #f6e3e8;
+  --gold: #b8893f;
+  --gold-soft: #f3e7d0;
+  --cream: #faf5f0;
+  --cream-deep: #f3ebe2;
+  --ink: #2b1d22;
 }
 
 * {
@@ -172,5 +173,85 @@ select:focus {
       opacity: 1;
       transform: translateY(0);
     }
+  }
+
+  /* Premium typography + surfaces */
+  .font-display {
+    font-family: var(--font-display), 'Times New Roman', serif;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .premium-card {
+    background: #ffffff;
+    border: 1px solid rgba(124, 42, 71, 0.08);
+    box-shadow: 0 24px 60px -42px rgba(43, 29, 34, 0.5);
+  }
+
+  .gold-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(184, 137, 63, 0.55), transparent);
+  }
+
+  .hero-radial {
+    background:
+      radial-gradient(120% 90% at 15% 0%, rgba(194, 73, 106, 0.16), transparent 55%),
+      radial-gradient(120% 100% at 100% 0%, rgba(184, 137, 63, 0.18), transparent 50%),
+      linear-gradient(180deg, #fdf8f3 0%, #faf5f0 100%);
+  }
+}
+
+/* ===== Upaharo premium UI primitives ===== */
+@layer components {
+  .u-eyebrow {
+    @apply flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.28em] text-gold;
+  }
+
+  .u-title {
+    @apply font-display font-semibold text-ink;
+  }
+
+  .u-card {
+    @apply rounded-[22px] border border-wine/10 bg-white;
+    box-shadow: 0 24px 60px -46px rgba(43, 29, 34, 0.5);
+  }
+
+  .u-surface {
+    @apply rounded-[22px] border border-wine/10 bg-white;
+  }
+
+  .u-btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-full text-sm font-semibold transition-all active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+
+  .u-btn-primary {
+    @apply u-btn bg-wine px-5 py-2.5 text-white hover:bg-wine-deep;
+    box-shadow: 0 16px 34px -22px rgba(124, 42, 71, 0.95);
+  }
+
+  .u-btn-secondary {
+    @apply u-btn border border-wine/20 bg-white px-5 py-2.5 text-wine hover:border-wine/40 hover:bg-cream;
+  }
+
+  .u-btn-ghost {
+    @apply u-btn px-4 py-2 text-ink/60 hover:bg-cream hover:text-ink;
+  }
+
+  .u-input {
+    @apply w-full rounded-xl border border-wine/15 bg-white px-4 py-2.5 text-sm text-ink outline-none transition placeholder:text-ink/40 focus:border-wine/40 focus:ring-2 focus:ring-wine/15;
+  }
+
+  .u-chip {
+    @apply inline-flex items-center gap-1.5 rounded-full border border-wine/15 bg-white px-3.5 py-1.5 text-xs font-medium text-ink/70 transition hover:border-wine/30;
+  }
+
+  .u-chip-active {
+    @apply border-transparent bg-wine text-white hover:border-transparent;
+  }
+
+  .u-badge {
+    @apply inline-flex items-center rounded-full bg-rose-soft px-2.5 py-0.5 text-[11px] font-semibold text-wine;
   }
 }

@@ -52,15 +52,15 @@ export default function ImageDropUpload({
         }}
         className={`rounded-xl border-2 border-dashed px-4 py-4 text-sm transition ${
           disabled
-            ? 'cursor-not-allowed border-gray-200 bg-gray-50 text-gray-400'
+            ? 'cursor-not-allowed border-wine/10 bg-cream text-ink/40'
             : isDragging
-              ? 'border-orange-400 bg-orange-50 text-orange-700'
-              : 'cursor-pointer border-gray-300 bg-white text-gray-600 hover:border-orange-300 hover:bg-orange-50/40'
+              ? 'border-wine/40 bg-rose-soft text-wine'
+              : 'cursor-pointer border-wine/20 bg-white text-ink/60 hover:border-wine/40 hover:bg-cream'
         }`}
       >
         <p className="font-medium">{label}</p>
-        <p className="mt-1 text-xs text-gray-500">Drag & drop or click to choose an image file</p>
-        {selectedName ? <p className="mt-2 truncate text-xs font-semibold text-gray-700">{selectedName}</p> : null}
+        <p className="mt-1 text-xs text-ink/55">Drag & drop or click to choose an image file</p>
+        {selectedName ? <p className="mt-2 truncate text-xs font-semibold text-ink/70">{selectedName}</p> : null}
       </div>
       <input
         ref={inputRef}
@@ -70,7 +70,7 @@ export default function ImageDropUpload({
         className="hidden"
         disabled={disabled}
       />
-      <p className="text-xs text-gray-500">{helperText}</p>
+      <p className="text-xs text-ink/55">{helperText}</p>
     </div>
   )
 }

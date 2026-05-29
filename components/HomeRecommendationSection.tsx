@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import ProductCard from '@/components/ProductCard'
+import SectionHeading from '@/components/home/SectionHeading'
 import { getRecentViewedProductIds } from '@/lib/recommendation-session'
 import { getRecentViewedCategories, hasPersonalizationConsent } from '@/lib/personalization-consent'
 
@@ -82,14 +83,9 @@ export default function HomeRecommendationSection({
   }
 
   return (
-    <section id="latest" className="space-y-4">
-      <div className="px-1">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">{title}</h2>
-          <p className="text-sm text-gray-500">{description}</p>
-        </div>
-      </div>
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+    <section id="latest" className="space-y-5">
+      <SectionHeading eyebrow="For you" title={title} description={description} />
+      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
         {products.map((product) => (
           <div key={product.id} className="w-[172px] flex-shrink-0 sm:w-[210px]">
             <ProductCard product={product} />

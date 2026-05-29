@@ -3,8 +3,10 @@ import Link from 'next/link'
 import BottomNav from '@/components/BottomNav'
 import ProductCard from '@/components/ProductCard'
 import HomeRecommendationSection from '@/components/HomeRecommendationSection'
-import HomepageTopLayout from '@/components/HomepageTopLayout'
-import HomepageBannerCarousel from '@/components/HomepageBannerCarousel'
+import HomeHero from '@/components/home/HomeHero'
+import PremiumCategoryStrip from '@/components/home/PremiumCategoryStrip'
+import SectionHeading from '@/components/home/SectionHeading'
+import TrustStrip from '@/components/home/TrustStrip'
 import { prisma } from '@/lib/prisma'
 import { ARCHIVED_PRODUCT_TAG } from '@/lib/product-archive'
 import { getAppSettings } from '@/lib/app-settings'
@@ -24,17 +26,14 @@ function renderCategorySection(
 
   if (variant === 1) {
     return (
-      <section key={category.id} className="rounded-[30px] border border-neutral-200 bg-white p-4 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">{category.name}</h2>
-            <p className="text-sm text-gray-500">Scroll through handpicked picks.</p>
-          </div>
-          <Link href={`/categories/${category.id}`} className="text-sm font-semibold text-pink-600 hover:text-pink-700">
-            View All
-          </Link>
-        </div>
-        <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+      <section key={category.id} className="space-y-5">
+        <SectionHeading
+          eyebrow="Collection"
+          title={category.name}
+          description="Scroll through a handpicked edit."
+          href={`/categories/${category.id}`}
+        />
+        <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
           {products.map((product) => (
             <div key={product.id} className="w-[172px] flex-shrink-0 sm:w-[210px]">
               <ProductCard product={product} />
@@ -50,34 +49,35 @@ function renderCategorySection(
     const supportingProducts = products.slice(1, 4)
 
     return (
-      <section key={category.id} className="rounded-[30px] border border-neutral-200 bg-white p-4 shadow-sm">
-        <div className="mb-4 flex items-center justify-between">
-          <div>
-            <h2 className="text-lg font-semibold text-gray-900">{category.name}</h2>
-            <p className="text-sm text-gray-500">A featured pick with quick links.</p>
-          </div>
-          <Link href={`/categories/${category.id}`} className="text-sm font-semibold text-pink-600 hover:text-pink-700">
-            Explore
-          </Link>
-        </div>
-        <div className="grid gap-3 lg:grid-cols-[1.25fr_0.95fr]">
+      <section key={category.id} className="space-y-5">
+        <SectionHeading
+          eyebrow="Featured"
+          title={category.name}
+          description="A signature pick with quick favourites."
+          href={`/categories/${category.id}`}
+          ctaLabel="Explore"
+        />
+        <div className="grid gap-4 lg:grid-cols-[1.25fr_0.95fr]">
           {leadProduct ? (
             <Link
               href={`/products/${leadProduct.id}`}
-              className="group relative min-h-[260px] overflow-hidden rounded-[26px] bg-neutral-100"
+              className="group relative min-h-[300px] overflow-hidden rounded-[30px] bg-cream-deep"
             >
               <Image
                 src={resolveImageUrl(leadProduct.image)}
                 alt={leadProduct.name}
                 fill
                 quality={72}
-                className="object-cover transition-transform duration-500 group-hover:scale-[1.03]"
+                className="object-cover transition-transform duration-700 group-hover:scale-[1.04]"
                 sizes="(max-width: 1024px) 100vw, 50vw"
               />
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent p-4 text-white">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70">{category.name}</p>
-                <h3 className="mt-1 text-xl font-semibold leading-tight">{leadProduct.name}</h3>
-                <p className="mt-2 text-sm font-semibold">{formatPriceNoDecimals(leadProduct.price)}</p>
+              <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-ink/15 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-6 text-white">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.28em] text-white/70">{category.name}</p>
+                <h3 className="mt-2 font-display text-2xl font-semibold leading-tight">{leadProduct.name}</h3>
+                <p className="mt-2 inline-flex rounded-full bg-white/15 px-3 py-1 text-sm font-semibold backdrop-blur">
+                  {formatPriceNoDecimals(leadProduct.price)}
+                </p>
               </div>
             </Link>
           ) : null}
@@ -87,9 +87,9 @@ function renderCategorySection(
               <Link
                 key={product.id}
                 href={`/products/${product.id}`}
-                className="flex items-center gap-3 rounded-2xl border border-neutral-200 bg-neutral-50 p-3 transition hover:border-pink-200 hover:bg-white"
+                className="flex items-center gap-3 rounded-[22px] border border-wine/10 bg-white p-3 transition hover:border-wine/25 hover:shadow-[0_18px_40px_-32px_rgba(124,42,71,0.7)]"
               >
-                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-white">
+                <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-2xl bg-cream">
                   <Image
                     src={resolveImageUrl(product.image)}
                     alt={product.name}
@@ -100,8 +100,8 @@ function renderCategorySection(
                   />
                 </div>
                 <div className="min-w-0">
-                  <p className="line-clamp-2 text-sm font-semibold text-gray-900">{product.name}</p>
-                  <p className="mt-1 text-sm font-semibold text-pink-600">{formatPriceNoDecimals(product.price)}</p>
+                  <p className="line-clamp-2 text-sm font-semibold text-ink">{product.name}</p>
+                  <p className="mt-1 text-sm font-semibold text-wine">{formatPriceNoDecimals(product.price)}</p>
                 </div>
               </Link>
             ))}
@@ -112,16 +112,13 @@ function renderCategorySection(
   }
 
   return (
-    <section key={category.id} className="rounded-[30px] border border-neutral-200 bg-white p-4 shadow-sm">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
-          <h2 className="text-lg font-semibold text-gray-900">{category.name}</h2>
-          <p className="text-sm text-gray-500">Fresh picks from this category.</p>
-        </div>
-        <Link href={`/categories/${category.id}`} className="text-sm font-semibold text-pink-600 hover:text-pink-700">
-          View All
-        </Link>
-      </div>
+    <section key={category.id} className="space-y-5">
+      <SectionHeading
+        eyebrow="Just In"
+        title={category.name}
+        description="Fresh arrivals from this collection."
+        href={`/categories/${category.id}`}
+      />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {products.map((product) => (
           <ProductCard key={product.id} product={product} />
@@ -232,60 +229,75 @@ async function getHomeData() {
 }
 
 export default async function Home() {
-  const { settings, categories, occasionCategories, groupedCategories, homepageRecommendationProducts, homepageBanners } =
-    await getHomeData()
+  const {
+    settings,
+    categories,
+    occasionCategories,
+    groupedCategories,
+    homepageRecommendationProducts,
+  } = await getHomeData()
+
+  const tagline = settings.announcementText || settings.deliveryEstimate
 
   return (
-    <main className="min-h-screen bg-[#f4f7fb]">
-      <div className="px-4 pt-3">
-        <div className="mx-auto max-w-7xl">
-          <HomepageTopLayout
-            categories={categories}
-            occasionCategories={occasionCategories}
-            showTopCategories={settings.homepageShowTopCategories}
-            showOccasionTabs={settings.homepageShowOccasionTabs}
+    <main className="min-h-screen bg-cream">
+      <div className="mx-auto max-w-7xl space-y-10 px-4 pb-28 pt-4 sm:px-6 lg:pb-12 lg:pt-6">
+        <HomeHero siteName={settings.siteName || 'Upaharo'} tagline={tagline} />
+
+        {settings.homepageShowTopCategories && categories.length > 0 ? (
+          <section className="space-y-5">
+            <SectionHeading
+              eyebrow="Browse"
+              title="Shop by category"
+              description="Find the perfect gift for every kind of moment."
+              href="/search"
+              ctaLabel="See all"
+            />
+            <PremiumCategoryStrip categories={categories.slice(0, 10)} variant="round" />
+          </section>
+        ) : null}
+
+        {settings.homepageShowRecommendations && homepageRecommendationProducts.length > 0 ? (
+          <HomeRecommendationSection
+            initialProducts={homepageRecommendationProducts}
+            initialTitle={settings.homepageRecommendationTitle || 'Recommended for you'}
+            initialDescription={
+              String(settings.homepageRecommendationMode || 'LATEST').toUpperCase() === 'BEST_OFFER'
+                ? 'Best discounts, curated for quick checkout.'
+                : 'Freshly added to the collection.'
+            }
           />
-        </div>
-      </div>
+        ) : null}
 
-      {settings.homepageShowBanner ? (
-        <div className="px-4 pt-2">
-          <div className="mx-auto max-w-7xl">
-            <HomepageBannerCarousel banners={homepageBanners} />
-          </div>
-        </div>
-      ) : null}
+        {settings.homepageShowOccasionTabs && occasionCategories.length > 0 ? (
+          <section className="space-y-5">
+            <SectionHeading eyebrow="Occasions" title="Shop the moment" description="Curated edits for life's celebrations." />
+            <PremiumCategoryStrip categories={occasionCategories.slice(0, 10)} variant="tile" />
+          </section>
+        ) : null}
 
-      <div id="featured" className="space-y-6 px-4 py-2 pb-24 lg:pb-8">
-        <div className="mx-auto max-w-7xl space-y-6">
+        <div id="featured" className="space-y-12">
           {groupedCategories.length === 0 && homepageRecommendationProducts.length === 0 ? (
-            <div className="rounded-2xl border border-neutral-200 bg-white py-12 text-center">
-              <div className="mx-auto mb-3 flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-                <svg className="h-8 w-8 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="rounded-[30px] border border-wine/10 bg-white py-16 text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-cream">
+                <svg className="h-8 w-8 text-wine/40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                 </svg>
               </div>
-              <p className="text-sm text-gray-500">No products available</p>
+              <h2 className="font-display text-xl font-semibold text-ink">Our shelves are being restocked</h2>
+              <p className="mt-1 text-sm text-ink/50">Beautiful gifts are on their way back. Please check in soon.</p>
             </div>
           ) : (
             <>
-              {settings.homepageShowRecommendations && homepageRecommendationProducts.length > 0 ? (
-                <HomeRecommendationSection
-                  initialProducts={homepageRecommendationProducts}
-                  initialTitle={settings.homepageRecommendationTitle || 'Recommended Products'}
-                  initialDescription={
-                    String(settings.homepageRecommendationMode || 'LATEST').toUpperCase() === 'BEST_OFFER'
-                      ? 'Best discount picks curated for quick checkout.'
-                      : 'Recently added products from the catalog.'
-                  }
-                />
-              ) : null}
-
               {settings.homepageShowCategorySections
                 ? groupedCategories.map((section, index) => renderCategorySection(section, index))
                 : null}
             </>
           )}
+
+          <div className="gold-divider" />
+
+          <TrustStrip />
         </div>
       </div>
 

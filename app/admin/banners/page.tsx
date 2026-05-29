@@ -101,12 +101,12 @@ export default function AdminBanners() {
     <div>
       <div className="mb-6 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Banners</h1>
-          <p className="text-gray-600 mt-1">Manage homepage banners</p>
+          <h1 className="font-display text-3xl font-semibold text-ink">Banners</h1>
+          <p className="text-ink/55 mt-1">Manage homepage banners</p>
         </div>
         <button
           onClick={() => setShowForm(!showForm)}
-          className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold"
+          className="bg-wine hover:bg-wine-deep text-white px-6 py-2.5 rounded-full font-semibold"
         >
           {showForm ? 'Cancel' : '+ Add Banner'}
         </button>
@@ -114,55 +114,55 @@ export default function AdminBanners() {
 
       {/* Form */}
       {showForm && (
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <h2 className="text-xl font-bold mb-4">{editingBanner ? 'Edit Banner' : 'New Banner'}</h2>
+        <div className="bg-white rounded-[22px] border border-wine/10 p-6 mb-6">
+          <h2 className="font-display text-xl font-semibold text-ink mb-4">{editingBanner ? 'Edit Banner' : 'New Banner'}</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Title*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Title*</label>
                 <input
                   type="text"
                   required
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Subtitle</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Subtitle</label>
                 <input
                   type="text"
                   value={formData.subtitle}
                   onChange={(e) => setFormData({ ...formData, subtitle: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Image URL*</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Image URL*</label>
                 <input
                   type="text"
                   required
                   value={formData.image}
                   onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Link</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Link</label>
                 <input
                   type="text"
                   value={formData.link}
                   onChange={(e) => setFormData({ ...formData, link: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Order</label>
+                <label className="block text-sm font-medium text-ink/70 mb-1">Order</label>
                 <input
                   type="number"
                   value={formData.order}
                   onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value) })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
               </div>
               <div className="flex items-center">
@@ -171,17 +171,17 @@ export default function AdminBanners() {
                     type="checkbox"
                     checked={formData.isActive}
                     onChange={(e) => setFormData({ ...formData, isActive: e.target.checked })}
-                    className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                    className="w-4 h-4 text-wine border-wine/30 rounded focus:ring-wine/30"
                   />
-                  <span className="text-sm font-medium text-gray-700">Active</span>
+                  <span className="text-sm font-medium text-ink/70">Active</span>
                 </label>
               </div>
             </div>
             <div className="flex gap-2">
-              <button type="submit" className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2 rounded-lg font-semibold">
+              <button type="submit" className="bg-wine hover:bg-wine-deep text-white px-6 py-2 rounded-full font-semibold">
                 {editingBanner ? 'Update' : 'Create'} Banner
               </button>
-              <button type="button" onClick={resetForm} className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2 rounded-lg font-semibold">
+              <button type="button" onClick={resetForm} className="border border-wine/20 bg-white hover:bg-cream text-wine px-6 py-2 rounded-full font-semibold">
                 Cancel
               </button>
             </div>
@@ -192,27 +192,27 @@ export default function AdminBanners() {
       {/* Banners List */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {loading ? (
-          <div className="col-span-2 p-8 text-center text-gray-500">Loading...</div>
+          <div className="col-span-2 p-8 text-center text-ink/55">Loading...</div>
         ) : banners.length === 0 ? (
-          <div className="col-span-2 p-8 text-center text-gray-500">No banners yet</div>
+          <div className="col-span-2 p-8 text-center text-ink/55">No banners yet</div>
         ) : (
           banners.map((banner) => (
-            <div key={banner.id} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+            <div key={banner.id} className="bg-white rounded-[22px] border border-wine/10 overflow-hidden">
               <div className="relative h-36">
                 <Image unoptimized src={banner.image} alt={banner.title} fill className="object-cover" />
                 {banner.isActive && (
-                  <span className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded text-xs font-medium">
+                  <span className="absolute top-2 right-2 bg-green-500 text-white px-2 py-1 rounded-lg text-xs font-medium">
                     Active
                   </span>
                 )}
               </div>
               <div className="p-4">
-                <h3 className="font-bold text-lg text-gray-900">{banner.title}</h3>
-                {banner.subtitle && <p className="text-gray-600 text-sm">{banner.subtitle}</p>}
+                <h3 className="font-display font-semibold text-lg text-ink">{banner.title}</h3>
+                {banner.subtitle && <p className="text-ink/55 text-sm">{banner.subtitle}</p>}
                 <div className="flex items-center justify-between mt-4">
-                  <span className="text-sm text-gray-500">Order: {banner.order}</span>
+                  <span className="text-sm text-ink/55">Order: {banner.order}</span>
                   <div className="flex gap-2">
-                    <button onClick={() => editBanner(banner)} className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+                    <button onClick={() => editBanner(banner)} className="text-wine hover:text-wine-deep text-sm font-semibold">
                       Edit
                     </button>
                     <button onClick={() => deleteBanner(banner.id)} className="text-red-600 hover:text-red-700 text-sm font-medium">

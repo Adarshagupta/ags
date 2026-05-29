@@ -234,8 +234,8 @@ export default function AdminOrders() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Orders</h1>
-        <p className="text-gray-600 mt-1">Manage customer orders and deliveries</p>
+        <h1 className="font-display text-2xl md:text-3xl font-semibold text-ink">Orders</h1>
+        <p className="text-ink/55 mt-1">Manage customer orders and deliveries</p>
       </div>
 
       {/* Search */}
@@ -245,62 +245,62 @@ export default function AdminOrders() {
           placeholder="Search by order number, customer name or email..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          className="w-full px-3 py-2 md:px-4 md:py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 text-sm"
+          className="w-full px-3 py-2 md:px-4 md:py-3 border border-wine/15 bg-white rounded-xl focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40 text-ink text-sm"
         />
       </div>
 
       {/* Orders List */}
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+      <div className="bg-white rounded-[22px] border border-wine/10 overflow-hidden">
         {loading ? (
-          <div className="p-8 text-center text-gray-500">Loading orders...</div>
+          <div className="p-8 text-center text-ink/55">Loading orders...</div>
         ) : filteredOrders.length === 0 ? (
-          <div className="p-8 text-center text-gray-500">No orders found</div>
+          <div className="p-8 text-center text-ink/55">No orders found</div>
         ) : (
           <>
             <div className="overflow-x-auto hidden md:block">
               <table className="w-full">
-                <thead className="bg-gray-50 border-b border-gray-200">
+                <thead className="bg-cream-deep/50 border-b border-wine/10">
                   <tr>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Order</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Customer</th>
-                    <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Address</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Amount</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Payment</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Delivery</th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">Actions</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Order</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Customer</th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Address</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Amount</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Payment</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Delivery</th>
+                  <th className="px-4 py-3 text-left text-xs font-semibold text-ink/55 uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200">
+              <tbody className="divide-y divide-wine/10">
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-gray-50">
+                  <tr key={order.id} className="hover:bg-cream/60">
                     <td className="px-4 py-4">
-                      <div className="font-medium text-gray-900">{order.orderNumber}</div>
-                      <div className="text-xs text-gray-500">{new Date(order.createdAt).toLocaleDateString()}</div>
+                      <div className="font-medium text-ink">{order.orderNumber}</div>
+                      <div className="text-xs text-ink/55">{new Date(order.createdAt).toLocaleDateString()}</div>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="font-medium text-gray-900">{order.user.name}</div>
-                      <div className="text-xs text-gray-500">{order.user.email}</div>
+                      <div className="font-medium text-ink">{order.user.name}</div>
+                      <div className="text-xs text-ink/55">{order.user.email}</div>
                     </td>
                     <td className="px-4 py-4">
                       {order.address ? (
                         <div className="max-w-[200px]">
-                          <div className="font-medium text-gray-900 text-sm truncate">📍 {order.address.city}</div>
-                          <div className="text-xs text-gray-500 truncate">{order.address.street}</div>
+                          <div className="font-medium text-ink text-sm truncate">📍 {order.address.city}</div>
+                          <div className="text-xs text-ink/55 truncate">{order.address.street}</div>
                         </div>
                       ) : (
-                        <span className="text-gray-400 text-sm">No address</span>
+                        <span className="text-ink/40 text-sm">No address</span>
                       )}
                     </td>
                     <td className="px-4 py-4">
-                      <div className="font-semibold text-gray-900">{formatPriceNoDecimals(order.total || 0)}</div>
-                      <div className="text-xs text-gray-500">{order.items.length} items</div>
+                      <div className="font-semibold text-ink">{formatPriceNoDecimals(order.total || 0)}</div>
+                      <div className="text-xs text-ink/55">{order.items.length} items</div>
                     </td>
                     <td className="px-4 py-4">
                       <select
                         value={order.status}
                         onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                        className={`text-xs px-2 py-1 rounded font-medium cursor-pointer ${getStatusColor(order.status)}`}
+                        className={`text-xs px-2 py-1 rounded-lg font-medium cursor-pointer ${getStatusColor(order.status)}`}
                       >
                         {STATUS_OPTIONS.map(status => (
                           <option key={status} value={status}>{status}</option>
@@ -311,7 +311,7 @@ export default function AdminOrders() {
                       <select
                         value={order.paymentStatus}
                         onChange={(e) => updatePaymentStatus(order.id, e.target.value)}
-                        className={`text-xs px-2 py-1 rounded font-medium cursor-pointer ${getStatusColor(order.paymentStatus)}`}
+                        className={`text-xs px-2 py-1 rounded-lg font-medium cursor-pointer ${getStatusColor(order.paymentStatus)}`}
                       >
                         {PAYMENT_STATUS_OPTIONS.map(status => (
                           <option key={status} value={status}>{status}</option>
@@ -319,12 +319,12 @@ export default function AdminOrders() {
                       </select>
                     </td>
                     <td className="px-4 py-4">
-                      <div className="text-sm text-gray-900">{new Date(order.deliveryDate).toLocaleDateString()}</div>
+                      <div className="text-sm text-ink">{new Date(order.deliveryDate).toLocaleDateString()}</div>
                     </td>
                     <td className="px-4 py-4">
                       <button
                         onClick={() => setSelectedOrder(order)}
-                        className="text-orange-600 hover:text-orange-700 text-sm font-medium"
+                        className="text-wine hover:text-wine-deep text-sm font-semibold"
                       >
                         View Details
                       </button>
@@ -334,24 +334,24 @@ export default function AdminOrders() {
               </tbody>
             </table>
             </div>
-            <div className="md:hidden divide-y divide-gray-100">
+            <div className="md:hidden divide-y divide-wine/10">
               {filteredOrders.map((order) => (
                 <button
                   key={`${order.id}-mobile`}
                   onClick={() => setSelectedOrder(order)}
-                  className="w-full text-left p-4 hover:bg-gray-50"
+                  className="w-full text-left p-4 hover:bg-cream/60"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="text-sm font-semibold text-gray-900">{order.orderNumber}</div>
+                    <div className="text-sm font-semibold text-ink">{order.orderNumber}</div>
                     <span className={`text-[10px] px-2 py-1 rounded-full font-semibold ${getStatusColor(order.status)}`}>
                       {order.status}
                     </span>
                   </div>
-                  <div className="mt-2 flex items-center justify-between text-xs text-gray-500">
+                  <div className="mt-2 flex items-center justify-between text-xs text-ink/55">
                     <span>{order.user.name}</span>
                     <span>{formatPriceNoDecimals(order.total || 0)}</span>
                   </div>
-                  <div className="mt-1 text-xs text-gray-500 truncate">
+                  <div className="mt-1 text-xs text-ink/55 truncate">
                     {order.address ? `${order.address.city} • ${order.address.street}` : 'No address'}
                   </div>
                 </button>
@@ -363,16 +363,16 @@ export default function AdminOrders() {
 
       {/* Order Details Modal */}
       {selectedOrder && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b border-gray-200 p-6 flex items-center justify-between">
+        <div className="fixed inset-0 bg-ink/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-[22px] max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b border-wine/10 p-6 flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-900">Order Details</h2>
-                <p className="text-gray-600">{selectedOrder.orderNumber}</p>
+                <h2 className="font-display text-2xl font-semibold text-ink">Order Details</h2>
+                <p className="text-ink/55">{selectedOrder.orderNumber}</p>
               </div>
               <button
                 onClick={() => setSelectedOrder(null)}
-                className="text-gray-400 hover:text-gray-600 text-2xl"
+                className="text-ink/40 hover:text-ink text-2xl"
               >
                 ×
               </button>
@@ -380,12 +380,12 @@ export default function AdminOrders() {
             <div className="p-6 space-y-6">
               {/* Customer Info */}
               <div>
-                <h3 className="font-bold text-gray-900 mb-2">Customer Information</h3>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-1">
-                  <p className="text-gray-900"><span className="font-medium">Name:</span> {selectedOrder.user.name}</p>
-                  <p className="text-gray-900"><span className="font-medium">Email:</span> {selectedOrder.user.email}</p>
+                <h3 className="font-display font-semibold text-ink mb-2">Customer Information</h3>
+                <div className="bg-cream rounded-xl p-4 space-y-1">
+                  <p className="text-ink"><span className="font-medium">Name:</span> {selectedOrder.user.name}</p>
+                  <p className="text-ink"><span className="font-medium">Email:</span> {selectedOrder.user.email}</p>
                   {selectedOrder.user.phone && (
-                    <p className="text-gray-900"><span className="font-medium">Phone:</span> {selectedOrder.user.phone}</p>
+                    <p className="text-ink"><span className="font-medium">Phone:</span> {selectedOrder.user.phone}</p>
                   )}
                 </div>
               </div>
@@ -393,27 +393,27 @@ export default function AdminOrders() {
               {/* Delivery Address with Map */}
               {selectedOrder.address && (
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-2">Delivery Address</h3>
-                  <div className="bg-gray-50 rounded-lg p-4">
+                  <h3 className="font-display font-semibold text-ink mb-2">Delivery Address</h3>
+                  <div className="bg-cream rounded-xl p-4">
                     <div className="flex items-start gap-3 mb-3">
                       <div className="text-2xl">📍</div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{selectedOrder.address.label}</p>
-                        <p className="text-gray-700">{selectedOrder.address.street}</p>
+                        <p className="font-medium text-ink">{selectedOrder.address.label}</p>
+                        <p className="text-ink/70">{selectedOrder.address.street}</p>
                         {selectedOrder.address.apartment && (
-                          <p className="text-gray-600 text-sm">Apt: {selectedOrder.address.apartment}</p>
+                          <p className="text-ink/55 text-sm">Apt: {selectedOrder.address.apartment}</p>
                         )}
                         {selectedOrder.address.landmark && (
-                          <p className="text-gray-600 text-sm">Landmark: {selectedOrder.address.landmark}</p>
+                          <p className="text-ink/55 text-sm">Landmark: {selectedOrder.address.landmark}</p>
                         )}
-                        <p className="text-gray-700">
+                        <p className="text-ink/70">
                           {selectedOrder.address.city}, {selectedOrder.address.state} - {selectedOrder.address.pincode}
                         </p>
                       </div>
                     </div>
                     {/* Google Maps Embed */}
                     {hasSelectedOrderCoords ? (
-                      <div className="mt-3 rounded-lg overflow-hidden border border-gray-200">
+                      <div className="mt-3 rounded-xl overflow-hidden border border-wine/10">
                         <iframe
                           width="100%"
                           height="200"
@@ -423,12 +423,12 @@ export default function AdminOrders() {
                           referrerPolicy="no-referrer-when-downgrade"
                           src={`https://www.google.com/maps?q=${selectedOrder.address.latitude},${selectedOrder.address.longitude}&z=15&output=embed`}
                         />
-                        <div className="grid grid-cols-2 gap-2 border-t border-gray-200 bg-white p-2">
+                        <div className="grid grid-cols-2 gap-2 border-t border-wine/10 bg-white p-2">
                           <a
                             href={`https://www.google.com/maps/search/?api=1&query=${selectedOrder.address.latitude},${selectedOrder.address.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="rounded-lg border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-700 hover:bg-gray-50"
+                            className="rounded-xl border border-wine/15 px-3 py-2 text-center text-xs font-semibold text-ink/70 hover:bg-cream"
                           >
                             📍 Open Map
                           </a>
@@ -436,14 +436,14 @@ export default function AdminOrders() {
                             href={`https://www.google.com/maps/dir/?api=1&destination=${selectedOrder.address.latitude},${selectedOrder.address.longitude}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="rounded-lg bg-blue-500 px-3 py-2 text-center text-xs font-semibold text-white hover:bg-blue-600"
+                            className="rounded-xl bg-wine px-3 py-2 text-center text-xs font-semibold text-white hover:bg-wine-deep"
                           >
                             🧭 Directions
                           </a>
                         </div>
                       </div>
                     ) : (
-                      <div className="mt-3 rounded-lg border border-dashed border-gray-200 px-4 py-3 text-xs text-gray-500">
+                      <div className="mt-3 rounded-xl border border-dashed border-wine/15 px-4 py-3 text-xs text-ink/55">
                         No map coordinates saved for this address.
                       </div>
                     )}
@@ -453,83 +453,83 @@ export default function AdminOrders() {
 
               {/* Gift Details */}
               <div>
-                <h3 className="font-bold text-gray-900 mb-2">Gift Details</h3>
-                <div className="bg-gray-50 rounded-lg p-4 space-y-2">
-                  <p className="text-gray-900">
+                <h3 className="font-display font-semibold text-ink mb-2">Gift Details</h3>
+                <div className="bg-cream rounded-xl p-4 space-y-2">
+                  <p className="text-ink">
                     <span className="font-medium">Order Type:</span> {selectedOrder.isGift ? 'Gift' : 'Direct'}
                   </p>
 
                   {selectedOrder.isGift ? (
                     <>
                       {selectedOrder.recipient ? (
-                        <p className="text-gray-900">
+                        <p className="text-ink">
                           <span className="font-medium">Recipient:</span> {selectedOrder.recipient.name}
                           {selectedOrder.recipient.relationship ? ` (${selectedOrder.recipient.relationship})` : ''}
                           {selectedOrder.recipient.phone ? ` - ${selectedOrder.recipient.phone}` : ''}
                         </p>
                       ) : (
-                        <p className="text-gray-600 text-sm">Recipient not selected</p>
+                        <p className="text-ink/55 text-sm">Recipient not selected</p>
                       )}
 
                       {selectedOrder.occasion ? (
-                        <p className="text-gray-900">
+                        <p className="text-ink">
                           <span className="font-medium">Occasion:</span> {selectedOrder.occasion.emoji}{' '}
                           {selectedOrder.occasion.name}
                         </p>
                       ) : null}
 
                       {selectedOrder.giftWrap ? (
-                        <p className="text-gray-900">
+                        <p className="text-ink">
                           <span className="font-medium">Gift Wrap:</span> {selectedOrder.giftWrap.image}{' '}
                           {selectedOrder.giftWrap.name}
                           {selectedOrder.giftWrap.type ? ` (${selectedOrder.giftWrap.type})` : ''} -{' '}
                           {formatPriceNoDecimals(selectedOrder.giftWrap.price || 0)}
                         </p>
                       ) : (
-                        <p className="text-gray-600 text-sm">Gift wrap not selected</p>
+                        <p className="text-ink/55 text-sm">Gift wrap not selected</p>
                       )}
 
                       {selectedOrder.greetingMessage ? (
-                        <p className="text-gray-900">
+                        <p className="text-ink">
                           <span className="font-medium">Message:</span> {selectedOrder.greetingMessage}
                         </p>
                       ) : null}
 
                       {selectedOrder.showSenderName !== false && selectedOrder.senderName ? (
-                        <p className="text-gray-900">
+                        <p className="text-ink">
                           <span className="font-medium">Sender Name:</span> {selectedOrder.senderName}
                         </p>
                       ) : (
-                        <p className="text-gray-600 text-sm">Sender name hidden</p>
+                        <p className="text-ink/55 text-sm">Sender name hidden</p>
                       )}
                     </>
                   ) : (
-                    <p className="text-gray-600 text-sm">Customer placed a normal (non-gift) order.</p>
+                    <p className="text-ink/55 text-sm">Customer placed a normal (non-gift) order.</p>
                   )}
                 </div>
               </div>
 
               {/* Order Items */}
               <div>
-                <h3 className="font-bold text-gray-900 mb-2">Order Items</h3>
+                <h3 className="font-display font-semibold text-ink mb-2">Order Items</h3>
                 <div className="space-y-2">
                   {selectedOrder.items.map((item) => (
-                    <div key={item.id} className="flex items-center gap-3 bg-gray-50 rounded-lg p-3">
+                    <div key={item.id} className="flex items-center gap-3 bg-cream rounded-xl p-3">
                       <div className="text-2xl">🎁</div>
                       <div className="flex-1">
-                        <p className="font-medium text-gray-900">{item.product.name}</p>
-                        <p className="text-sm text-gray-600">Qty: {item.quantity} × Rs. {item.price.toFixed(2)}</p>
+                        <p className="font-medium text-ink">{item.product.name}</p>
+                        <p className="text-sm text-ink/55">Qty: {item.quantity} × Rs. {item.price.toFixed(2)}</p>
                       </div>
-                      <p className="font-semibold text-gray-900">Rs. {(item.quantity * item.price).toFixed(2)}</p>
+                      <p className="font-semibold text-ink">Rs. {(item.quantity * item.price).toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
               </div>
 
               {/* Order Summary */}
-              <div className="border-t border-gray-200 pt-4">
-                <div className="mb-4 rounded-lg border border-orange-200 bg-orange-50 p-3">
-                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-orange-700">
+              <div className="border-t border-wine/10 pt-4">
+                <div className="mb-4 rounded-xl border border-gold/30 bg-gold-soft/40 p-3">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-gold">
                     Estimated Delivery Time
                   </p>
                   <div className="flex gap-2">
@@ -539,12 +539,12 @@ export default function AdminOrders() {
                       step={estimatedTimeUnit === 'days' ? '0.5' : '1'}
                       value={estimatedTimeDraft}
                       onChange={(event) => setEstimatedTimeDraft(event.target.value)}
-                      className="w-full rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="w-full rounded-xl border border-wine/15 bg-white px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                     />
                     <select
                       value={estimatedTimeUnit}
                       onChange={(event) => handleEstimatedTimeUnitChange(event.target.value as EstimatedTimeUnit)}
-                      className="rounded-lg border border-orange-200 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="rounded-xl border border-wine/15 bg-white px-3 py-2 text-sm font-medium text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                     >
                       <option value="minutes">Minutes</option>
                       <option value="days">Days</option>
@@ -553,41 +553,41 @@ export default function AdminOrders() {
                       type="button"
                       onClick={() => updateEstimatedTime(selectedOrder.id)}
                       disabled={savingEstimatedTime}
-                      className="rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-600 disabled:opacity-60"
+                      className="rounded-xl bg-wine px-4 py-2 text-sm font-semibold text-white hover:bg-wine-deep disabled:opacity-60"
                     >
                       {savingEstimatedTime ? 'Saving...' : 'Save'}
                     </button>
                   </div>
-                  <p className="mt-2 text-xs text-gray-600">
+                  <p className="mt-2 text-xs text-ink/55">
                     Customer view: {Number(selectedOrder.estimatedTime) > 0 ? formatTime(Number(selectedOrder.estimatedTime) || 0) : 'Not set yet'}
                   </p>
                 </div>
 
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-600">Delivery Date:</span>
-                  <span className="text-gray-900">{new Date(selectedOrder.deliveryDate).toLocaleDateString()}</span>
+                  <span className="font-medium text-ink/55">Delivery Date:</span>
+                  <span className="text-ink">{new Date(selectedOrder.deliveryDate).toLocaleDateString()}</span>
                 </div>
                 <div className="flex justify-between items-center mb-2">
-                  <span className="font-medium text-gray-600">Order Status:</span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(selectedOrder.status)}`}>
+                  <span className="font-medium text-ink/55">Order Status:</span>
+                  <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(selectedOrder.status)}`}>
                     {selectedOrder.status}
                   </span>
                 </div>
                 <div className="flex justify-between items-center mb-4">
-                  <span className="font-medium text-gray-600">Payment Status:</span>
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(selectedOrder.paymentStatus)}`}>
+                  <span className="font-medium text-ink/55">Payment Status:</span>
+                  <span className={`px-2 py-1 rounded-lg text-xs font-medium ${getStatusColor(selectedOrder.paymentStatus)}`}>
                     {selectedOrder.paymentStatus}
                   </span>
                 </div>
                 {selectedOrder.giftWrap ? (
                   <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-gray-600">Gift Wrap:</span>
-                    <span className="text-gray-900">{formatPriceNoDecimals(selectedOrder.giftWrap.price || 0)}</span>
+                    <span className="font-medium text-ink/55">Gift Wrap:</span>
+                    <span className="text-ink">{formatPriceNoDecimals(selectedOrder.giftWrap.price || 0)}</span>
                   </div>
                 ) : null}
-                <div className="flex justify-between items-center text-lg font-bold border-t border-gray-200 pt-4">
-                  <span>Total Amount:</span>
-                  <span className="text-orange-600">{formatPriceNoDecimals(selectedOrder.total || 0)}</span>
+                <div className="flex justify-between items-center text-lg font-bold border-t border-wine/10 pt-4">
+                  <span className="text-ink">Total Amount:</span>
+                  <span className="text-wine">{formatPriceNoDecimals(selectedOrder.total || 0)}</span>
                 </div>
               </div>
             </div>

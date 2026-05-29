@@ -255,60 +255,60 @@ export default function NewProduct() {
   return (
     <div className="max-w-4xl">
       <div className="mb-6">
-        <Link href="/admin/products" className="text-blue-600 hover:text-blue-700 text-sm font-medium mb-2 inline-block">
+        <Link href="/admin/products" className="text-wine hover:text-wine-deep text-sm font-semibold mb-2 inline-block">
           ← Back to Products
         </Link>
-        <h1 className="text-3xl font-bold text-gray-900">Add New Product</h1>
+        <h1 className="font-display text-3xl font-semibold text-ink">Add New Product</h1>
       </div>
 
-      <form onSubmit={handleSubmit} className="bg-white rounded-xl border border-gray-200 p-6">
-        <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-orange-100 bg-orange-50 px-4 py-3">
-          <p className="text-sm font-medium text-orange-700">Quick setup for cake products and combo-ready metadata.</p>
+      <form onSubmit={handleSubmit} className="bg-white rounded-[22px] border border-wine/10 p-6">
+        <div className="mb-6 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-gold/30 bg-gold-soft/40 px-4 py-3">
+          <p className="text-sm font-medium text-ink/70">Quick setup for cake products and combo-ready metadata.</p>
           <button
             type="button"
             onClick={applyCakeQuickSetup}
-            className="rounded-full bg-orange-500 px-4 py-2 text-xs font-semibold text-white hover:bg-orange-400"
+            className="rounded-full bg-wine px-4 py-2 text-xs font-semibold text-white hover:bg-wine-deep"
           >
             Apply Cake Starter
           </button>
         </div>
         <div className="grid grid-cols-2 gap-6">
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Name*</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Name*</label>
             <input
               type="text"
               required
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Mini Description</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Mini Description</label>
             <input
               type="text"
               value={formData.miniDescription}
               onChange={(e) => setFormData({ ...formData, miniDescription: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               placeholder="Short one-line text shown above price"
             />
           </div>
 
           <div className="col-span-2 space-y-3">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Description (Markdown)*</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Description (Markdown)*</label>
             <textarea
               required
               rows={7}
               value={formData.description}
               onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               placeholder="# Product Highlights&#10;- Freshly baked&#10;- Same day delivery&#10;&#10;**Storage:** Keep refrigerated."
             />
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3">
-              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">Preview</p>
+            <div className="rounded-xl border border-wine/10 bg-cream p-3">
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.2em] text-gold">Preview</p>
               <div
-                className="space-y-3 text-sm leading-7 text-gray-700 [&_a]:text-pink-600 [&_h1]:text-xl [&_h2]:text-lg"
+                className="space-y-3 text-sm leading-7 text-ink/70 [&_a]:text-wine [&_h1]:text-xl [&_h2]:text-lg"
                 dangerouslySetInnerHTML={{ __html: renderProductDescriptionMarkdown(formData.description) }}
               />
             </div>
@@ -332,25 +332,25 @@ export default function NewProduct() {
           <SubProductSelector value={subProductIds} onChange={setSubProductIds} />
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Price (NPR)*</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Price (NPR)*</label>
             <input
               type="number"
               required
               step="0.01"
               value={formData.price}
               onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Main Image URL*</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Main Image URL*</label>
             <input
               type="text"
               required
               value={formData.image}
               onChange={(e) => setFormData({ ...formData, image: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
             <div className="mt-2 space-y-2">
               <ImageDropUpload
@@ -362,7 +362,7 @@ export default function NewProduct() {
                 type="button"
                 onClick={handleMainImageUpload}
                 disabled={!mainImageFile || uploadingMainImage}
-                className="px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                className="px-4 py-2 bg-wine text-white rounded-xl text-sm font-medium hover:bg-wine-deep disabled:opacity-50"
               >
                 {uploadingMainImage ? 'Uploading...' : 'Upload Main Image'}
               </button>
@@ -370,7 +370,7 @@ export default function NewProduct() {
           </div>
 
           <div className="col-span-2">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Additional Images</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Additional Images</label>
             {formData.images.map((img, index) => (
               <div key={index} className="flex gap-2 mb-2">
                 <input
@@ -382,7 +382,7 @@ export default function NewProduct() {
                     setFormData({ ...formData, images: newImages })
                   }}
                   placeholder={`Image ${index + 1} URL`}
-                  className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                  className="flex-1 px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 />
                 <button
                   type="button"
@@ -390,7 +390,7 @@ export default function NewProduct() {
                     const newImages = formData.images.filter((_, i) => i !== index)
                     setFormData({ ...formData, images: newImages })
                   }}
-                  className="px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200"
+                  className="px-4 py-2 bg-red-100 text-red-600 rounded-xl hover:bg-red-200"
                 >
                   Remove
                 </button>
@@ -399,11 +399,11 @@ export default function NewProduct() {
             <button
               type="button"
               onClick={() => setFormData({ ...formData, images: [...formData.images, ''] })}
-              className="mt-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 text-sm font-medium"
+              className="mt-2 px-4 py-2 border border-wine/20 bg-white text-wine rounded-xl hover:bg-cream text-sm font-medium"
             >
               + Add Another Image
             </button>
-            <div className="mt-3 rounded-lg border border-dashed border-gray-300 p-3">
+            <div className="mt-3 rounded-xl border border-dashed border-wine/20 p-3">
               <ImageDropUpload
                 label="Additional gallery image"
                 onFileSelect={setAdditionalImageFile}
@@ -413,7 +413,7 @@ export default function NewProduct() {
                 type="button"
                 onClick={handleAdditionalImageUpload}
                 disabled={!additionalImageFile || uploadingAdditionalImage}
-                className="mt-2 px-4 py-2 bg-gray-900 text-white rounded-lg text-sm font-medium hover:bg-black disabled:opacity-50"
+                className="mt-2 px-4 py-2 bg-wine text-white rounded-xl text-sm font-medium hover:bg-wine-deep disabled:opacity-50"
               >
                 {uploadingAdditionalImage ? 'Uploading...' : 'Upload and Add'}
               </button>
@@ -422,43 +422,43 @@ export default function NewProduct() {
 
           <div className="col-span-2">
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-medium text-gray-700">Product Variants</label>
+              <label className="block text-sm font-medium text-ink/70">Product Variants</label>
               <button
                 type="button"
                 onClick={addVariant}
-                className="px-3 py-1.5 bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold hover:bg-indigo-200"
+                className="px-3 py-1.5 bg-rose-soft text-wine rounded-xl text-xs font-semibold hover:bg-rose-soft/70"
               >
                 + Add Variant
               </button>
             </div>
             {formData.variants.length === 0 && (
-              <p className="text-xs text-gray-500 border border-dashed border-gray-300 rounded-lg p-3">
+              <p className="text-xs text-ink/55 border border-dashed border-wine/20 rounded-xl p-3">
                 Add color or size variants and upload a specific image for each variant.
               </p>
             )}
             {formData.variants.map((variant, index) => (
-              <div key={index} className="mb-3 rounded-lg border border-gray-200 p-3">
+              <div key={index} className="mb-3 rounded-xl border border-wine/10 p-3">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-2">
                   <input
                     type="text"
                     value={variant.color}
                     onChange={(e) => updateVariant(index, 'color', e.target.value)}
                     placeholder="Color (e.g., Red)"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="px-3 py-2 border border-wine/15 rounded-xl bg-white text-ink text-sm focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="text"
                     value={variant.size}
                     onChange={(e) => updateVariant(index, 'size', e.target.value)}
                     placeholder="Size (e.g., Large)"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="px-3 py-2 border border-wine/15 rounded-xl bg-white text-ink text-sm focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="text"
                     value={variant.image}
                     onChange={(e) => updateVariant(index, 'image', e.target.value)}
                     placeholder="Variant Image URL"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="px-3 py-2 border border-wine/15 rounded-xl bg-white text-ink text-sm focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                   <input
                     type="number"
@@ -472,7 +472,7 @@ export default function NewProduct() {
                       )
                     }
                     placeholder="Variant Price"
-                    className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-orange-500"
+                    className="px-3 py-2 border border-wine/15 rounded-xl bg-white text-ink text-sm focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                   />
                 </div>
                 <div className="mt-2 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
@@ -491,7 +491,7 @@ export default function NewProduct() {
                       type="button"
                       onClick={() => uploadVariantImage(index)}
                       disabled={!variantFiles[index] || uploadingVariantIndex === index}
-                      className="px-3 py-2 bg-gray-900 text-white rounded-lg text-xs font-medium hover:bg-black disabled:opacity-50"
+                      className="px-3 py-2 bg-wine text-white rounded-xl text-xs font-medium hover:bg-wine-deep disabled:opacity-50"
                     >
                       {uploadingVariantIndex === index ? 'Uploading...' : 'Upload Variant Image'}
                     </button>
@@ -499,30 +499,30 @@ export default function NewProduct() {
                   <button
                     type="button"
                     onClick={() => removeVariant(index)}
-                    className="px-3 py-2 bg-red-50 text-red-600 rounded-lg text-xs font-medium hover:bg-red-100 self-start"
+                    className="px-3 py-2 bg-red-50 text-red-600 rounded-xl text-xs font-medium hover:bg-red-100 self-start"
                   >
                     Remove Variant
                   </button>
                 </div>
                 {typeof variant.price === 'number' ? (
-                  <p className="mt-2 text-xs font-semibold text-orange-600">Selling at {formatPriceNoDecimals(variant.price)}</p>
+                  <p className="mt-2 text-xs font-semibold text-wine">Selling at {formatPriceNoDecimals(variant.price)}</p>
                 ) : null}
               </div>
             ))}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Image Alt Text</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Image Alt Text</label>
             <input
               type="text"
               value={formData.imageAlt}
               onChange={(e) => setFormData({ ...formData, imageAlt: e.target.value })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Preparation Time*</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Preparation Time*</label>
             <div className="flex gap-2">
               <input
                 type="number"
@@ -531,28 +531,28 @@ export default function NewProduct() {
                 step={prepTimeUnit === 'days' ? '0.25' : '1'}
                 value={prepTimeInputValue}
                 onChange={(e) => handlePrepTimeValueChange(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
               <select
                 value={prepTimeUnit}
                 onChange={(e) => setPrepTimeUnit(e.target.value as PrepTimeUnit)}
-                className="px-3 py-2 border border-gray-300 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="px-3 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               >
                 <option value="minutes">Minutes</option>
                 <option value="days">Days</option>
               </select>
             </div>
-            <p className="mt-1 text-xs text-gray-500">Shown on product page as: {formatTime(formData.prepTime)}</p>
+            <p className="mt-1 text-xs text-ink/55">Shown on product page as: {formatTime(formData.prepTime)}</p>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Discount (%)</label>
+            <label className="block text-sm font-medium text-ink/70 mb-1">Discount (%)</label>
             <input
               type="number"
               step="0.01"
               value={formData.discount}
               onChange={(e) => setFormData({ ...formData, discount: parseFloat(e.target.value) })}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+              className="w-full px-4 py-2 border border-wine/15 rounded-xl bg-white text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
             />
           </div>
 
@@ -569,9 +569,9 @@ export default function NewProduct() {
                 type="checkbox"
                 checked={formData.isAvailable}
                 onChange={(e) => setFormData({ ...formData, isAvailable: e.target.checked })}
-                className="w-4 h-4 text-orange-600 border-gray-300 rounded focus:ring-orange-500"
+                className="w-4 h-4 text-wine border-wine/30 rounded focus:ring-wine/30"
               />
-              <span className="text-sm font-medium text-gray-700">Available</span>
+              <span className="text-sm font-medium text-ink/70">Available</span>
             </label>
           </div>
         </div>
@@ -580,13 +580,13 @@ export default function NewProduct() {
           <button
             type="submit"
             disabled={loading}
-            className="bg-orange-500 hover:bg-orange-600 text-white px-6 py-2.5 rounded-lg font-semibold disabled:opacity-50"
+            className="bg-wine hover:bg-wine-deep text-white px-6 py-2.5 rounded-full font-semibold disabled:opacity-50"
           >
             {loading ? 'Creating...' : 'Create Product'}
           </button>
           <Link
             href="/admin/products"
-            className="bg-gray-200 hover:bg-gray-300 text-gray-700 px-6 py-2.5 rounded-lg font-semibold"
+            className="border border-wine/20 bg-white hover:bg-cream text-wine px-6 py-2.5 rounded-full font-semibold"
           >
             Cancel
           </Link>

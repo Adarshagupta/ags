@@ -121,106 +121,106 @@ export default function AdminSettingsPage() {
   }
 
   if (loading) {
-    return <div className="p-8 text-center text-gray-500">Loading settings...</div>
+    return <div className="p-8 text-center text-ink/55">Loading settings...</div>
   }
 
   return (
     <div className="max-w-4xl">
       <div className="mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Settings</h1>
-        <p className="mt-1 text-gray-600">Control support details, delivery text, map defaults, and homepage announcements.</p>
+        <h1 className="font-display text-3xl font-semibold text-ink">Settings</h1>
+        <p className="mt-1 text-ink/55">Control support details, delivery text, map defaults, and homepage announcements.</p>
       </div>
 
       {message && (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white px-4 py-3 text-sm text-gray-700">
+        <div className="mb-6 rounded-xl border border-wine/10 bg-white px-4 py-3 text-sm text-ink/70">
           {message}
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-6">
-        <section className="rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Branding</h2>
+        <section className="rounded-[22px] border border-wine/10 bg-white p-6">
+          <h2 className="font-display text-lg font-semibold text-ink">Branding</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Site Name</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Site Name</label>
               <input
                 type="text"
                 value={formData.siteName}
                 onChange={(e) => setFormData((prev) => ({ ...prev, siteName: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Homepage Announcement</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Homepage Announcement</label>
               <input
                 type="text"
                 value={formData.announcementText}
                 onChange={(e) => setFormData((prev) => ({ ...prev, announcementText: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Homepage Layout</h2>
+        <section className="rounded-[22px] border border-wine/10 bg-white p-6">
+          <h2 className="font-display text-lg font-semibold text-ink">Homepage Layout</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
-            <label className="flex items-center gap-3 text-sm text-gray-700">
+            <label className="flex items-center gap-3 text-sm text-ink/70">
               <input
                 type="checkbox"
                 checked={formData.homepageShowBanner}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowBanner: e.target.checked }))}
-                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-wine/30 text-wine focus:ring-wine/30"
               />
               Show homepage banner
             </label>
 
-            <label className="flex items-center gap-3 text-sm text-gray-700">
+            <label className="flex items-center gap-3 text-sm text-ink/70">
               <input
                 type="checkbox"
                 checked={formData.homepageShowTopCategories}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowTopCategories: e.target.checked }))}
-                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-wine/30 text-wine focus:ring-wine/30"
               />
               Show top category cards
             </label>
 
-            <label className="flex items-center gap-3 text-sm text-gray-700">
+            <label className="flex items-center gap-3 text-sm text-ink/70">
               <input
                 type="checkbox"
                 checked={formData.homepageShowOccasionTabs}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowOccasionTabs: e.target.checked }))}
-                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-wine/30 text-wine focus:ring-wine/30"
               />
               Show occasion tabs row
             </label>
 
-            <label className="flex items-center gap-3 text-sm text-gray-700">
+            <label className="flex items-center gap-3 text-sm text-ink/70">
               <input
                 type="checkbox"
                 checked={formData.homepageShowCategorySections}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowCategorySections: e.target.checked }))}
-                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-wine/30 text-wine focus:ring-wine/30"
               />
               Show category sections
             </label>
 
-            <label className="flex items-center gap-3 text-sm text-gray-700">
+            <label className="flex items-center gap-3 text-sm text-ink/70">
               <input
                 type="checkbox"
                 checked={formData.homepageShowRecommendations}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageShowRecommendations: e.target.checked }))}
-                className="h-4 w-4 rounded border-gray-300 text-orange-500 focus:ring-orange-500"
+                className="h-4 w-4 rounded border-wine/30 text-wine focus:ring-wine/30"
               />
               Show recommended products section
             </label>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Recommendation Type</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Recommendation Type</label>
               <select
                 value={formData.homepageRecommendationMode}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageRecommendationMode: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               >
                 <option value="LATEST">Latest Arrivals</option>
                 <option value="BEST_OFFER">Best Offers</option>
@@ -228,109 +228,109 @@ export default function AdminSettingsPage() {
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Recommendation Title</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Recommendation Title</label>
               <input
                 type="text"
                 value={formData.homepageRecommendationTitle}
                 onChange={(e) => setFormData((prev) => ({ ...prev, homepageRecommendationTitle: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 placeholder="Latest Arrivals"
               />
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Support</h2>
+        <section className="rounded-[22px] border border-wine/10 bg-white p-6">
+          <h2 className="font-display text-lg font-semibold text-ink">Support</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Support Phone</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Support Phone</label>
               <input
                 type="text"
                 value={formData.supportPhone}
                 onChange={(e) => setFormData((prev) => ({ ...prev, supportPhone: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Support Email</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Support Email</label>
               <input
                 type="email"
                 value={formData.supportEmail}
                 onChange={(e) => setFormData((prev) => ({ ...prev, supportEmail: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Support Hours</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Support Hours</label>
               <input
                 type="text"
                 value={formData.supportHours}
                 onChange={(e) => setFormData((prev) => ({ ...prev, supportHours: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
                 placeholder="9:00 AM - 9:00 PM"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Support Message</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Support Message</label>
               <input
                 type="text"
                 value={formData.supportMessage}
                 onChange={(e) => setFormData((prev) => ({ ...prev, supportMessage: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
           </div>
         </section>
 
-        <section className="rounded-xl border border-gray-200 bg-white p-6">
-          <h2 className="text-lg font-semibold text-gray-900">Delivery and Map</h2>
+        <section className="rounded-[22px] border border-wine/10 bg-white p-6">
+          <h2 className="font-display text-lg font-semibold text-ink">Delivery and Map</h2>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Delivery Estimate</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Delivery Estimate</label>
               <input
                 type="text"
                 value={formData.deliveryEstimate}
                 onChange={(e) => setFormData((prev) => ({ ...prev, deliveryEstimate: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Delivery Note</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Delivery Note</label>
               <input
                 type="text"
                 value={formData.deliveryNote}
                 onChange={(e) => setFormData((prev) => ({ ...prev, deliveryNote: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div className="md:col-span-2">
-              <label className="mb-1 block text-sm font-medium text-gray-700">Store Address</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Store Address</label>
               <input
                 type="text"
                 value={formData.storeAddress}
                 onChange={(e) => setFormData((prev) => ({ ...prev, storeAddress: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Default Map Latitude</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Default Map Latitude</label>
               <input
                 type="number"
                 step="0.000001"
                 value={formData.mapLatitude}
                 onChange={(e) => setFormData((prev) => ({ ...prev, mapLatitude: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
             <div>
-              <label className="mb-1 block text-sm font-medium text-gray-700">Default Map Longitude</label>
+              <label className="mb-1 block text-sm font-medium text-ink/70">Default Map Longitude</label>
               <input
                 type="number"
                 step="0.000001"
                 value={formData.mapLongitude}
                 onChange={(e) => setFormData((prev) => ({ ...prev, mapLongitude: e.target.value }))}
-                className="w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                className="w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40"
               />
             </div>
           </div>
@@ -340,7 +340,7 @@ export default function AdminSettingsPage() {
           <button
             type="submit"
             disabled={saving}
-            className="rounded-lg bg-orange-500 px-6 py-2.5 font-semibold text-white transition-colors hover:bg-orange-600 disabled:opacity-50"
+            className="rounded-full bg-wine px-6 py-2.5 font-semibold text-white transition-colors hover:bg-wine-deep disabled:opacity-50"
           >
             {saving ? 'Saving...' : 'Save Settings'}
           </button>

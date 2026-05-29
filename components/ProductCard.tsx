@@ -61,9 +61,9 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   return (
     <Link href={`/products/${product.id}`}>
-      <div className="bg-white rounded-xl overflow-hidden border border-neutral-100 cursor-pointer transition-transform active:scale-[0.985]">
-      <div className="relative aspect-square w-full">
-        {!imageLoaded ? <div className="absolute inset-0 animate-pulse bg-neutral-100" /> : null}
+      <div className="group bg-white rounded-[22px] overflow-hidden border border-wine/10 cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:border-wine/20 hover:shadow-[0_26px_55px_-38px_rgba(124,42,71,0.85)] active:scale-[0.985]">
+      <div className="relative aspect-square w-full overflow-hidden">
+        {!imageLoaded ? <div className="absolute inset-0 animate-pulse bg-cream-deep" /> : null}
         <Image
           src={imageUrl}
           alt={product.name}
@@ -71,46 +71,46 @@ export default function ProductCard({ product }: ProductCardProps) {
           loading="lazy"
           quality={70}
           onLoad={() => setImageLoaded(true)}
-          className={`object-cover transition-opacity duration-300 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+          className={`object-cover transition-all duration-500 group-hover:scale-[1.05] ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
           sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 20vw"
         />
         
         {/* Veg/Non-veg indicator */}
         {product.showFoodTypeLabel && (
-          <div className="absolute top-2 left-2">
+          <div className="absolute top-2.5 left-2.5">
             <FoodTypeBadge isVeg={product.isVeg} />
           </div>
         )}
 
         {/* Discount badge */}
         {product.discount && product.discount > 0 && (
-          <div className="absolute top-2 right-2 bg-gradient-to-r from-pink-500 to-rose-600 text-white px-1.5 py-0.5 rounded text-[10px] font-medium shadow-md">
+          <div className="absolute top-2.5 right-2.5 bg-wine text-white px-2 py-0.5 rounded-full text-[10px] font-semibold tracking-wide shadow-[0_10px_22px_-14px_rgba(124,42,71,0.9)]">
             {product.discount}% OFF
           </div>
         )}
       </div>
 
-      <div className="p-3">
-        <h3 className="font-medium text-sm text-neutral-900 mb-0.5 line-clamp-1">
+      <div className="p-3.5">
+        <h3 className="font-display text-[15px] font-semibold text-ink mb-0.5 line-clamp-1">
           {product.name}
         </h3>
-        <p className="text-xs text-neutral-400 mb-2 line-clamp-1">
+        <p className="text-xs text-ink/40 mb-2.5 line-clamp-1">
           {cardDescription}
         </p>
 
         <div className="flex items-center justify-between">
           <div className="flex-1">
             {product.discount && product.discount > 0 ? (
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-semibold text-neutral-900">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[15px] font-semibold text-wine">
                   {formatPrice(discountedPrice)}
                 </span>
-                <span className="text-xs text-neutral-400 line-through">
+                <span className="text-xs text-ink/35 line-through">
                   {formatPrice(product.price)}
                 </span>
               </div>
             ) : (
-              <span className="text-sm font-semibold text-neutral-900">
+              <span className="text-[15px] font-semibold text-ink">
                 {formatPrice(product.price)}
               </span>
             )}
@@ -119,22 +119,22 @@ export default function ProductCard({ product }: ProductCardProps) {
           {quantity === 0 ? (
             <button
               onClick={handleAdd}
-              className="bg-gradient-to-r from-pink-500 to-rose-600 text-white px-4 py-1.5 rounded-lg text-xs font-medium shadow-sm whitespace-nowrap active:scale-95"
+              className="bg-wine text-white px-4 py-1.5 rounded-full text-xs font-semibold uppercase tracking-[0.08em] shadow-[0_12px_26px_-18px_rgba(124,42,71,0.9)] whitespace-nowrap transition hover:bg-wine-deep active:scale-95"
             >
               Add
             </button>
           ) : (
-            <div className="flex items-center bg-gradient-to-r from-pink-500 to-rose-600 text-white rounded-lg shadow-sm overflow-hidden">
+            <div className="flex items-center bg-wine text-white rounded-full shadow-[0_12px_26px_-18px_rgba(124,42,71,0.9)] overflow-hidden">
               <button
                 onClick={handleDecrement}
-                className="w-5 h-6 flex items-center justify-center text-sm font-bold leading-none active:scale-90"
+                className="w-7 h-7 flex items-center justify-center text-sm font-bold leading-none transition hover:bg-wine-deep active:scale-90"
               >
                 −
               </button>
-              <span className="text-[11px] font-semibold px-0.5 min-w-[14px] text-center">{quantity}</span>
+              <span className="text-[12px] font-semibold px-0.5 min-w-[16px] text-center">{quantity}</span>
               <button
                 onClick={handleIncrement}
-                className="w-5 h-6 flex items-center justify-center text-sm font-bold leading-none active:scale-90"
+                className="w-7 h-7 flex items-center justify-center text-sm font-bold leading-none transition hover:bg-wine-deep active:scale-90"
               >
                 &#43;
               </button>

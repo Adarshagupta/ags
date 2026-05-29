@@ -42,15 +42,13 @@ function ChoiceGroup({
   accent: 'pink' | 'orange'
   loading: boolean
 }) {
-  const activeClassName =
-    accent === 'orange'
-      ? 'border-orange-200 bg-orange-50 text-orange-700'
-      : 'border-pink-200 bg-pink-50 text-pink-700'
+  const activeClassName = 'border-transparent bg-wine text-white'
+  void accent
 
   return (
     <div>
-      <label className="block text-sm font-medium text-gray-700 mb-2">{title}</label>
-      <p className="mb-3 text-xs text-gray-500">{description}</p>
+      <label className="block text-sm font-medium text-ink/70 mb-2">{title}</label>
+      <p className="mb-3 text-xs text-ink/55">{description}</p>
       <div className="flex flex-wrap gap-2">
         {options.map((option) => {
           const isSelected = selections.includes(option.name)
@@ -63,7 +61,7 @@ function ChoiceGroup({
               className={`rounded-full border px-3 py-2 text-sm font-medium transition ${
                 isSelected
                   ? activeClassName
-                  : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                  : 'border-wine/15 bg-white text-ink/70 hover:border-wine/30'
               }`}
             >
               {option.name}
@@ -72,12 +70,12 @@ function ChoiceGroup({
         })}
       </div>
       {!loading && options.length === 0 && (
-        <p className="mt-3 rounded-lg border border-dashed border-gray-300 bg-white px-3 py-2 text-xs text-gray-500">
+        <p className="mt-3 rounded-xl border border-dashed border-wine/20 bg-white px-3 py-2 text-xs text-ink/55">
           No categories configured yet.
         </p>
       )}
       {loading && options.length === 0 && (
-        <p className="mt-3 text-xs text-gray-500">Loading categories...</p>
+        <p className="mt-3 text-xs text-ink/55">Loading categories...</p>
       )}
     </div>
   )
@@ -97,22 +95,24 @@ export default function ProductCategoryFields({
   onOccasionSelectionsChange,
   accent = 'pink',
 }: ProductCategoryFieldsProps) {
-  const ringClassName = accent === 'orange' ? 'focus:ring-orange-500' : 'focus:ring-pink-500'
+  const fieldClassName =
+    'w-full rounded-xl border border-wine/15 bg-white px-4 py-2 text-ink focus:outline-none focus:ring-2 focus:ring-wine/15 focus:border-wine/40'
+  void accent
   const selectedCategoryMissing =
     Boolean(category) &&
     !categories.productCategories.some((option) => option.name === category)
 
   return (
-    <div className="col-span-2 rounded-xl border border-gray-200 bg-gray-50/80 p-4 space-y-4">
+    <div className="col-span-2 rounded-xl border border-wine/10 bg-cream/80 p-4 space-y-4">
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Product Category*</label>
+          <label className="block text-sm font-medium text-ink/70 mb-2">Product Category*</label>
           {!loading && categories.productCategories.length > 0 ? (
             <select
               required
               value={category}
               onChange={(e) => onCategoryChange(e.target.value)}
-              className={`w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 ${ringClassName}`}
+              className={fieldClassName}
             >
               <option value="">Select a product category</option>
               {selectedCategoryMissing && <option value={category}>{category}</option>}
@@ -128,25 +128,25 @@ export default function ProductCategoryFields({
               required
               value={category}
               onChange={(e) => onCategoryChange(e.target.value)}
-              className={`w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 ${ringClassName}`}
+              className={fieldClassName}
               placeholder={loading ? 'Loading categories...' : 'Flowers'}
             />
           )}
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-ink/55">
             {error || 'Main catalog group such as Flowers, Cakes, or Addons.'}
           </p>
         </div>
 
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Additional Tags</label>
+          <label className="block text-sm font-medium text-ink/70 mb-2">Additional Tags</label>
           <input
             type="text"
             value={customTags}
             onChange={(e) => onCustomTagsChange(e.target.value)}
             placeholder="romantic, premium, same day"
-            className={`w-full rounded-lg border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 ${ringClassName}`}
+            className={fieldClassName}
           />
-          <p className="mt-1 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-ink/55">
             Optional extra search tags. Recipient and occasion selections are added automatically.
           </p>
         </div>

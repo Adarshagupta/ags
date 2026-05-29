@@ -89,9 +89,9 @@ export default function DodoReturnPage() {
   }, [clearCart, router, searchParams])
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#f4f7fb] px-4">
-      <div className="w-full max-w-md rounded-3xl bg-white p-6 text-center shadow-[0_24px_60px_-36px_rgba(15,23,42,0.35)]">
-        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#eef5ff] text-[#2563eb]">
+    <main className="flex min-h-screen items-center justify-center bg-cream px-4">
+      <div className="w-full max-w-md rounded-[22px] border border-wine/10 bg-white p-6 text-center shadow-[0_24px_60px_-46px_rgba(43,29,34,0.5)]">
+        <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-rose-soft text-wine">
           {state === 'failed' || state === 'error' ? (
             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18 18 6M6 6l12 12" />
@@ -105,7 +105,7 @@ export default function DodoReturnPage() {
           )}
         </div>
 
-        <h1 className="text-xl font-semibold text-slate-900">
+        <h1 className="font-display text-xl font-semibold text-ink">
           {state === 'success'
             ? 'Payment Successful'
             : state === 'processing'
@@ -117,19 +117,19 @@ export default function DodoReturnPage() {
                   : 'Verifying Payment'}
         </h1>
 
-        <p className="mt-3 text-sm text-slate-600">{message}</p>
+        <p className="mt-3 text-sm text-ink/55">{message}</p>
 
         {(state === 'failed' || state === 'error') && (
           <div className="mt-5 flex justify-center gap-3">
             <Link
               href="/checkout"
-              className="rounded-xl bg-slate-900 px-4 py-2 text-sm font-medium text-white"
+              className="rounded-full bg-wine px-5 py-2 text-sm font-semibold text-white hover:bg-wine-deep transition-colors"
             >
               Back to Checkout
             </Link>
             <Link
               href="/orders"
-              className="rounded-xl border border-slate-200 px-4 py-2 text-sm font-medium text-slate-700"
+              className="rounded-full border border-wine/20 bg-white px-5 py-2 text-sm font-semibold text-wine hover:bg-cream transition-colors"
             >
               View Orders
             </Link>

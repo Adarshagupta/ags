@@ -24,8 +24,8 @@ export default function SellerLayout({
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-pink-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-cream">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-wine"></div>
       </div>
     )
   }
@@ -42,22 +42,22 @@ export default function SellerLayout({
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 md:pb-0">
+    <div className="min-h-screen bg-cream pb-20 md:pb-0">
       {/* Desktop Header */}
-      <nav className="hidden md:block bg-white shadow-sm border-b sticky top-0 z-40">
+      <nav className="hidden md:block bg-white shadow-sm border-b border-wine/10 sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16">
             <div className="flex items-center gap-8">
-              <h1 className="text-xl font-bold text-pink-600">🏪 Seller Hub</h1>
+              <h1 className="font-display text-xl font-semibold text-wine">🏪 Seller Hub</h1>
               <div className="flex space-x-1">
                 {navItems.map((item) => (
                   <Link
                     key={item.href}
                     href={item.href}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                       pathname === item.href
-                        ? 'bg-pink-50 text-pink-600'
-                        : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                        ? 'bg-rose-soft text-wine'
+                        : 'text-ink/60 hover:bg-cream hover:text-ink'
                     }`}
                   >
                     <span className="mr-2">{item.icon}</span>
@@ -67,12 +67,12 @@ export default function SellerLayout({
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-700">
+              <span className="text-sm text-ink/70">
                 {session.user?.name}
               </span>
               <a
                 href="/api/auth/signout"
-                className="text-sm text-pink-600 hover:text-pink-700 font-medium"
+                className="text-sm text-wine hover:text-wine-deep font-medium"
               >
                 Logout
               </a>
@@ -82,12 +82,12 @@ export default function SellerLayout({
       </nav>
 
       {/* Mobile Header */}
-      <div className="md:hidden bg-white shadow-sm border-b sticky top-0 z-40">
+      <div className="md:hidden bg-white shadow-sm border-b border-wine/10 sticky top-0 z-40">
         <div className="px-4 h-14 flex items-center justify-between">
-          <h1 className="text-lg font-bold text-pink-600">🏪 Seller Hub</h1>
+          <h1 className="font-display text-lg font-semibold text-wine">🏪 Seller Hub</h1>
           <a
             href="/api/auth/signout"
-            className="text-sm text-pink-600 hover:text-pink-700 font-medium"
+            className="text-sm text-wine hover:text-wine-deep font-medium"
           >
             Logout
           </a>
@@ -100,7 +100,7 @@ export default function SellerLayout({
       </main>
 
       {/* Mobile Bottom Navigation */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t shadow-lg z-50">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-wine/10 shadow-lg z-50">
         <div className="grid grid-cols-4">
           {navItems.map((item) => (
             <Link
@@ -108,8 +108,8 @@ export default function SellerLayout({
               href={item.href}
               className={`flex flex-col items-center justify-center py-2 text-xs font-medium transition-colors ${
                 pathname === item.href
-                  ? 'text-pink-600 bg-pink-50'
-                  : 'text-gray-600'
+                  ? 'text-wine bg-rose-soft'
+                  : 'text-ink/60'
               }`}
             >
               <span className="text-2xl mb-1">{item.icon}</span>
